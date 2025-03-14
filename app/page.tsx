@@ -19,6 +19,7 @@ export default function Home() {
           height={38}
           priority
         />
+        <h1>Group 12</h1>
         <ol>
           <li>
             <code>app/page.tsx</code>{" "}
