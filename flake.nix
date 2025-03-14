@@ -31,6 +31,7 @@
             git
             deno
             watchman
+            docker
           ]
           ++ lib.optionals stdenv.isDarwin [
             xcodes
@@ -50,6 +51,7 @@
             export PATH="${pkgs.git}/bin:$PATH"
             export PATH="${pkgs.deno}/bin:$PATH"
             export PATH="${pkgs.watchman}/bin:$PATH"
+            export PATH="${pkgs.docker}/bin:$PATH"
             
             XCODE_VERSION_OLD="15.3"
             XCODE_VERSION="16.2"
