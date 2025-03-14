@@ -25,6 +25,9 @@ RUN npm config set cache /app/.npm-cache --global
 USER 3301
 # Set container working directory to /app
 WORKDIR /app
+
+RUN ls -l /app
+
 # Copy node modules and app
 COPY --chown=node:node --from=build /app/node_modules /app/node_modules
 COPY --chown=node:node --from=build /app/build /app/build
