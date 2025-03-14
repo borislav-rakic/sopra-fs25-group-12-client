@@ -12,6 +12,9 @@ RUN npm ci --loglevel=error
 COPY . .
 # Build the app
 RUN npm run build
+
+RUN ls -l /app
+
 # Delete all non-production dependencies to make copy in line 28 more efficient
 RUN npm prune --production
 
@@ -25,9 +28,6 @@ RUN npm config set cache /app/.npm-cache --global
 USER 3301
 # Set container working directory to /app
 WORKDIR /app
-
-RUN ls -l /app
-
 # Copy node modules and app
 COPY --chown=node:node --from=build /app/node_modules /app/node_modules
 COPY --chown=node:node --from=build /app/build build
