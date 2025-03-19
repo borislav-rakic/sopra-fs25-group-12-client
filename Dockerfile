@@ -28,7 +28,7 @@ WORKDIR /app
 # Copy node modules and app
 COPY --chown=node:node --from=build /app/node_modules /app/node_modules
 COPY --chown=root:root --chmod=755 --from=build /app/.next /app/.next
-COPY --chown=node:node --from=build /app/public ./public
+COPY --chown=root:root --chmod=755 --from=build /app/public ./public
 # Expose port for serve
 EXPOSE 3000
 # Start app
