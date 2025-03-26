@@ -13,7 +13,7 @@ interface FormFieldProps {
   value: string;
 }
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
@@ -27,7 +27,7 @@ const Login: React.FC = () => {
   } = useLocalStorage<string>("token", ""); // note that the key we are selecting is "token" and the default value we are setting is an empty string
   // if you want to pick a different token, i.e "usertoken", the line above would look as follows: } = useLocalStorage<string>("usertoken", "");
 
-  const handleLogin = async (values: FormFieldProps) => {
+  const handleRegister = async (values: FormFieldProps) => {
     try {
       // Call the API service and let it handle JSON serialization and error handling
       const response = await apiService.post<User>("/users", values);
@@ -55,23 +55,23 @@ const Login: React.FC = () => {
         name="login"
         size="large"
         variant="outlined"
-        onFinish={handleLogin}
+        onFinish={handleRegister}
         layout="vertical"
       >
         <Form.Item
           name="username"
           label="Username"
-          rules={[{ required: true, message: "Please input your username!" }]}
+          rules={[{ required: true, message: "Create a username!" }]}
         >
-          <Input placeholder="Enter username" />
+          <Input placeholder="Enter new username" />
         </Form.Item>
 
         <Form.Item
           name="password"
           label="Password"
-          rules={[{ required: true, message: "Please input your password!" }]}
+          rules={[{ required: true, message: "Create a password!" }]}
         >
-          <Input placeholder="Enter Password" />
+          <Input placeholder="Enter new Password" />
         </Form.Item>
 
         <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
@@ -86,14 +86,14 @@ const Login: React.FC = () => {
             htmlType="submit"
             className="login-button"
           >
-            Login
+            Register
           </Button>
 
         </div>
 
         <div style={{ marginTop: "16px", textAlign: "center" }}>
           <Button type="link" onClick={() => router.push("/register")}>
-            Don&apos;t have an account? Register here.
+            Already have an account? Login here.
           </Button>
         </div>
 
@@ -102,4 +102,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Register;
