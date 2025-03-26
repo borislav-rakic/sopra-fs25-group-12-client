@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Table, Button, Space } from "antd";
 import "@/styles/globals.css";
-import styles from "@/styles/page.module.css";
+// import styles from "@/styles/page.module.css";
 
 const columns = [
   {
@@ -23,8 +23,8 @@ const columns = [
   },
 ];
 
-const data = [
-];
+// const data = [
+// ];
 
 const LeaderboardPage: React.FC = () => {
   const router = useRouter();

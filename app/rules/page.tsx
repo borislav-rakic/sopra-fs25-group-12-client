@@ -32,7 +32,7 @@ const RulesPage: React.FC = () => {
       <Card variant="borderless">
         <Title level={2}>💡 How to Play Hearts</Title>
         <Paragraph>
-          Welcome to <strong>Hearts Attack!</strong> If you're new to the game,
+          Welcome to <strong>Hearts Attack!</strong> If you&apos;re new to the game,
           here&apos;s everything you need to know.
         </Paragraph>
 
@@ -66,7 +66,7 @@ const RulesPage: React.FC = () => {
         </Paragraph>
 
         <Paragraph>
-        The winner of the trick leads the next round with a card of their choice — unless that card is a Heart and Hearts haven&apos;t been "broken" yet.
+        The winner of the trick leads the next round with a card of their choice — unless that card is a Heart and Hearts haven&apos;t been &quot;broken&quot; yet.
         </Paragraph>
 
         <Paragraph>
@@ -82,7 +82,7 @@ const RulesPage: React.FC = () => {
         </Paragraph>
 
         <Paragraph>
-        <strong>🌙 Shooting the Moon:</strong> If you manage to collect <strong>all 13 Hearts</strong> and the <strong>Queen of Spades</strong> in a single round, you “shoot the moon”! Instead of getting 26 points, you get <strong>0</strong> and <strong>everyone else gets 26 points</strong>. It's a bold and risky move — but it can turn the game around!
+        <strong>🌙 Shooting the Moon:</strong> If you manage to collect <strong>all 13 Hearts</strong> and the <strong>Queen of Spades</strong> in a single round, you &quot;shoot the moon&quot;! Instead of getting 26 points, you get <strong>0</strong> and <strong>everyone else gets 26 points</strong>. It&apos;s a bold and risky move — but it can turn the game around!
         </Paragraph>
 
         <Title level={3}>📊 Scoring</Title>

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Form, Input, Button } from "antd";
 import "@/styles/globals.css";
-import styles from "@/styles/page.module.css";
+// import styles from "@/styles/page.module.css";
 
 const JoinPage: React.FC = () => {
   const router = useRouter();

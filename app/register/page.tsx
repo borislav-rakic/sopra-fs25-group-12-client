@@ -6,7 +6,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { Button, Form, Input } from "antd";
 import "@/styles/globals.css"; 
-import styles from "@/styles/page.module.css";
+// import styles from "@/styles/page.module.css";
 
 interface FormFieldProps {
   label: string;
