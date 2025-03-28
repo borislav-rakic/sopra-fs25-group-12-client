@@ -104,3 +104,18 @@ a {
   border-radius: 8px;
   border: 1px solid #d9d9d9;
 }
+
+.white-bordered-table .ant-table {
+  background: white;
+}
+
+.white-bordered-table .ant-table-thead > tr > th,
+.white-bordered-table .ant-table-tbody > tr > td {
+  background: white !important;
+  color: black !important;     
+  border: 1px solid black;
+}
+
+.white-bordered-table .ant-table-tbody > tr:hover > td {
+  background: white !important; /* disable hover effect */
+}

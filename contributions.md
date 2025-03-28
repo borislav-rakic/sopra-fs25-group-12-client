@@ -30,12 +30,14 @@ reason).
 
 ---
 
-## Contributions Week 1 - [Begin Date] to [End Date]
+## Contributions Week 1 - [Begin Date] to 02.04.2025
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@stevaniaeilyn]** | [26.03.2025]   | [https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/403f08d3c106311c8747e6a4ea60168c79b3f66f
+] | [Base Layout Template for All Pages +
+First implementation of Landing Page, Landing Page User, Rules Page, Register Page & Login Page] | [This contribution is relevant because it marks the first implementation of key frontend pages. This contribution laid the foundation for the application's user interface and navigation, making it possible to interact with the app and build further features.] |
+|                    | [26.03.2025]   | [https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/e2fa873b10e09e674eb5d03a98b0dd21b4ad4924] | [Complete Implementation of Register Page & Login Page without Avatars] | [This commit is relevant because it completes the implementation of the Register and Login pages, enabling users to create accounts and securely access the application. It is a critical step in setting up the authentication flow and allowing personalized user experiences within the app.] |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
