@@ -60,17 +60,31 @@ export class ApiService {
    * @param endpoint - The API endpoint (e.g. "/users").
    * @returns JSON data of type T.
    */
-  public async get<T>(endpoint: string): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
+  public async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
+    let url = `${this.baseURL}${endpoint}`;
+
+    // Add query params if present
+    if (params) {
+      const query = new URLSearchParams();
+      for (const key in params) {
+        if (params[key] !== undefined && params[key] !== null) {
+          query.append(key, params[key]);
+        }
+      }
+      url += `?${query.toString()}`;
+    }
+
     const res = await fetch(url, {
       method: "GET",
       headers: this.defaultHeaders,
     });
+
     return this.processResponse<T>(
       res,
       "An error occurred while fetching the data.\n",
     );
   }
+
 
   /**
    * POST request.
