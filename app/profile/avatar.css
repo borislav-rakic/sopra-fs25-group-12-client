@@ -1,0 +1,19 @@
+.avatar-selector {
+    margin-top: 1rem;
+}
+
+.avatar-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.avatar-grid img {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 6px;
+}
+
+.avatar-grid img.selected {
+    border-color: #007bff;
+}

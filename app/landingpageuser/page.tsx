@@ -62,6 +62,11 @@ const LandingPageUser: React.FC = () => {
               </Button>
             </Col>
             <Col>
+              <Button type="primary" color="yellow" variant="solid" onClick={() => router.push("/profile")}>
+                Profile
+              </Button>
+            </Col>
+            <Col>
               <Button type="primary" color="yellow" variant="solid" onClick={() => router.push("/settings")}>
                 Settings
               </Button>
