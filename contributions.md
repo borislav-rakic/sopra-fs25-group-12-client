@@ -40,7 +40,7 @@ reason).
 |**@diderot5038**|2025-03-28|https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/f1e38928b21363c0875c8187d7db987f69b820c4|Created API GET /leaderboard|For our leaderboard feature, we need to be able to pull that data from the db, while sorting, filtering, paginating it.|
 |                    |2025-03-28|https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/282ab373f31af73064006048b89915649c0a91e1|Created API POST /users and GET /users/{userId}|POST to /users creates a new User account; GET to /users/{userId} retrieves data on individual User.|
 | @borislav-rakic | 28.03.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/ee21341f0ea5d7f0989b6927e116d700f297765e | Create the DTO classes for the match management | The DTO classes are needed for the implementation of the game logic. |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | 29.03.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/d8e9815d03c5b8cc32d832583efb24e499fa0dc8 | Some match management API calls for starting a match, getting information from all matches, and getting information for a specific match (+test cases). | These API calls will be used, when creating a new match, and searching for an existing match to join.  |
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 
