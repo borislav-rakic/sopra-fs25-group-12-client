@@ -5,9 +5,27 @@ import Image from "next/image";
 import { Button } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
+import { useEffect } from "react";
+import { useApi } from "@/hooks/useApi";
 
 export default function Home() {
   const router = useRouter();
+  const apiService = useApi();
+    
+  useEffect(() => {
+    console.log("look at populate called");
+    if (!sessionStorage.getItem("populateCalled")) {
+      const response = apiService.post<void>("/leaderboard/populate", null)
+      .then(() => {
+          console.log("Leaderboard populated (if needed).");
+        })
+        .catch((err) => {
+          console.error("Failed to populate leaderboard:", err);
+        });
+
+      sessionStorage.setItem("populateCalled", "true");
+    }
+  }, []);
 
   return (
     <div className={styles.page}>
