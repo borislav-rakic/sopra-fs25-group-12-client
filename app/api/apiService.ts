@@ -1,6 +1,8 @@
 import { getApiDomain } from "@/utils/domain";
 import { ApplicationError } from "@/types/error";
 
+
+
 export class ApiService {
   private baseURL: string;
   private defaultHeaders: HeadersInit;
@@ -10,6 +12,21 @@ export class ApiService {
     this.defaultHeaders = {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
+    };
+  }
+
+  private getHeaders(): HeadersInit {
+    let token = localStorage.getItem("token");
+    let cleanedToken = token;
+
+    if (token && token.startsWith('"') && token.endsWith('"')) {
+      cleanedToken = token.slice(1, -1);
+    }
+
+    return {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      ...(cleanedToken ? { Authorization: `Bearer ${cleanedToken}` } : {}),
     };
   }
 
@@ -29,6 +46,7 @@ export class ApiService {
     if (!res.ok) {
       let errorDetail = res.statusText;
       try {
+        console.log('Raw error response:', await res.text());
         const errorInfo = await res.json();
         if (errorInfo?.message) {
           errorDetail = errorInfo.message;
@@ -76,7 +94,7 @@ export class ApiService {
 
     const res = await fetch(url, {
       method: "GET",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
     });
 
     return this.processResponse<T>(
@@ -96,7 +114,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "POST",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
@@ -115,7 +133,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "PUT",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
@@ -133,7 +151,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "DELETE",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
     });
     return this.processResponse<T>(
       res,
