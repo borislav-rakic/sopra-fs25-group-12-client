@@ -1,15 +1,21 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { message, Button } from "antd";
+import "@ant-design/v5-patch-for-react-19";
 import AvatarSelector from './avatar';
 import './profile.css';
 import { useApi } from "@/hooks/useApi";
+import { useRouter } from "next/navigation";
 
 interface ProfileProps {
   profileId: string;
 }
 
+
+
 const Profile: React.FC<ProfileProps> = ({ profileId }) => {
+  const router = useRouter();
   const [form, setForm] = useState({
     username: '',
     password: '',
@@ -17,12 +23,36 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
     birthday: '',
     avatar: 1,
   });
-  
+  const formattedBirthday = new Date(form.birthday).toLocaleDateString('en-GB', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
   const apiService = useApi();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const user = await apiService.get(`/users/me`);
+        
+        setForm((prev) => ({
+          ...prev,
+          username: user.username || '',
+          birthday: user.birthday || '',
+          avatar: user.avatar || 1,
+        }));
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        alert('Failed to load profile.');
+      }
+    };
+  
+    fetchProfile();
+  }, [profileId]);
 
   const handleAvatarSelect = (avatarNumber: number) => {
     setForm((prev) => ({ ...prev, avatar: avatarNumber }));
@@ -33,7 +63,11 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
     e.preventDefault();
   
     if (form.password && form.password !== form.passwordConfirmed) {
-      alert('Passwords do not match!');
+      message.open({
+        type: "error",
+        content: "Passwords do not match!",
+        duration: 2,
+      });
       return;
     }
   
@@ -57,27 +91,46 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
     try {
       console.log("PUT payload:", payload);
       const updatedUser = await apiService.put(`/users/me`, payload);
-      alert('Profile updated successfully!');
+      message.open({
+        type: "success",
+        content: "Profile updated successfully.",
+        duration: 2,
+      });
       setForm((prev) => ({
         ...prev,
         password: '',
         passwordConfirmed: '',
       }));
     } catch (error) {
-      console.error('Error updating profile:', error);
-      alert('Failed to update profile.');
+      message.open({
+        type: "error",
+        content: "Failed to update profile.",
+        duration: 2,
+      });
     }
   };
   
-  
+  const avatarUrl = `/avatars_118x118/r${100 + form.avatar}.png`;
 
   return (
+    
     <div className="profile-container">
+      <div className="profile-header-fixed">
+        <img
+          src={avatarUrl}
+          alt="Selected Avatar"
+          className="profile-avatar"
+        />
+        <div className="profile-info">
+          <div className="profile-username">{form.username || 'Username'}</div>
+          <div className="profile-birthday">{formattedBirthday || 'Birthday'}</div>
+        </div>
+      </div>
       <h2>Edit Profile</h2>
       <form onSubmit={handleSubmit}>
         <label>
           Username:
-          <input name="username" value={form.username} onChange={handleChange} />
+          <input name="username" value={form.username} onChange={handleChange} maxLength={36}/>
         </label>
         <label>
           Password:
@@ -106,7 +159,12 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
 
         <AvatarSelector selected={form.avatar} onSelect={handleAvatarSelect} />
 
-        <button type="submit">Save Changes</button>
+        <Button type="primary"  color="green" htmlType="submit">
+          Save Changes
+        </Button>
+        <Button type="primary" color="red" variant="solid"  style={{ marginLeft: '1em' }} onClick={() => router.push("/landingpageuser")}>
+            Cancel
+          </Button>
       </form>
     </div>
   );
