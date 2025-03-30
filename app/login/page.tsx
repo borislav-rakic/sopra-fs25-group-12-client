@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
+import "@ant-design/v5-patch-for-react-19";
 import "@/styles/globals.css"; 
 // import styles from "@/styles/page.module.css";
 
@@ -29,15 +30,29 @@ const Login: React.FC = () => {
 
       if (response.token) {
         setToken(response.token);
+        router.push("/landingpageuser");
+      } else {
+        message.open({
+          type: "error",
+          content: "Login failed. No token returned.",
+          duration: 2,
+        });
       }
-
-      router.push("/landingpageuser");
 
     } catch (error) {
       if (error instanceof Error) {
-        alert(`Something went wrong during the login:\n${error.message}`);
+        message.open({
+          type: "error",
+          content: `Login failed: ${error.message}`,
+          duration: 3,
+        });
       } else {
         console.error("An unknown error occurred during login.");
+        message.open({
+          type: "error",
+          content: "An unknown error occurred during login.",
+          duration: 3,
+        });
       }
     }
   };
