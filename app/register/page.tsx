@@ -55,9 +55,19 @@ const Register: React.FC = () => {
         <Form.Item
           name="username"
           label="Username:"
-          rules={[{ required: true, message: "Create a username!" }]}
+          rules={[
+            { required: true, message: "Create a username!" },
+            {
+              max: 36,
+              message: "Username cannot be longer than 36 characters.",
+            },
+            {
+              min: 3,
+              message: "Username must be at least 3 characters.",
+            },
+          ]}
         >
-          <Input placeholder="Enter new username" />
+          <Input placeholder="Enter new username" maxLength={37} />
         </Form.Item>
 
         <Form.Item
