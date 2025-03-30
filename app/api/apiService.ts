@@ -39,39 +39,29 @@ export class ApiService {
    * @returns Parsed JSON data.
    * @throws ApplicationError if res.ok is false.
    */
-  private async processResponse<T>(
-    res: Response,
-    errorMessage: string,
-  ): Promise<T> {
+  private async processResponse<T>(res: Response, errorMsg: string): Promise<T> {
     if (!res.ok) {
-      let errorDetail = res.statusText;
-      try {
-        console.log('Raw error response:', await res.text());
-        const errorInfo = await res.json();
-        if (errorInfo?.message) {
-          errorDetail = errorInfo.message;
-        } else {
-          errorDetail = JSON.stringify(errorInfo);
-        }
-      } catch {
-        // If parsing fails, keep using res.statusText
+      const contentType = res.headers.get("Content-Type");
+      let errorDetail = "";
+
+      if (contentType && contentType.includes("application/json")) {
+        const errorJson = await res.json();
+        errorDetail = errorJson.message || JSON.stringify(errorJson);
+      } else {
+        errorDetail = await res.text();
       }
-      const detailedMessage = `${errorMessage} (${res.status}: ${errorDetail})`;
-      const error: ApplicationError = new Error(
-        detailedMessage,
-      ) as ApplicationError;
-      error.info = JSON.stringify(
-        { status: res.status, statusText: res.statusText },
-        null,
-        2,
-      );
-      error.status = res.status;
-      throw error;
+
+      throw new Error(`${errorMsg}${res.status} ${res.statusText}: ${errorDetail}`);
     }
-    return res.headers.get("Content-Type")?.includes("application/json")
-      ? res.json() as Promise<T>
-      : Promise.resolve(res as T);
+
+    // Try parsing response body
+    try {
+      return await res.json();
+    } catch {
+      throw new Error(`${errorMsg}Invalid JSON response.`);
+    }
   }
+
 
   /**
    * GET request.
