@@ -5,21 +5,25 @@ import Image from "next/image";
 import { Button , Row, Col, Space } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
-// import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
+import { useApi } from "@/hooks/useApi";
+import { Match } from "@/types/match";
 
 const LandingPageUser: React.FC = () => {
   const router = useRouter();
-  const {
-    // value: token, // is commented out because we dont need to know the token value for logout
-    // set: setToken, // is commented out because we dont need to set or update the token value
-    clear: clearToken, // all we need in this scenario is a method to clear the token
-  } = useLocalStorage<string>("token", ""); // if you wanted to select a different token, i.e "lobby", useLocalStorage<string>("lobby", "");
+  const apiService = useApi();
 
   const handleLogout = () => {
-    clearToken();
+    localStorage.removeItem("token");
     router.push("/");
   };
+
+  const handleNewMatch = async () => {
+    const response = await apiService.post<Match>("/matches", { "playerToken": localStorage.getItem("token") });
+
+    console.log(response.matchId);
+
+    router.push("/start")
+  }
 
   return (
     <div className={styles.page}>
@@ -36,7 +40,7 @@ const LandingPageUser: React.FC = () => {
         <Space direction="vertical" size="middle" style={{ marginTop: 24 }}>
           <Row gutter={16} justify="center">
             <Col>
-              <Button type="primary" color="green" variant="solid" onClick={() => router.push("/start")}>
+              <Button type="primary" color="green" variant="solid" onClick={handleNewMatch}>
                 New Match
               </Button>
             </Col>

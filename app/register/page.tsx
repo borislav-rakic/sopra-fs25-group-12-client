@@ -1,8 +1,7 @@
 "use client"; 
 
 import { useRouter } from "next/navigation"; 
-import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
+import { useApi } from "@/hooks/useApi";  
 import { User } from "@/types/user";
 import { Button, Form, Input } from "antd";
 import "@/styles/globals.css"; 
@@ -17,10 +16,6 @@ const Register: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
-  
-  const {
-    set: setToken,
-  } = useLocalStorage<string>("token", "");
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
@@ -28,7 +23,8 @@ const Register: React.FC = () => {
       const response = await apiService.post<User>("/users", values);
 
       if (response.token) {
-        setToken(response.token);
+        localStorage.setItem("token", response.token);
+        // setToken(response.token);
       }
 
       router.push("/landingpageuser");

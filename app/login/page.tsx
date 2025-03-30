@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { Button, Form, Input, message } from "antd";
 import "@ant-design/v5-patch-for-react-19";
@@ -18,10 +17,6 @@ const Login: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
-  
-  const {
-    set: setToken,
-  } = useLocalStorage<string>("token", "");
 
   const handleLogin = async (values: FormFieldProps) => {
     try {
@@ -29,7 +24,7 @@ const Login: React.FC = () => {
       const response = await apiService.post<User>("/login", values);
 
       if (response.token) {
-        setToken(response.token);
+        localStorage.setItem("token", response.token);
         router.push("/landingpageuser");
       } else {
         message.open({
