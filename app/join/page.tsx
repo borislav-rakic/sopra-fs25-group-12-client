@@ -3,10 +3,15 @@
 import { useRouter } from "next/navigation";
 import { Form, Input, Button, Table } from "antd";
 import "@/styles/globals.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Match } from "@/types/match";
+import { useApi } from "@/hooks/useApi";
+import type { TableProps } from "antd";
 
 const JoinPage: React.FC = () => {
   const router = useRouter();
+  const apiService = useApi();
+  const [matches, setMatches] = useState<Match[] | null>(null);
 
   const [mockData, setMockData] = useState([
     // TODO: data retrievement
@@ -14,21 +19,11 @@ const JoinPage: React.FC = () => {
     { id: 2, host: "user2", length: 150 },
   ]);
 
-  const handleSearch = (value: string) => {
-    // TODO: search functionality
-    console.log("Searching match ID:", value);
-  };
-
-  const handleJoin = (matchId: number) => {
-    // TODO: join match functionality
-    console.log("Joining match:", matchId);
-  };
-
-  const columns = [
+  const columns: TableProps<Match>["columns"] = [
     {
       title: "MatchID",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "matchId",
+      key: "matchId",
     },
     {
       title: "Host",
@@ -46,13 +41,73 @@ const JoinPage: React.FC = () => {
       render: (_: any, record: any) => (
         <Button
           className="login-button"
-          onClick={() => handleJoin(record.id)}
+          onClick={() => handleJoin(record.matchId)}
         >
           Join
         </Button>
       ),
     },
-  ];
+  ]
+
+  const handleSearch = (value: string) => {
+    // TODO: search functionality
+    console.log("Searching match ID:", value);
+  };
+
+  const handleJoin = (matchId: number) => {
+    // TODO: join match functionality
+    console.log("Joining match:", matchId);
+  };
+
+  // const columns = [
+  //   {
+  //     title: "MatchID",
+  //     dataIndex: "id",
+  //     key: "id",
+  //   },
+  //   {
+  //     title: "Host",
+  //     dataIndex: "host",
+  //     key: "host",
+  //   },
+  //   {
+  //     title: "Length",
+  //     dataIndex: "length",
+  //     key: "length",
+  //   },
+  //   {
+  //     title: "",
+  //     key: "action",
+  //     render: (_: any, record: any) => (
+  //       <Button
+  //         className="login-button"
+  //         onClick={() => handleJoin(record.id)}
+  //       >
+  //         Join
+  //       </Button>
+  //     ),
+  //   },
+  // ];
+
+  useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        // apiService.get<Match[]> returns the parsed JSON object directly,
+        // thus we can simply assign it to our matches variable.
+        const matches: Match[] = await apiService.get<Match[]>("/matches");
+        setMatches(matches);
+        console.log("Fetched users:", matches);
+      } catch (error) {
+        if (error instanceof Error) {
+          alert(`Something went wrong while fetching matches:\n${error.message}`);
+        } else {
+          console.error("An unknown error occurred while fetching matches.");
+        }
+      }
+    };
+
+    fetchMatches();
+  }, [apiService]);
 
   return (
     <div className="login-container" style={{ paddingTop: "40px", maxWidth: 600, margin: "0 auto" }}>
@@ -64,14 +119,16 @@ const JoinPage: React.FC = () => {
           />
         </Form.Item>
 
-        <Table
-          dataSource={mockData}
+        {matches && (
+          <Table<Match>
+          dataSource={matches}
           columns={columns}
-          rowKey="id"
+          rowKey="matchId"
           pagination={false}
           bordered
           className="white-bordered-table"
         />
+        )}
 
         <Form.Item style={{ marginTop: "1.5rem" }}>
           <Button className="back-button" onClick={() => router.back()}>
