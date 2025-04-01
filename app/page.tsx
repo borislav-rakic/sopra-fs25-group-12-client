@@ -16,7 +16,7 @@ export default function Home() {
     console.log("look at populate called");
     if (!sessionStorage.getItem("populateCalled")) {
       apiService.post<void>("/leaderboard/populate", null)
-      .then(() => {
+        .then(() => {
           console.log("Leaderboard populated (if needed).");
         })
         .catch((err) => {
@@ -25,7 +25,7 @@ export default function Home() {
 
       sessionStorage.setItem("populateCalled", "true");
     }
-  }, []);
+  }, [apiService]);
 
   return (
     <div className={styles.page}>

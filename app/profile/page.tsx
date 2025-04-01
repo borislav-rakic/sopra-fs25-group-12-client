@@ -24,11 +24,13 @@ const Profile: React.FC = () => {
     birthday: "",
     avatar: 1,
   });
-  const formattedBirthday = form.birthday ? new Date(form.birthday).toLocaleDateString('en-GB', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }) : '';
+  const formattedBirthday = form.birthday
+    ? new Date(form.birthday).toLocaleDateString("en-GB", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+    : "";
   const apiService = useApi();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,7 +41,6 @@ const Profile: React.FC = () => {
     const fetchProfile = async () => {
       try {
         const user = await apiService.get<UserProfile>("/users/me");
-
 
         setForm((prev) => ({
           ...prev,
@@ -53,7 +54,6 @@ const Profile: React.FC = () => {
       }
     };
 
-
     fetchProfile();
   }, [apiService]); // Removed profileId from dependency array as it's no longer a prop
 
@@ -61,10 +61,8 @@ const Profile: React.FC = () => {
     setForm((prev) => ({ ...prev, avatar: avatarNumber }));
   };
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
 
     if (form.password && form.password !== form.passwordConfirmed) {
       message.open({
@@ -74,7 +72,6 @@ const Profile: React.FC = () => {
       });
       return;
     }
-
 
     const payload: Record<string, string | number | boolean> = {};
 
@@ -123,8 +120,9 @@ const Profile: React.FC = () => {
         passwordConfirmed: "",
       }));
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to update profile.";
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "Failed to update profile.";
 
       message.open({
         type: "error",
@@ -134,11 +132,9 @@ const Profile: React.FC = () => {
     }
   };
 
-
   const avatarUrl = `/avatars_118x118/r${100 + form.avatar}.png`;
 
   return (
-
     <div className="profile-container">
       <div className="profile-header-fixed">
         <Image
