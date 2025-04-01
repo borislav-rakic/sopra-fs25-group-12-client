@@ -3,7 +3,7 @@
 import "@ant-design/v5-patch-for-react-19";
 
 import { useEffect, useState } from "react";
-import { Table, Button, Space } from "antd";
+import { Button, Space, Table } from "antd";
 import { useApi } from "@/hooks/useApi";
 import "@/styles/globals.css";
 
@@ -78,7 +78,11 @@ const LeaderboardPage: React.FC = () => {
   return (
     <div className="login-container">
       <div style={{ width: "100%", maxWidth: "800px" }}>
-        <Space direction="vertical" size="middle" style={{ width: "100%", marginBottom: "16px" }}>
+        <Space
+          direction="vertical"
+          size="middle"
+          style={{ width: "100%", marginBottom: "16px" }}
+        >
           <Space style={{ justifyContent: "flex-end", width: "100%" }}>
             <Button className="login-button">Search</Button>
             <Button className="login-button">Filter</Button>
@@ -92,7 +96,13 @@ const LeaderboardPage: React.FC = () => {
             loading={loading}
           />
 
-          <Space style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+          <Space
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
             <Button
               className="back-button"
               onClick={() => {

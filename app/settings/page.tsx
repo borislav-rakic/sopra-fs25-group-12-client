@@ -2,7 +2,7 @@
 
 import "@ant-design/v5-patch-for-react-19";
 import { useRouter } from "next/navigation";
-import { Button, Typography, Space, Select } from "antd";
+import { Button, Select, Space, Typography } from "antd";
 import styles from "@/styles/page.module.css";
 import { useState } from "react";
 
@@ -23,7 +23,6 @@ const SettingsPage: React.FC = () => {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-
         <Title level={4} style={{ color: "black" }}>Deck Design:</Title>
         <Select
           placeholder="Choose deck style"

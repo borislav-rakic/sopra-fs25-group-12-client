@@ -9,7 +9,9 @@ interface AvatarSelectorProps {
   onSelect: (avatarNumber: number) => void;
 }
 
-const AvatarSelector: React.FC<AvatarSelectorProps> = ({ selected, onSelect }) => {
+const AvatarSelector: React.FC<AvatarSelectorProps> = (
+  { selected, onSelect },
+) => {
   const avatars = Array.from({ length: 49 }, (_, i) => i + 1);
 
   return (

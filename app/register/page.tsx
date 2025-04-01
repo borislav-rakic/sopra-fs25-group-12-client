@@ -1,10 +1,10 @@
-"use client"; 
+"use client";
 
-import { useRouter } from "next/navigation"; 
-import { useApi } from "@/hooks/useApi";  
+import { useRouter } from "next/navigation";
+import { useApi } from "@/hooks/useApi";
 import { User } from "@/types/user";
 import { Button, Form, Input } from "antd";
-import "@/styles/globals.css"; 
+import "@/styles/globals.css";
 // import styles from "@/styles/page.module.css";
 
 interface FormFieldProps {
@@ -19,7 +19,6 @@ const Register: React.FC = () => {
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
-
       const response = await apiService.post<User>("/users", values);
 
       if (response.token) {
@@ -28,7 +27,6 @@ const Register: React.FC = () => {
       }
 
       router.push("/landingpageuser");
-
     } catch (error) {
       if (error instanceof Error) {
         alert(`Something went wrong during the login:\n${error.message}`);
@@ -74,7 +72,13 @@ const Register: React.FC = () => {
           <Input placeholder="Enter new Password" />
         </Form.Item>
 
-        <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "10px",
+          }}
+        >
           <Button
             className="back-button"
             onClick={() => router.push("/")}
@@ -88,7 +92,6 @@ const Register: React.FC = () => {
           >
             Register
           </Button>
-
         </div>
 
         <div style={{ marginTop: "16px", textAlign: "center" }}>
@@ -96,7 +99,6 @@ const Register: React.FC = () => {
             Already have an account? Login here.
           </Button>
         </div>
-
       </Form>
     </div>
   );

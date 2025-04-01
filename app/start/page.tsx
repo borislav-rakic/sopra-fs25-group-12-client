@@ -1,9 +1,9 @@
 "use client";
 
 import "@ant-design/v5-patch-for-react-19";
-import { useRouter, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button, Card, Row, Col } from "antd";
+import { Button, Card, Col, Row } from "antd";
 import styles from "@/styles/page.module.css";
 //import { difficultyLevels } from "@/app/constants/difficultyLevels";
 
@@ -47,7 +47,9 @@ const StartPage: React.FC = () => {
       <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
         <Button
           style={{
-            backgroundColor: selectedPlayers[index] === "invite" ? "#b2f2bb" : "#d9d9d9",
+            backgroundColor: selectedPlayers[index] === "invite"
+              ? "#b2f2bb"
+              : "#d9d9d9",
             border: "none",
             width: "100%",
           }}
@@ -65,7 +67,9 @@ const StartPage: React.FC = () => {
 
         <Button
           style={{
-            backgroundColor: selectedPlayers[index] === "computer" ? "#b2f2bb" : "#d9d9d9",
+            backgroundColor: selectedPlayers[index] === "computer"
+              ? "#b2f2bb"
+              : "#d9d9d9",
             border: "none",
             width: "100%",
             whiteSpace: "normal",
@@ -82,7 +86,8 @@ const StartPage: React.FC = () => {
           Computer opponent
         </Button>
 
-{/*         {showDifficulty[index] && (
+        {
+          /*         {showDifficulty[index] && (
           <>
             <p style={{ color: "black", fontWeight: "bold", fontSize: 12, margin: "6px 0 2px" }}>
               Computer difficulty:
@@ -105,7 +110,8 @@ const StartPage: React.FC = () => {
               </Button>
             ))}
           </>
-        )} */}
+        )} */
+        }
       </div>
     </Card>
   );
@@ -128,16 +134,19 @@ const StartPage: React.FC = () => {
   );
 
   return (
-    <div className={styles.page} style={{ backgroundColor: "white", padding: "40px" }}>
+    <div
+      className={styles.page}
+      style={{ backgroundColor: "white", padding: "40px" }}
+    >
       <main className={styles.main}>
-        <p style={{ marginBottom: "20px", fontWeight: "bold", fontSize: "16px" }}>
+        <p
+          style={{ marginBottom: "20px", fontWeight: "bold", fontSize: "16px" }}
+        >
           Game ID: <span style={{ fontFamily: "monospace" }}>{gameId}</span>
         </p>
 
         <Row gutter={[12, 12]} justify="center">
-          {[0, 1, 2].map((i) => (
-            <Col key={i}>{renderPlayerCard(i)}</Col>
-          ))}
+          {[0, 1, 2].map((i) => <Col key={i}>{renderPlayerCard(i)}</Col>)}
           <Col>{renderSelfCard()}</Col>
         </Row>
 
@@ -151,7 +160,9 @@ const StartPage: React.FC = () => {
                 <Button
                   onClick={() => setSelectedPoints(points)}
                   style={{
-                    backgroundColor: selectedPoints === points ? "#b2f2bb" : "#d9d9d9",
+                    backgroundColor: selectedPoints === points
+                      ? "#b2f2bb"
+                      : "#d9d9d9",
                     border: "none",
                     color: "black",
                     width: "60px",
@@ -175,7 +186,10 @@ const StartPage: React.FC = () => {
           <Button className="login-button" onClick={handleStart}>
             Start
           </Button>
-          <Button className="back-button" onClick={() => router.push("/landingpageuser")}>
+          <Button
+            className="back-button"
+            onClick={() => router.push("/landingpageuser")}
+          >
             Cancel Match
           </Button>
         </div>
