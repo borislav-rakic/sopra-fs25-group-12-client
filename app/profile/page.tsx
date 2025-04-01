@@ -7,6 +7,7 @@ import AvatarSelector from './avatar';
 import './profile.css';
 import { useApi } from "@/hooks/useApi";
 import { useRouter } from "next/navigation";
+import Image from "next/image"; // Add this to your imports
 
 interface ProfileProps {
   profileId: string;
@@ -52,7 +53,7 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
     };
   
     fetchProfile();
-  }, [profileId]);
+  }, [profileId, apiService]);
 
   const handleAvatarSelect = (avatarNumber: number) => {
     setForm((prev) => ({ ...prev, avatar: avatarNumber }));
@@ -71,7 +72,7 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
       return;
     }
   
-    const payload: Record<string, any> = {};
+    const payload: Record<string, string | number | boolean> = {};
 
   // Only include non-empty fields
   if (form.username.trim()) {
@@ -91,6 +92,7 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
     try {
       console.log("PUT payload:", payload);
       const updatedUser = await apiService.put(`/users/me`, payload);
+      if (updatedUser == null){console.log("");}
       message.open({
         type: "success",
         content: "Profile updated successfully.",
@@ -102,9 +104,12 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
         passwordConfirmed: '',
       }));
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update profile.";
+    
       message.open({
         type: "error",
-        content: "Failed to update profile.",
+        content: errorMessage,
         duration: 2,
       });
     }
@@ -116,10 +121,13 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
     
     <div className="profile-container">
       <div className="profile-header-fixed">
-        <img
+      <Image
           src={avatarUrl}
           alt="Selected Avatar"
           className="profile-avatar"
+          width={65}
+          height={65}
+          priority
         />
         <div className="profile-info">
           <div className="profile-username">{form.username || 'Username'}</div>
