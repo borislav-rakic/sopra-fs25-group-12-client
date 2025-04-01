@@ -3,7 +3,6 @@
 import "@ant-design/v5-patch-for-react-19";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Table, Button, Space } from "antd";
 import { useApi } from "@/hooks/useApi";
 import "@/styles/globals.css";
@@ -33,8 +32,6 @@ const columns = [
 ];
 
 const LeaderboardPage: React.FC = () => {
-  const router = useRouter();
-
   const apiService = useApi();
 
   const [data, setData] = useState([]);
@@ -76,7 +73,7 @@ const LeaderboardPage: React.FC = () => {
     };
 
     fetchLeaderboard();
-  }, [page]);
+  }, [page, apiService, pageSize]);
 
   return (
     <div className="login-container">
