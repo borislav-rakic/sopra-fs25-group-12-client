@@ -78,7 +78,7 @@ export class ApiService {
       const query = new URLSearchParams();
       for (const key in params) {
         if (params[key] !== undefined && params[key] !== null) {
-          query.append(key, params[key]);
+          query.append(key, String(params[key]));
         }
       }
       url += `?${query.toString()}`;
