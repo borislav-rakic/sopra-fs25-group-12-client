@@ -1,5 +1,4 @@
 import { getApiDomain } from "@/utils/domain";
-import { ApplicationError } from "@/types/error";
 
 
 
@@ -16,12 +15,11 @@ export class ApiService {
   }
 
   private getHeaders(): HeadersInit {
-    let token = localStorage.getItem("token");
-    let cleanedToken = token;
-
-    if (token && token.startsWith('"') && token.endsWith('"')) {
-      cleanedToken = token.slice(1, -1);
-    }
+    const token = localStorage.getItem("token");
+    const cleanedToken =
+      token && token.startsWith('"') && token.endsWith('"')
+        ? token.slice(1, -1)
+        : token;
 
     return {
       "Content-Type": "application/json",
@@ -29,6 +27,7 @@ export class ApiService {
       ...(cleanedToken ? { Authorization: `Bearer ${cleanedToken}` } : {}),
     };
   }
+
 
   /**
    * Helper function to check the response, parse JSON,
@@ -68,7 +67,7 @@ export class ApiService {
    * @param endpoint - The API endpoint (e.g. "/users").
    * @returns JSON data of type T.
    */
-  public async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
+  public async get<T>(endpoint: string, params?: Record<string, string | number | boolean>): Promise<T> {
     let url = `${this.baseURL}${endpoint}`;
 
     // Add query params if present
