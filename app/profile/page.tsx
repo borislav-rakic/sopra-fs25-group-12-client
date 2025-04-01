@@ -9,6 +9,12 @@ import { useApi } from "@/hooks/useApi";
 import { useRouter } from "next/navigation";
 import Image from "next/image"; // Add this to your imports
 
+type UserProfile = {
+  username: string;
+  birthday: string;
+  avatar: number;
+};
+
 const Profile: React.FC = () => {
   const router = useRouter();
   const [form, setForm] = useState({
@@ -32,7 +38,7 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const user = await apiService.get(`/users/me`);
+        const user = await apiService.get<UserProfile>("/users/me");
 
 
         setForm((prev) => ({
