@@ -19,13 +19,6 @@ type LeaderboardRow = {
   points: number;
   rank: number;
 };
-
-type LeaderboardRow = {
-  key: number;
-  username: string;
-  points: number;
-  rank: number;
-};
 const columns = [
   {
     title: "Rank",
