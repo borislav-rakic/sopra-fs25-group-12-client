@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,6 @@ import { User } from "@/types/user";
 import { Button, Card, Table } from "antd";
 import type { TableProps } from "antd";
 // import "@/styles/views/Dashboard.scss";
-
 
 const columns: TableProps<User>["columns"] = [
   {
@@ -29,7 +28,7 @@ const Dashboard: React.FC = () => {
   const [users, setUsers] = useState<User[] | null>(null);
   const {
     clear: clearToken,
-  } = useLocalStorage<string>("token", ""); 
+  } = useLocalStorage<string>("token", "");
 
   const handleLogout = (): void => {
     clearToken();
@@ -39,7 +38,6 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        
         const users: User[] = await apiService.get<User[]>("/users");
         setUsers(users);
         console.log("Fetched users:", users);
@@ -53,7 +51,7 @@ const Dashboard: React.FC = () => {
     };
 
     fetchUsers();
-  }, [apiService]); 
+  }, [apiService]);
 
   return (
     <div className="card-container">

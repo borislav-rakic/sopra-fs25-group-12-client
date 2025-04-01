@@ -11,7 +11,7 @@ import { useApi } from "@/hooks/useApi";
 export default function Home() {
   const router = useRouter();
   const apiService = useApi();
-    
+
   useEffect(() => {
     console.log("look at populate called");
     if (!sessionStorage.getItem("populateCalled")) {
@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-      <Image 
+        <Image
           src="/LandingPageCards.png" // Replace with the actual path of your image
           alt="Hearts Attack Cards"
           width={200} // Adjust width as needed

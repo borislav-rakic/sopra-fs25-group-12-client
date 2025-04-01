@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useState } from "react";
-import { Button, Input, Typography, Row, Col, Space } from "antd";
+import { Button, Col, Input, Row, Space, Typography } from "antd";
 import "@/styles/globals.css";
 
 const { Title } = Typography;
@@ -18,11 +18,9 @@ const UserProfilePage: React.FC = () => {
 
   const friends = ["user1", "user2", "user3"]; // mock for layout
 
-  const handleFriendRequestToggle = async () => {
-    // 📝 Leave this empty for now as requested
+  const handleFriendRequestToggle = () => {
     setRequestSent((prev) => !prev);
   };
-
   return (
     <div
       className="login-container"
@@ -46,7 +44,11 @@ const UserProfilePage: React.FC = () => {
             <Title level={4} style={{ color: "black", marginBottom: 4 }}>
               Password
             </Title>
-            <Input.Password placeholder="Password" disabled style={{ marginBottom: 8 }} />
+            <Input.Password
+              placeholder="Password"
+              disabled
+              style={{ marginBottom: 8 }}
+            />
           </div>
         )}
 
@@ -60,7 +62,9 @@ const UserProfilePage: React.FC = () => {
               width: "100%",
             }}
           >
-            {requestSent ? "Sent. Cancel friend request?" : "Send friend request"}
+            {requestSent
+              ? "Sent. Cancel friend request?"
+              : "Send friend request"}
           </Button>
         )}
 
