@@ -13,11 +13,11 @@ const JoinPage: React.FC = () => {
   const apiService = useApi();
   const [matches, setMatches] = useState<Match[] | null>(null);
 
-  const [mockData, setMockData] = useState([
-    // TODO: data retrievement
-    { id: 1, host: "user1", length: 100 },
-    { id: 2, host: "user2", length: 150 },
-  ]);
+  // const [mockData, setMockData] = useState([
+  //   // TODO: data retrievement
+  //   { id: 1, host: "user1", length: 100 },
+  //   { id: 2, host: "user2", length: 150 },
+  // ]);
 
   const columns: TableProps<Match>["columns"] = [
     {
@@ -38,7 +38,7 @@ const JoinPage: React.FC = () => {
     {
       title: "",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_, record: Match) => (
         <Button
           className="login-button"
           onClick={() => handleJoin(record.matchId)}
@@ -54,7 +54,7 @@ const JoinPage: React.FC = () => {
     console.log("Searching match ID:", value);
   };
 
-  const handleJoin = (matchId: number) => {
+  const handleJoin = (matchId: bigint | null) => {
     // TODO: join match functionality
     console.log("Joining match:", matchId);
   };

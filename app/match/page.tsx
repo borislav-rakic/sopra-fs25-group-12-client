@@ -5,3 +5,5 @@ const Match: React.FC = () => {
         <p>TEMPORARY PAGE</p>
     )
 }
+
+export default Match;

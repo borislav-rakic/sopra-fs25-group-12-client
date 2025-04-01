@@ -13,6 +13,12 @@ type User = {
   rating: number;
 };
 
+type LeaderboardRow = {
+  key: number;
+  username: string;
+  points: number;
+  rank: number;
+};
 const columns = [
   {
     title: "Rank",
@@ -34,7 +40,7 @@ const columns = [
 const LeaderboardPage: React.FC = () => {
   const apiService = useApi();
 
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<LeaderboardRow[]>([]);
   const [page, setPage] = useState(0);
   const [pageSize] = useState(10);
   const [total, setTotal] = useState(0);

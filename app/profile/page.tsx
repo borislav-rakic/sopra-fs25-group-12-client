@@ -9,13 +9,7 @@ import { useApi } from "@/hooks/useApi";
 import { useRouter } from "next/navigation";
 import Image from "next/image"; // Add this to your imports
 
-interface ProfileProps {
-  profileId: string;
-}
-
-
-
-const Profile: React.FC<ProfileProps> = ({ profileId }) => {
+const Profile: React.FC = () => {
   const router = useRouter();
   const [form, setForm] = useState({
     username: '',
@@ -24,11 +18,11 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
     birthday: '',
     avatar: 1,
   });
-  const formattedBirthday = new Date(form.birthday).toLocaleDateString('en-GB', {
+  const formattedBirthday = form.birthday ? new Date(form.birthday).toLocaleDateString('en-GB', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  });
+  }) : '';
   const apiService = useApi();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,7 +33,7 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
     const fetchProfile = async () => {
       try {
         const user = await apiService.get(`/users/me`);
-        
+
         setForm((prev) => ({
           ...prev,
           username: user.username || '',
@@ -51,18 +45,18 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
         alert('Failed to load profile.');
       }
     };
-  
+
     fetchProfile();
-  }, [profileId, apiService]);
+  }, [apiService]); // Removed profileId from dependency array as it's no longer a prop
 
   const handleAvatarSelect = (avatarNumber: number) => {
     setForm((prev) => ({ ...prev, avatar: avatarNumber }));
   };
 
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (form.password && form.password !== form.passwordConfirmed) {
       message.open({
         type: "error",
@@ -71,24 +65,24 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
       });
       return;
     }
-  
+
     const payload: Record<string, string | number | boolean> = {};
 
-  // Only include non-empty fields
-  if (form.username.trim()) {
-    payload.username = form.username.trim();
-  }
-  if (form.birthday.trim()) {
-    payload.birthday = form.birthday.trim();
-  }
-  if (form.avatar) {
-    payload.avatar = form.avatar;
-  }
-  if (form.password.trim()) {
-    payload.password = form.password;
-    payload.passwordConfirmed = form.passwordConfirmed;
-  }
-  
+    // Only include non-empty fields
+    if (form.username.trim()) {
+      payload.username = form.username.trim();
+    }
+    if (form.birthday.trim()) {
+      payload.birthday = form.birthday.trim();
+    }
+    if (form.avatar) {
+      payload.avatar = form.avatar;
+    }
+    if (form.password.trim()) {
+      payload.password = form.password;
+      payload.passwordConfirmed = form.passwordConfirmed;
+    }
+
     try {
       console.log("PUT payload:", payload);
       const updatedUser = await apiService.put(`/users/me`, payload);
@@ -106,7 +100,7 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to update profile.";
-    
+
       message.open({
         type: "error",
         content: errorMessage,
@@ -114,11 +108,11 @@ const Profile: React.FC<ProfileProps> = ({ profileId }) => {
       });
     }
   };
-  
+
   const avatarUrl = `/avatars_118x118/r${100 + form.avatar}.png`;
 
   return (
-    
+
     <div className="profile-container">
       <div className="profile-header-fixed">
       <Image
