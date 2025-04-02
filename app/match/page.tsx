@@ -2,21 +2,21 @@
 import "@ant-design/v5-patch-for-react-19";
 import { useRouter, /*useParams*/ } from "next/navigation";
 import Image from "next/image";
-import { Button , Row, Col, Space } from "antd";
+import { Button /* , Row, Col, Space */ } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
-import { useApi } from "@/hooks/useApi";
-import { Match } from "@/types/match";
+// import { useApi } from "@/hooks/useApi";
+// import { Match } from "@/types/match";
 import { JSX, useState } from "react";
 
 const MatchPage: React.FC = () => {
 
     const router = useRouter();
-    const apiService = useApi();
+    // const apiService = useApi();
 
     const [cardsInHand, setCardsInHand] = useState<JSX.Element[]>([]);
 
-    var playerHand = document.getElementById("hand-0");
+    // let playerHand = document.getElementById("hand-0");
 
 
 
@@ -24,12 +24,12 @@ const MatchPage: React.FC = () => {
 
         <div className={`${styles.page} matchPage`}>
             <div className="gear-icon">
-                <img src = "/setting-gear.svg" alt="Settings" width={50} height={50} onClick={() => router.push("/settings")}/>
+                <Image src = "/setting-gear.svg" alt="Settings" width={50} height={50} onClick={() => router.push("/settings")}/>
             </div>
 
         <div className="matchtester" draggable={true} style={{width: "100px", height: "100px", position: "absolute", top: "100px", left: "10px"}}>
             <Button
-            onClick={() => setCardsInHand([...cardsInHand, <img className="playingcard" src="https://deckofcardsapi.com/static/img/AS.png"></img>])}>
+            onClick={() => setCardsInHand([...cardsInHand, <Image key="PLACEHOLDER" className="playingcard" src="https://deckofcardsapi.com/static/Image/AS.png" alt="PLACEHOLDER"></Image>])}>
                 test
             </Button>
         </div>
@@ -72,63 +72,63 @@ const MatchPage: React.FC = () => {
         </div>    
 
         <div className="hand-1">
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
         </div>   
 
         <div className="hand-2">
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
         </div>   
 
         <div className="hand-3">
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
-            <img className="playingcard-back" src="https://deckofcardsapi.com/static/img/back.png"></img>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
+            <Image className="playingcard-back" src="https://deckofcardsapi.com/static/Image/back.png" alt="playingcard-back"></Image>
         </div>   
 
         <div className="pile">
-            <img className="playingcard-pile-0" src="https://deckofcardsapi.com/static/img/AS.png"></img>
-            <img className="playingcard-pile-1" src="https://deckofcardsapi.com/static/img/AS.png"></img>
-            <img className="playingcard-pile-2" src="https://deckofcardsapi.com/static/img/AS.png"></img>
-            <img className="playingcard-pile-3" src="https://deckofcardsapi.com/static/img/AS.png"></img>
+            <Image className="playingcard-pile-0" src="https://deckofcardsapi.com/static/Image/AS.png" alt="PLACEHOLDER"></Image>
+            <Image className="playingcard-pile-1" src="https://deckofcardsapi.com/static/Image/AS.png" alt="PLACEHOLDER"></Image>
+            <Image className="playingcard-pile-2" src="https://deckofcardsapi.com/static/Image/AS.png" alt="PLACEHOLDER"></Image>
+            <Image className="playingcard-pile-3" src="https://deckofcardsapi.com/static/Image/AS.png" alt="PLACEHOLDER"></Image>
         </div>
 
         <div className="game-playerscore0">
             <div className="game-avatarbox">
-                <img className="player-avatar" src="/avatars/actor-chaplin-comedy.png"></img>
+                <Image className="player-avatar" src="/avatars/actor-chaplin-comedy.png" alt="avatar"></Image>
             </div>
             <div className="game-playername">Player 1</div>
             <div className="game-playerscore">Score: 10</div>
@@ -138,7 +138,7 @@ const MatchPage: React.FC = () => {
 
         <div className="game-playerscore1">
             <div className="game-avatarbox">
-                <img className="player-avatar" src="/avatars/addicted-draw-love.png"></img>
+                <Image className="player-avatar" src="/avatars/addicted-draw-love.png" alt="avatar"></Image>
             </div>
             <div className="game-playername">Player 2</div>
             <div className="game-playerscore">Score: 15</div>
@@ -146,7 +146,7 @@ const MatchPage: React.FC = () => {
 
         <div className="game-playerscore2">
             <div className="game-avatarbox">
-                <img className="player-avatar" src="/avatars/afro-avatar-male.png"></img>
+                <Image className="player-avatar" src="/avatars/afro-avatar-male.png" alt="avatar"></Image>
             </div>
             <div className="game-playername">Player 3</div>
             <div className="game-playerscore">Score: 20</div>
@@ -154,7 +154,7 @@ const MatchPage: React.FC = () => {
 
         <div className="game-playerscore3">
             <div className="game-avatarbox">
-                <img className="player-avatar" src="/avatars/alien-avatar-space.png"></img>
+                <Image className="player-avatar" src="/avatars/alien-avatar-space.png" alt="avatar"></Image>
             </div>
             <div className="game-playername">Player 4</div>
             <div className="game-playerscore">Score: 25</div>
