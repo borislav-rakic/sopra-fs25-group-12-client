@@ -5,7 +5,7 @@ import { useApi } from "@/hooks/useApi";
 import { User } from "@/types/user";
 import { Button, Form, Input, message } from "antd";
 import "@ant-design/v5-patch-for-react-19";
-import "@/styles/globals.css"; 
+import "@/styles/globals.css";
 // import styles from "@/styles/page.module.css";
 
 interface FormFieldProps {
@@ -20,7 +20,6 @@ const Login: React.FC = () => {
 
   const handleLogin = async (values: FormFieldProps) => {
     try {
-
       const response = await apiService.post<User>("/login", values);
 
       if (response.token) {
@@ -33,7 +32,6 @@ const Login: React.FC = () => {
           duration: 2,
         });
       }
-
     } catch (error) {
       if (error instanceof Error) {
         message.open({
@@ -78,7 +76,13 @@ const Login: React.FC = () => {
           <Input placeholder="Enter Password" />
         </Form.Item>
 
-        <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "10px",
+          }}
+        >
           <Button
             className="back-button"
             onClick={() => router.push("/")}
@@ -92,7 +96,6 @@ const Login: React.FC = () => {
           >
             Login
           </Button>
-
         </div>
 
         <div style={{ marginTop: "16px", textAlign: "center" }}>
@@ -100,7 +103,6 @@ const Login: React.FC = () => {
             Don&apos;t have an account? Register here.
           </Button>
         </div>
-
       </Form>
     </div>
   );

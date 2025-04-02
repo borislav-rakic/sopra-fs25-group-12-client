@@ -212,29 +212,48 @@ npm run dev
 # Docker
 
 ### Introduction
-This year, for the first time, Docker will be used to ease the process of deployment.\
-Docker is a tool that uses containers as isolated environments, ensuring that the application runs consistently and uniformly across different devices.\
-Everything in this repository is already set up to minimize your effort for deployment.\
-All changes to the main branch will automatically be pushed to dockerhub and optimized for production.
+
+This year, for the first time, Docker will be used to ease the process of
+deployment.\
+Docker is a tool that uses containers as isolated environments, ensuring that
+the application runs consistently and uniformly across different devices.\
+Everything in this repository is already set up to minimize your effort for
+deployment.\
+All changes to the main branch will automatically be pushed to dockerhub and
+optimized for production.
 
 ### Setup
-1. **One** member of the team should create an account on [dockerhub](https://hub.docker.com/), _incorporating the group number into the account name_, for example, `SoPra_group_XX`.\
-2. This account then creates a repository on dockerhub with the _same name as the group's Github repository name_.\
-3. Finally, the person's account details need to be added as [secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository) to the group's repository:
-    - dockerhub_username (the username of the dockerhub account from step 1, for example, `SoPra_group_XX`)
-    - dockerhub_password (a generated PAT([personal access token](https://docs.docker.com/docker-hub/access-tokens/)) of the account with read and write access)
-    - dockerhub_repo_name (the name of the dockerhub repository from step 2)
+
+1. **One** member of the team should create an account on
+   [dockerhub](https://hub.docker.com/), _incorporating the group number into
+   the account name_, for example, `SoPra_group_XX`.\
+2. This account then creates a repository on dockerhub with the _same name as
+   the group's Github repository name_.\
+3. Finally, the person's account details need to be added as
+   [secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository)
+   to the group's repository:
+   - dockerhub_username (the username of the dockerhub account from step 1, for
+     example, `SoPra_group_XX`)
+   - dockerhub_password (a generated
+     PAT([personal access token](https://docs.docker.com/docker-hub/access-tokens/))
+     of the account with read and write access)
+   - dockerhub_repo_name (the name of the dockerhub repository from step 2)
 
 ### Pull and run
-Once the image is created and has been successfully pushed to dockerhub, the image can be run on any machine.\
-Ensure that [Docker](https://www.docker.com/) is installed on the machine you wish to run the container.\
-First, pull (download) the image with the following command, replacing your username and repository name accordingly.
 
-```docker pull <dockerhub_username>/<dockerhub_repo_name>```
+Once the image is created and has been successfully pushed to dockerhub, the
+image can be run on any machine.\
+Ensure that [Docker](https://www.docker.com/) is installed on the machine you
+wish to run the container.\
+First, pull (download) the image with the following command, replacing your
+username and repository name accordingly.
 
-Then, run the image in a container with the following command, again replacing _<dockerhub_username>_ and _<dockerhub_repo_name>_ accordingly.
+`docker pull <dockerhub_username>/<dockerhub_repo_name>`
 
-```docker run -p 3000:3000 <dockerhub_username>/<dockerhub_repo_name>```
+Then, run the image in a container with the following command, again replacing
+_<dockerhub_username>_ and _<dockerhub_repo_name>_ accordingly.
+
+`docker run -p 3000:3000 <dockerhub_username>/<dockerhub_repo_name>`
 
 <br>
 <br>
@@ -388,22 +407,22 @@ filesystem. You can do this either by
 
 ## REST Specification
 
-|Mapping|Method|Request / DTO|Response / DTO|Status Code|Description|
-|-|-|-|-|-|-|
-|/users|POST|UserCreateDTO|UserDTO<br>ErrorResponseDTO|201 Created<br>409 Conflict|Successfully added user.<br>Failed:username exists.|
-|/users/{userId}|GET|Long userId|UserDTO<br>ErrorResponseDTO|200 OK<br>404 Not Found|Retrieve user profile with userId.<br>User with userId was not found.|
-|/users/{userId}|PUT|UserUpdateDTO|UserDTO<br>ErrorResponseDTO|200 OK<br>404 Not Found|Updated user profile.<br>User with userId was not found.|
-|/login|POST|LoginRequestDTO|LoginResponseDTO<br>ErrorResponseDTO|200 OK<br>401 Unauthorized|Successful login.<br>Error: Faulty credentials.|
-|/logout|POST||204 No Content<br>ErrorResponseDTO|204 No Content<br>401 Unauthorized|Successful logout.<br>Denied logout: token was not ok.|
-|/users/{userId1}/friends|GET|Long userId1<br>Long userId2|List <FriendDTO><br>ErrorResponseDTO|200 OK<br>401 Unauthorized|Get list of friends.<br>User can only see their own friends.|
-|/users/{userId1}/friends/{userId2}|POST|Long userId1<br>Long userId2|204 No Content<br>ErrorResponseDTO|204 No Content<br>404 Not Found|Friend added.<br>Found no User with userId2.|
-|/users/{userId1}/friends/{userId2}|DEL|Long userId1<br>Long userId2|204 No Content<br>ErrorResponseDTO|204 No Content<br>404 Not Found|Friend removed.<br>Found no User with userId2.|
-|/matches|POST|MatchCreateDTO|MatchDTO<br>ErrorResponseDTO|201 Created<br>401 Unauthorized.|Successfully created match.<br>Error: Faulty token.|
-|/matches/{matchId}|GET|Long matchId|MatchDTO<br>ErrorResponseDTO|200 OK<br>404 Not Found|Get match details.<br>No match with matchID found.|
-|/matches/{matchId}/join|POST|PlayerDTO|MatchDTO<br>ErrorResponseDTO|200 OK<br>400 Bad Request|Seat reserved on match.<br>Joining not possible (e.g. overbooked).|
-|/matches/{matchId}/start|POST|[GameOwnerOnly]|MatchDTO<br>ErrorResponseDTO|200 OK<br>403 Forbidden|Start the game.<br>Not all Players ready.|
-|/matches/{matchId}/rounds/{roundId}|GET|Long matchID,<br>int roundId|RoundDTO<br>ErrorResponseDTO|200 OK<br>404 Not Found|Get stats on round.<br>No such round played, yet.|
-|/matches/{matchId}/play/|POST|PlayCardDTO|PlayedCardDTO ErrorResponseDTO<br>ErrorResponseDTO|200 OK<br>404 Not Found<br>400 Bad Request|Card accepted in this round.<br>No such game or round at play.<br>Illegal card played.|
-|/leaderboard/|GET|n/a|LeaderBDTO|200 OK|Return leaderboard data.|
-|/leaderboard/friends|GET|n/a|LeaderBDTO|200 OK<br>401 Unauthorized|Return leaderboard data of friends only.<br>Only logged in users can use this feature.|
-|/leaderboard/update|POST|LeaderBUpdateDTO|204 No Content<br>ErrorResponseDTO<br>ErrorResponseDTO|204 No Content<br>404 Not Found<br>400 Bad Request|Score of listed players was updated.<br>This matchId/matchToken not found.<br>Mismatch of match and players.|
+| Mapping                             | Method | Request / DTO                | Response / DTO                                         | Status Code                                        | Description                                                                                                  |
+| ----------------------------------- | ------ | ---------------------------- | ------------------------------------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| /users                              | POST   | UserCreateDTO                | UserDTO<br>ErrorResponseDTO                            | 201 Created<br>409 Conflict                        | Successfully added user.<br>Failed:username exists.                                                          |
+| /users/{userId}                     | GET    | Long userId                  | UserDTO<br>ErrorResponseDTO                            | 200 OK<br>404 Not Found                            | Retrieve user profile with userId.<br>User with userId was not found.                                        |
+| /users/{userId}                     | PUT    | UserUpdateDTO                | UserDTO<br>ErrorResponseDTO                            | 200 OK<br>404 Not Found                            | Updated user profile.<br>User with userId was not found.                                                     |
+| /login                              | POST   | LoginRequestDTO              | LoginResponseDTO<br>ErrorResponseDTO                   | 200 OK<br>401 Unauthorized                         | Successful login.<br>Error: Faulty credentials.                                                              |
+| /logout                             | POST   |                              | 204 No Content<br>ErrorResponseDTO                     | 204 No Content<br>401 Unauthorized                 | Successful logout.<br>Denied logout: token was not ok.                                                       |
+| /users/{userId1}/friends            | GET    | Long userId1<br>Long userId2 | List <FriendDTO><br>ErrorResponseDTO                   | 200 OK<br>401 Unauthorized                         | Get list of friends.<br>User can only see their own friends.                                                 |
+| /users/{userId1}/friends/{userId2}  | POST   | Long userId1<br>Long userId2 | 204 No Content<br>ErrorResponseDTO                     | 204 No Content<br>404 Not Found                    | Friend added.<br>Found no User with userId2.                                                                 |
+| /users/{userId1}/friends/{userId2}  | DEL    | Long userId1<br>Long userId2 | 204 No Content<br>ErrorResponseDTO                     | 204 No Content<br>404 Not Found                    | Friend removed.<br>Found no User with userId2.                                                               |
+| /matches                            | POST   | MatchCreateDTO               | MatchDTO<br>ErrorResponseDTO                           | 201 Created<br>401 Unauthorized.                   | Successfully created match.<br>Error: Faulty token.                                                          |
+| /matches/{matchId}                  | GET    | Long matchId                 | MatchDTO<br>ErrorResponseDTO                           | 200 OK<br>404 Not Found                            | Get match details.<br>No match with matchID found.                                                           |
+| /matches/{matchId}/join             | POST   | PlayerDTO                    | MatchDTO<br>ErrorResponseDTO                           | 200 OK<br>400 Bad Request                          | Seat reserved on match.<br>Joining not possible (e.g. overbooked).                                           |
+| /matches/{matchId}/start            | POST   | [GameOwnerOnly]              | MatchDTO<br>ErrorResponseDTO                           | 200 OK<br>403 Forbidden                            | Start the game.<br>Not all Players ready.                                                                    |
+| /matches/{matchId}/rounds/{roundId} | GET    | Long matchID,<br>int roundId | RoundDTO<br>ErrorResponseDTO                           | 200 OK<br>404 Not Found                            | Get stats on round.<br>No such round played, yet.                                                            |
+| /matches/{matchId}/play/            | POST   | PlayCardDTO                  | PlayedCardDTO ErrorResponseDTO<br>ErrorResponseDTO     | 200 OK<br>404 Not Found<br>400 Bad Request         | Card accepted in this round.<br>No such game or round at play.<br>Illegal card played.                       |
+| /leaderboard/                       | GET    | n/a                          | LeaderBDTO                                             | 200 OK                                             | Return leaderboard data.                                                                                     |
+| /leaderboard/friends                | GET    | n/a                          | LeaderBDTO                                             | 200 OK<br>401 Unauthorized                         | Return leaderboard data of friends only.<br>Only logged in users can use this feature.                       |
+| /leaderboard/update                 | POST   | LeaderBUpdateDTO             | 204 No Content<br>ErrorResponseDTO<br>ErrorResponseDTO | 204 No Content<br>404 Not Found<br>400 Bad Request | Score of listed players was updated.<br>This matchId/matchToken not found.<br>Mismatch of match and players. |

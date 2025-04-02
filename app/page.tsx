@@ -11,12 +11,12 @@ import { useApi } from "@/hooks/useApi";
 export default function Home() {
   const router = useRouter();
   const apiService = useApi();
-    
+
   useEffect(() => {
     console.log("look at populate called");
     if (!sessionStorage.getItem("populateCalled")) {
-      const response = apiService.post<void>("/leaderboard/populate", null)
-      .then(() => {
+      apiService.post<void>("/leaderboard/populate", null)
+        .then(() => {
           console.log("Leaderboard populated (if needed).");
         })
         .catch((err) => {
@@ -25,12 +25,12 @@ export default function Home() {
 
       sessionStorage.setItem("populateCalled", "true");
     }
-  }, []);
+  }, [apiService]);
 
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-      <Image 
+        <Image
           src="/LandingPageCards.png" // Replace with the actual path of your image
           alt="Hearts Attack Cards"
           width={200} // Adjust width as needed

@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Form, Input, Button, Table } from "antd";
+import { Button, Form, Input, Table } from "antd";
 import "@/styles/globals.css";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Match } from "@/types/match";
 import { useApi } from "@/hooks/useApi";
 import type { TableProps } from "antd";
@@ -13,11 +13,11 @@ const JoinPage: React.FC = () => {
   const apiService = useApi();
   const [matches, setMatches] = useState<Match[] | null>(null);
 
-  const [mockData, setMockData] = useState([
-    // TODO: data retrievement
-    { id: 1, host: "user1", length: 100 },
-    { id: 2, host: "user2", length: 150 },
-  ]);
+  // const [mockData, setMockData] = useState([
+  //   // TODO: data retrievement
+  //   { id: 1, host: "user1", length: 100 },
+  //   { id: 2, host: "user2", length: 150 },
+  // ]);
 
   const columns: TableProps<Match>["columns"] = [
     {
@@ -38,7 +38,7 @@ const JoinPage: React.FC = () => {
     {
       title: "",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_, record: Match) => (
         <Button
           className="login-button"
           onClick={() => handleJoin(record.matchId)}
@@ -47,14 +47,14 @@ const JoinPage: React.FC = () => {
         </Button>
       ),
     },
-  ]
+  ];
 
   const handleSearch = (value: string) => {
     // TODO: search functionality
     console.log("Searching match ID:", value);
   };
 
-  const handleJoin = (matchId: number) => {
+  const handleJoin = (matchId: bigint | null) => {
     // TODO: join match functionality
     console.log("Joining match:", matchId);
   };
@@ -99,7 +99,9 @@ const JoinPage: React.FC = () => {
         console.log("Fetched users:", matches);
       } catch (error) {
         if (error instanceof Error) {
-          alert(`Something went wrong while fetching matches:\n${error.message}`);
+          alert(
+            `Something went wrong while fetching matches:\n${error.message}`,
+          );
         } else {
           console.error("An unknown error occurred while fetching matches.");
         }
@@ -110,7 +112,10 @@ const JoinPage: React.FC = () => {
   }, [apiService]);
 
   return (
-    <div className="login-container" style={{ paddingTop: "40px", maxWidth: 600, margin: "0 auto" }}>
+    <div
+      className="login-container"
+      style={{ paddingTop: "40px", maxWidth: 600, margin: "0 auto" }}
+    >
       <Form name="join" layout="vertical" size="large" variant="outlined">
         <Form.Item label="MatchID" name="matchId">
           <Input
@@ -121,13 +126,13 @@ const JoinPage: React.FC = () => {
 
         {matches && (
           <Table<Match>
-          dataSource={matches}
-          columns={columns}
-          rowKey="matchId"
-          pagination={false}
-          bordered
-          className="white-bordered-table"
-        />
+            dataSource={matches}
+            columns={columns}
+            rowKey="matchId"
+            pagination={false}
+            bordered
+            className="white-bordered-table"
+          />
         )}
 
         <Form.Item style={{ marginTop: "1.5rem" }}>
@@ -136,7 +141,6 @@ const JoinPage: React.FC = () => {
           </Button>
         </Form.Item>
       </Form>
-
     </div>
   );
 };

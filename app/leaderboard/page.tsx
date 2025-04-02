@@ -3,8 +3,7 @@
 import "@ant-design/v5-patch-for-react-19";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Table, Button, Space } from "antd";
+import { Button, Space, Table } from "antd";
 import { useApi } from "@/hooks/useApi";
 import "@/styles/globals.css";
 
@@ -14,6 +13,12 @@ type User = {
   rating: number;
 };
 
+type LeaderboardRow = {
+  key: number;
+  username: string;
+  points: number;
+  rank: number;
+};
 const columns = [
   {
     title: "Rank",
@@ -33,11 +38,9 @@ const columns = [
 ];
 
 const LeaderboardPage: React.FC = () => {
-  const router = useRouter();
-
   const apiService = useApi();
 
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<LeaderboardRow[]>([]);
   const [page, setPage] = useState(0);
   const [pageSize] = useState(10);
   const [total, setTotal] = useState(0);
@@ -76,12 +79,16 @@ const LeaderboardPage: React.FC = () => {
     };
 
     fetchLeaderboard();
-  }, [page]);
+  }, [page, apiService, pageSize]);
 
   return (
     <div className="login-container">
       <div style={{ width: "100%", maxWidth: "800px" }}>
-        <Space direction="vertical" size="middle" style={{ width: "100%", marginBottom: "16px" }}>
+        <Space
+          direction="vertical"
+          size="middle"
+          style={{ width: "100%", marginBottom: "16px" }}
+        >
           <Space style={{ justifyContent: "flex-end", width: "100%" }}>
             <Button className="login-button">Search</Button>
             <Button className="login-button">Filter</Button>
@@ -95,7 +102,13 @@ const LeaderboardPage: React.FC = () => {
             loading={loading}
           />
 
-          <Space style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+          <Space
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
             <Button
               className="back-button"
               onClick={() => {

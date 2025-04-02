@@ -1,7 +1,4 @@
 import { getApiDomain } from "@/utils/domain";
-import { ApplicationError } from "@/types/error";
-
-
 
 export class ApiService {
   private baseURL: string;
@@ -16,12 +13,10 @@ export class ApiService {
   }
 
   private getHeaders(): HeadersInit {
-    let token = localStorage.getItem("token");
-    let cleanedToken = token;
-
-    if (token && token.startsWith('"') && token.endsWith('"')) {
-      cleanedToken = token.slice(1, -1);
-    }
+    const token = localStorage.getItem("token");
+    const cleanedToken = token && token.startsWith('"') && token.endsWith('"')
+      ? token.slice(1, -1)
+      : token;
 
     return {
       "Content-Type": "application/json",
@@ -39,7 +34,10 @@ export class ApiService {
    * @returns Parsed JSON data.
    * @throws ApplicationError if res.ok is false.
    */
-  private async processResponse<T>(res: Response, errorMsg: string): Promise<T> {
+  private async processResponse<T>(
+    res: Response,
+    errorMsg: string,
+  ): Promise<T> {
     if (!res.ok) {
       const contentType = res.headers.get("Content-Type");
       let errorDetail = "";
@@ -51,7 +49,9 @@ export class ApiService {
         errorDetail = await res.text();
       }
 
-      throw new Error(`${errorMsg}${res.status} ${res.statusText}: ${errorDetail}`);
+      throw new Error(
+        `${errorMsg}${res.status} ${res.statusText}: ${errorDetail}`,
+      );
     }
 
     // Try parsing response body
@@ -62,13 +62,15 @@ export class ApiService {
     }
   }
 
-
   /**
    * GET request.
    * @param endpoint - The API endpoint (e.g. "/users").
    * @returns JSON data of type T.
    */
-  public async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
+  public async get<T>(
+    endpoint: string,
+    params?: Record<string, string | number | boolean>,
+  ): Promise<T> {
     let url = `${this.baseURL}${endpoint}`;
 
     // Add query params if present
@@ -76,7 +78,7 @@ export class ApiService {
       const query = new URLSearchParams();
       for (const key in params) {
         if (params[key] !== undefined && params[key] !== null) {
-          query.append(key, params[key]);
+          query.append(key, String(params[key]));
         }
       }
       url += `?${query.toString()}`;
@@ -92,7 +94,6 @@ export class ApiService {
       "An error occurred while fetching the data.\n",
     );
   }
-
 
   /**
    * POST request.

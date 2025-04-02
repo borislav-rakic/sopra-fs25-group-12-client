@@ -1,8 +1,8 @@
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 import "@ant-design/v5-patch-for-react-19";
-import { useRouter, /*useParams*/ } from "next/navigation";
+import { useRouter /*useParams*/ } from "next/navigation";
 import Image from "next/image";
-import { Button , Row, Col, Space } from "antd";
+import { Button, Col, Row, Space } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
@@ -18,12 +18,14 @@ const LandingPageUser: React.FC = () => {
   };
 
   const handleNewMatch = async () => {
-    const response = await apiService.post<Match>("/matches", { "playerToken": localStorage.getItem("token") });
+    const response = await apiService.post<Match>("/matches", {
+      "playerToken": localStorage.getItem("token"),
+    });
 
     console.log(response.matchId);
 
-    router.push("/start")
-  }
+    router.push("/start");
+  };
 
   return (
     <div className={styles.page}>
@@ -40,12 +42,22 @@ const LandingPageUser: React.FC = () => {
         <Space direction="vertical" size="middle" style={{ marginTop: 24 }}>
           <Row gutter={16} justify="center">
             <Col>
-              <Button type="primary" color="green" variant="solid" onClick={handleNewMatch}>
+              <Button
+                type="primary"
+                color="green"
+                variant="solid"
+                onClick={handleNewMatch}
+              >
                 New Match
               </Button>
             </Col>
             <Col>
-              <Button type="primary" color="green" variant="solid" onClick={() => router.push("/join")}>
+              <Button
+                type="primary"
+                color="green"
+                variant="solid"
+                onClick={() => router.push("/join")}
+              >
                 Join Match
               </Button>
             </Col>
@@ -58,7 +70,12 @@ const LandingPageUser: React.FC = () => {
 
           <Row justify="center">
             <Col>
-              <Button type="primary" color="yellow" variant="solid" onClick={() => router.push("/leaderboard")}>
+              <Button
+                type="primary"
+                color="yellow"
+                variant="solid"
+                onClick={() => router.push("/leaderboard")}
+              >
                 Leaderboard
               </Button>
             </Col>
@@ -66,17 +83,32 @@ const LandingPageUser: React.FC = () => {
 
           <Row gutter={16} justify="center">
             <Col>
-              <Button type="primary" color="yellow" variant="solid" onClick={() => router.push("/rules")}>
+              <Button
+                type="primary"
+                color="yellow"
+                variant="solid"
+                onClick={() => router.push("/rules")}
+              >
                 Rules
               </Button>
             </Col>
             <Col>
-              <Button type="primary" color="yellow" variant="solid" onClick={() => router.push("/profile")}>
+              <Button
+                type="primary"
+                color="yellow"
+                variant="solid"
+                onClick={() => router.push("/profile")}
+              >
                 Profile
               </Button>
             </Col>
             <Col>
-              <Button type="primary" color="yellow" variant="solid" onClick={() => router.push("/settings")}>
+              <Button
+                type="primary"
+                color="yellow"
+                variant="solid"
+                onClick={() => router.push("/settings")}
+              >
                 Settings
               </Button>
             </Col>
@@ -84,7 +116,12 @@ const LandingPageUser: React.FC = () => {
 
           <Row justify="center">
             <Col>
-              <Button type="primary" color="red" variant="solid" onClick={handleLogout}>
+              <Button
+                type="primary"
+                color="red"
+                variant="solid"
+                onClick={handleLogout}
+              >
                 Logout
               </Button>
             </Col>
