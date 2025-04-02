@@ -1,10 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
-    domains: ['deckofcardsapi.com'],
-  }
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'deckofcardsapi.com',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
