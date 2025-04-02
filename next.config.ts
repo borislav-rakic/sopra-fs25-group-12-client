@@ -4,9 +4,9 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'deckofcardsapi.com',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "deckofcardsapi.com",
+        pathname: "/**",
       },
     ],
   },

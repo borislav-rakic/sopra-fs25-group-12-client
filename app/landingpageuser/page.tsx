@@ -62,7 +62,12 @@ const LandingPageUser: React.FC = () => {
               </Button>
             </Col>
             <Col>
-              <Button type="primary" color="green" variant="solid" onClick={() => router.push("/match")}>
+              <Button
+                type="primary"
+                color="green"
+                variant="solid"
+                onClick={() => router.push("/match")}
+              >
                 Match Page Test
               </Button>
             </Col>

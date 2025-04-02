@@ -71,7 +71,6 @@ export class ApiService {
     }
   }
 
-
   /**
    * GET request.
    * @param endpoint - The API endpoint (e.g. "/users").

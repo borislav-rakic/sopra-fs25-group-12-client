@@ -120,16 +120,17 @@ a {
   background: white !important; /* disable hover effect */
 }
 
-
 .gear-icon img {
   position: fixed;
-  top: 10px;  /* Adjust to your preference */
+  top: 10px; /* Adjust to your preference */
   left: 10px; /* Adjust to your preference */
   width: 30px; /* Adjust the size of the icon */
   height: 30px; /* Adjust the size of the icon */
   cursor: pointer;
   z-index: 1000; /* Ensures it's above other content */
-  filter: invert(1); /* Invert colors for better visibility on dark backgrounds */
+  filter: invert(
+    1
+  ); /* Invert colors for better visibility on dark backgrounds */
 }
 
 /* Optional hover effect */
@@ -143,7 +144,12 @@ a {
   position: fixed;
   top: 10px; /* Adjust for your preference */
   right: 10px; /* Position on the top-right corner */
-  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent background */
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.9
+  ); /* Slightly transparent background */
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   padding: 10px;
@@ -213,9 +219,9 @@ a {
   border-radius: 6px;
   top: 75%;
   left: 25%;
-  
+
   display: grid;
-  grid-template-columns: repeat(auto-fit,  minmax(10px, max-content)) ;
+  grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
   align-items: center; /* Center child elements vertically */
 }
 
@@ -232,9 +238,9 @@ a {
   transform: rotate(90deg);
   transform-origin: top left;
   text-align: left;
-  
+
   display: grid;
-  grid-template-columns: repeat(auto-fit,  minmax(10px, max-content)) ;
+  grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
   align-items: center; /* Center child elements vertically */
 }
 
@@ -252,7 +258,7 @@ a {
   text-align: left;
 
   display: grid;
-  grid-template-columns: repeat(auto-fit,  minmax(10px, max-content)) ;
+  grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
   align-items: center; /* Center child elements vertically */
 }
 
@@ -271,7 +277,7 @@ a {
   text-align: left;
 
   display: grid;
-  grid-template-columns: repeat(auto-fit,  minmax(10px, max-content)) ;
+  grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
   align-items: center; /* Center child elements vertically */
 }
 
@@ -315,11 +321,10 @@ a {
   border-radius: 6px;
   left: 32.5%;
   top: 32.5%;
-
 }
 
 .playingcard-pile-0 {
-  position:absolute;
+  position: absolute;
   width: 35%;
   aspect-ratio: 2/3;
   border-radius: 10px;
@@ -334,7 +339,7 @@ a {
 }
 
 .playingcard-pile-1 {
-  position:absolute;
+  position: absolute;
   width: 35%;
   aspect-ratio: 2/3;
   border-radius: 10px;
@@ -350,7 +355,7 @@ a {
 }
 
 .playingcard-pile-2 {
-  position:absolute;
+  position: absolute;
   width: 35%;
   aspect-ratio: 2/3;
   border-radius: 10px;
@@ -366,7 +371,7 @@ a {
 }
 
 .playingcard-pile-3 {
-  position:absolute;
+  position: absolute;
   width: 35%;
   aspect-ratio: 2/3;
   border-radius: 10px;
@@ -443,7 +448,7 @@ a {
 
 .game-avatarbox {
   border: 0px solid white;
-  display:flex;
+  display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
@@ -464,7 +469,7 @@ a {
   max-height: 100%;
 }
 
-.game-playername{
+.game-playername {
   border: 0px solid white;
   position: absolute;
   z-index: 10;
@@ -483,7 +488,7 @@ a {
   font-size: 1vw;
 }
 
-.game-playerscore{
+.game-playerscore {
   border: 0px solid white;
   position: absolute;
   z-index: 10;

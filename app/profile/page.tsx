@@ -16,8 +16,6 @@ type UserProfile = {
 };
 
 const Profile: React.FC = () => {
-  console.log("API ENV:", process.env.NEXT_PUBLIC_API_ENV);
-  //console.log("Using API domain:", getApiDomain());
   const router = useRouter();
   const [form, setForm] = useState({
     username: "",
@@ -108,7 +106,6 @@ const Profile: React.FC = () => {
     }
 
     try {
-      console.log("PUT payload:", payload);
       const updatedUser = await apiService.put(`/users/me`, payload);
       console.log("Update success, response:", updatedUser);
       message.open({
