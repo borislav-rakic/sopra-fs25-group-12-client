@@ -14,7 +14,7 @@ export default function Home() {
 
   useEffect(() => {
     console.log("look at populate called");
-    if (!sessionStorage.getItem("populateCalled")) {
+    if (true || !sessionStorage.getItem("populateCalled")) {
       apiService.post<void>("/leaderboard/populate", null)
         .then(() => {
           console.log("Leaderboard populated (if needed).");
