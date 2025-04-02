@@ -119,3 +119,384 @@ a {
 .white-bordered-table .ant-table-tbody > tr:hover > td {
   background: white !important; /* disable hover effect */
 }
+
+
+.gear-icon img {
+  position: fixed;
+  top: 10px;  /* Adjust to your preference */
+  left: 10px; /* Adjust to your preference */
+  width: 30px; /* Adjust the size of the icon */
+  height: 30px; /* Adjust the size of the icon */
+  cursor: pointer;
+  z-index: 1000; /* Ensures it's above other content */
+  filter: invert(1); /* Invert colors for better visibility on dark backgrounds */
+}
+
+/* Optional hover effect */
+.gear-icon img:hover {
+  transform: scale(1.1); /* Slightly enlarge the icon on hover */
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Score table styling */
+.score-table {
+  position: fixed;
+  top: 10px; /* Adjust for your preference */
+  right: 10px; /* Position on the top-right corner */
+  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent background */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  z-index: 1000; /* Ensure it's on top */
+}
+
+/* Table styling */
+.score-table table {
+  width: 200px; /* Set the table width */
+  border-collapse: collapse; /* Removes space between table cells */
+  font-family: Arial, sans-serif;
+  font-size: 14px; /* Adjust font size */
+  text-align: left;
+}
+
+/* Table header styling */
+.score-table th {
+  background-color: #224702; /* Header background color */
+  color: rgb(255, 255, 255);
+  padding: 8px;
+  font-weight: bold;
+}
+
+/* Table row styling */
+.score-table td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd; /* Light gray border for rows */
+  color: rgb(0, 0, 0);
+}
+
+/* Hover effect for rows */
+.score-table tr:hover {
+  background-color: #f1f1f1; /* Light gray background on row hover */
+}
+
+.gameboard {
+  height: 60vw;
+  aspect-ratio: 1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(4, 82, 10);
+  border-radius: 20px; /* Add rounded corners */
+  overflow: hidden; /* Optional: Ensures content inside respects the rounded corners */
+  position: relative;
+  min-height: 500px;
+  max-height: 1000px;
+}
+
+.hand {
+  border: 0px solid white;
+  position: absolute;
+  z-index: 10;
+  width: 500px;
+  height: 200px;
+  background-color: rgba(122, 122, 122, 0.742);
+  border-radius: 6px;
+}
+
+.hand-0 {
+  border: 0px solid white;
+  position: absolute;
+  z-index: 10;
+  width: 50%;
+  height: 20%;
+  background-color: rgba(122, 122, 122, 0.742);
+  border-radius: 6px;
+  top: 75%;
+  left: 25%;
+  
+  display: grid;
+  grid-template-columns: repeat(auto-fit,  minmax(10px, max-content)) ;
+  align-items: center; /* Center child elements vertically */
+}
+
+.hand-1 {
+  border: 0px solid white;
+  position: absolute;
+  z-index: 10;
+  width: 50%;
+  height: 20%;
+  background-color: rgba(122, 122, 122, 0.742);
+  border-radius: 6px;
+  left: 25%;
+  top: 25%;
+  transform: rotate(90deg);
+  transform-origin: top left;
+  text-align: left;
+  
+  display: grid;
+  grid-template-columns: repeat(auto-fit,  minmax(10px, max-content)) ;
+  align-items: center; /* Center child elements vertically */
+}
+
+.hand-2 {
+  border: 0px solid white;
+  position: absolute;
+  z-index: 10;
+  width: 50%;
+  height: 20%;
+  background-color: rgba(122, 122, 122, 0.742);
+  border-radius: 6px;
+  left: 25%;
+  top: 5%;
+  transform: rotate(180deg);
+  text-align: left;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit,  minmax(10px, max-content)) ;
+  align-items: center; /* Center child elements vertically */
+}
+
+.hand-3 {
+  border: 0px solid white;
+  position: absolute;
+  z-index: 10;
+  width: 50%;
+  height: 20%;
+  background-color: rgba(122, 122, 122, 0.742);
+  border-radius: 6px;
+  left: 75%;
+  top: 75%;
+  transform: rotate(270deg);
+  transform-origin: top left;
+  text-align: left;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit,  minmax(10px, max-content)) ;
+  align-items: center; /* Center child elements vertically */
+}
+
+.playingcard {
+  height: 75%;
+  aspect-ratio: 2/3;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid black;
+  z-index: 20;
+  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  justify-content: center;
+  flex: 0 0 50px;
+}
+
+.playingcard:hover {
+  transform: scale(1.1); /* Scale up on hover */
+  cursor: pointer;
+  z-index: 30; /* Bring to front on hover */
+}
+
+.playingcard-back {
+  height: 75%;
+  aspect-ratio: 2/3;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid black;
+  z-index: 20;
+  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  justify-content: center;
+  flex: 0 0 50px;
+}
+
+.pile {
+  border: 0px solid white;
+  position: absolute;
+  z-index: 10;
+  width: 35%;
+  height: 35%;
+  background-color: rgba(122, 122, 122, 0.742);
+  border-radius: 6px;
+  left: 32.5%;
+  top: 32.5%;
+
+}
+
+.playingcard-pile-0 {
+  position:absolute;
+  width: 35%;
+  aspect-ratio: 2/3;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid black;
+  z-index: 20;
+  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  justify-content: center;
+  flex: 0 0 50px;
+  left: 32.5%;
+  bottom: 5%;
+}
+
+.playingcard-pile-1 {
+  position:absolute;
+  width: 35%;
+  aspect-ratio: 2/3;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid black;
+  z-index: 19;
+  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  justify-content: center;
+  flex: 0 0 50px;
+  left: 15%;
+  top: 27.5%;
+  transform: rotate(90deg);
+}
+
+.playingcard-pile-2 {
+  position:absolute;
+  width: 35%;
+  aspect-ratio: 2/3;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid black;
+  z-index: 18;
+  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  justify-content: center;
+  flex: 0 0 50px;
+  left: 32.5%;
+  top: 5%;
+  transform: rotate(180deg);
+}
+
+.playingcard-pile-3 {
+  position:absolute;
+  width: 35%;
+  aspect-ratio: 2/3;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid black;
+  z-index: 17;
+  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  justify-content: center;
+  flex: 0 0 50px;
+  right: 15%;
+  top: 27.5%;
+  transform: rotate(270deg);
+}
+
+.game-playerscore0 {
+  border: 3px solid black;
+  position: absolute;
+  z-index: 10;
+  width: 15%;
+  height: 15%;
+  background-color: rgb(193, 193, 193);
+  border-radius: 6px;
+  top: 80%;
+  left: 80%;
+  transform: rotate(0deg);
+  transform-origin: top left;
+  text-align: left;
+}
+
+.game-playerscore1 {
+  border: 3px solid black;
+  position: absolute;
+  z-index: 10;
+  width: 15%;
+  height: 15%;
+  background-color: rgb(193, 193, 193);
+  border-radius: 6px;
+  top: 80%;
+  left: 5%;
+  transform: rotate(0deg);
+  transform-origin: top left;
+  text-align: left;
+}
+
+.game-playerscore2 {
+  border: 3px solid black;
+  position: absolute;
+  z-index: 10;
+  width: 15%;
+  height: 15%;
+  background-color: rgb(193, 193, 193);
+  border-radius: 6px;
+  top: 5%;
+  left: 5%;
+  transform: rotate(0deg);
+  transform-origin: top left;
+  text-align: left;
+}
+
+.game-playerscore3 {
+  border: 3px solid black;
+  position: absolute;
+  z-index: 10;
+  width: 15%;
+  height: 15%;
+  background-color: rgb(193, 193, 193);
+  border-radius: 6px;
+  top: 5%;
+  left: 80%;
+  transform: rotate(0deg);
+  transform-origin: top left;
+  text-align: left;
+}
+
+.game-avatarbox {
+  border: 0px solid white;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: absolute;
+  z-index: 10;
+  width: 35%;
+  aspect-ratio: 1/1;
+  border-radius: 100%;
+  top: 5%;
+  left: 5%;
+}
+
+.game-avatarbox img {
+  flex-shrink: 0;
+  min-width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+  max-height: 100%;
+}
+
+.game-playername{
+  border: 0px solid white;
+  position: absolute;
+  z-index: 10;
+  background-color: rgb(255, 255, 255);
+  border-radius: 10%;
+  min-width: 10%;
+  max-width: 90%;
+  height: 20%;
+  top: 45%;
+  left: 5%;
+  font-weight: bold;
+  color: black;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 3px;
+  font-size: 1vw;
+}
+
+.game-playerscore{
+  border: 0px solid white;
+  position: absolute;
+  z-index: 10;
+  background-color: rgb(255, 255, 255);
+  border-radius: 10%;
+  min-width: 10%;
+  max-width: 90%;
+  height: 20%;
+  top: 70%;
+  left: 5%;
+  color: black;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 3px;
+  font-size: 1vw;
+}
