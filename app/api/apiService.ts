@@ -54,13 +54,23 @@ export class ApiService {
       );
     }
 
-    // Try parsing response body
+    // No parsing if response is empty anyway.
+    if (res.status === 204) {
+      return {} as T;
+    }
+
+    const text = await res.text();
+    if (!text) {
+      return {} as T;
+    }
+
     try {
-      return await res.json();
+      return JSON.parse(text);
     } catch {
       throw new Error(`${errorMsg}Invalid JSON response.`);
     }
   }
+
 
   /**
    * GET request.
