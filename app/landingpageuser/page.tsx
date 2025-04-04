@@ -24,7 +24,10 @@ const LandingPageUser: React.FC = () => {
 
     console.log(response.matchId);
 
-    router.push("/start");
+    if (response && response.matchId) {
+      const matchId = response.matchId.toString(); // convert bigint if needed
+      router.push(`/start/${matchId}`);
+    }
   };
 
   return (
