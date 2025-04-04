@@ -184,7 +184,7 @@ const UserProfileView: React.FC = () => {
               onClick={() => handleFriendAction("add")}
               loading={loadingAction}
             >
-              Send Request Again
+              Reconnect
             </Button>
           </div>
         );
