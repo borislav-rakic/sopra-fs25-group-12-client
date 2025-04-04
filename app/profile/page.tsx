@@ -15,7 +15,7 @@ type UserProfile = {
   avatar: number;
 };
 
-const Profile: React.FC = () => {
+const MyProfile: React.FC = () => {
   const router = useRouter();
   const [form, setForm] = useState({
     username: "",
@@ -211,4 +211,4 @@ const Profile: React.FC = () => {
   );
 };
 
-export default Profile;
+export default MyProfile;

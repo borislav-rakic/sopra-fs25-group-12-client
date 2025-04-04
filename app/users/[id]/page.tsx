@@ -1,120 +1,248 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import useLocalStorage from "@/hooks/useLocalStorage";
-import { useState } from "react";
-import { Button, Col, Input, Row, Space, Typography } from "antd";
-import "@/styles/globals.css";
+import { useApi } from "@/hooks/useApi";
+import Image from "next/image";
+import { Button, message } from "antd";
+import "@ant-design/v5-patch-for-react-19";
+import "./userProfileView.css";
 
-const { Title } = Typography;
+type FriendshipStatus = "UNDEFINED" | "PENDING" | "ACCEPTED" | "DECLINED";
 
-const UserProfilePage: React.FC = () => {
+type FriendStatusResponse = {
+  status: FriendshipStatus;
+  initiatedByCurrentUser: boolean;
+};
+
+type UserPublicProfile = {
+  id: number;
+  username: string;
+  status: string;
+  avatar: number;
+  birthday: string;
+  rating: number;
+};
+
+const UserProfileView: React.FC = () => {
+  const params = useParams();
+  const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const router = useRouter();
-  const { id } = useParams();
-  const { value: userId } = useLocalStorage("userId", "");
-  const isOwnProfile = id === userId;
+  const api = useApi();
 
-  const [requestSent, setRequestSent] = useState(false); // toggles green/grey
+  const [user, setUser] = useState<UserPublicProfile | null>(null);
+  const [friendStatus, setFriendStatus] = useState<FriendStatusResponse | null>(
+    null,
+  );
+  const [error, setError] = useState<string | null>(null);
+  const [loadingAction, setLoadingAction] = useState(false);
 
-  const friends = ["user1", "user2", "user3"]; // mock for layout
+  useEffect(() => {
+    if (!id) return;
 
-  const handleFriendRequestToggle = () => {
-    setRequestSent((prev) => !prev);
+    const fetchData = async () => {
+      try {
+        const userRes = await api.get<UserPublicProfile>(`/users/${id}`);
+        setUser(userRes);
+
+        const statusRes = await api.get<FriendStatusResponse>(
+          `/users/${id}/friends/status`,
+        );
+        setFriendStatus(statusRes);
+      } catch (err) {
+        console.error("Failed to load user or friendship status", err);
+        setError("Could not load user profile");
+      }
+    };
+
+    fetchData();
+  }, [api, id]);
+
+  const refreshFriendStatus = async () => {
+    try {
+      const res = await api.get<FriendStatusResponse>(
+        `/users/${id}/friends/status`,
+      );
+      setFriendStatus(res);
+    } catch (err) {
+      console.error("Failed to refresh friend status", err);
+    }
   };
-  return (
-    <div
-      className="login-container"
-      style={{
-        maxWidth: 400,
-        margin: "0 auto",
-        paddingTop: "40px",
-        textAlign: "center",
-      }}
-    >
-      <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-        <div>
-          <Title level={4} style={{ color: "black", marginBottom: 4 }}>
-            Username
-          </Title>
-          <Input value={`user${id}`} disabled style={{ marginBottom: 8 }} />
-        </div>
 
-        {isOwnProfile && (
+  const handleFriendAction = async (
+    action: "add" | "accept" | "decline" | "remove",
+  ) => {
+    if (!id) return;
+
+    setLoadingAction(true);
+    try {
+      switch (action) {
+        case "add":
+          await api.post(`/users/${id}/friends`, {});
+          break;
+        case "accept":
+          await api.put(`/users/${id}/friends`, { status: "ACCEPTED" });
+          break;
+        case "decline":
+          await api.put(`/users/${id}/friends`, { status: "DECLINED" });
+          break;
+        case "remove":
+          await api.delete(`/users/${id}/friends`);
+          break;
+      }
+
+      message.open({
+        type: "success",
+        content: "Action completed successfully.",
+        duration: 2,
+      });
+
+      await refreshFriendStatus();
+    } catch (err: unknown) {
+      console.error("Friend action failed:", err);
+
+      let errorMessage = "Friend action failed.";
+
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "message" in err &&
+        typeof (err as { message?: string }).message === "string"
+      ) {
+        errorMessage = (err as { message: string }).message;
+      }
+
+      message.open({
+        type: "error",
+        content: errorMessage,
+        duration: 2,
+      });
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  const renderFriendActions = () => {
+    if (!friendStatus) return null;
+    const { status, initiatedByCurrentUser } = friendStatus;
+
+    switch (status) {
+      case "ACCEPTED":
+        return (
           <div>
-            <Title level={4} style={{ color: "black", marginBottom: 4 }}>
-              Password
-            </Title>
-            <Input.Password
-              placeholder="Password"
-              disabled
-              style={{ marginBottom: 8 }}
-            />
+            <p>✅ You are friends</p>
+            <Button
+              danger
+              onClick={() => handleFriendAction("remove")}
+              loading={loadingAction}
+            >
+              Remove Friend
+            </Button>
           </div>
-        )}
+        );
 
-        {!isOwnProfile && (
+      case "PENDING":
+        return initiatedByCurrentUser
+          ? (
+            <div>
+              <p>⏳ Friend request sent</p>
+              <Button
+                danger
+                onClick={() => handleFriendAction("remove")}
+                loading={loadingAction}
+              >
+                Cancel Request
+              </Button>
+            </div>
+          )
+          : (
+            <div>
+              <p>📩 Friend request received</p>
+              <Button
+                type="primary"
+                onClick={() => handleFriendAction("accept")}
+                loading={loadingAction}
+              >
+                Accept
+              </Button>
+              <Button
+                onClick={() => handleFriendAction("decline")}
+                loading={loadingAction}
+                style={{ marginLeft: 8 }}
+              >
+                Decline
+              </Button>
+            </div>
+          );
+
+      case "DECLINED":
+        return (
+          <div>
+            <p>❌ Friend request was declined</p>
+            <Button
+              type="primary"
+              onClick={() => handleFriendAction("add")}
+              loading={loadingAction}
+            >
+              Send Request Again
+            </Button>
+          </div>
+        );
+
+      case "UNDEFINED":
+      default:
+        return (
           <Button
-            onClick={handleFriendRequestToggle}
-            style={{
-              backgroundColor: requestSent ? "#b2f2bb" : "#d9d9d9",
-              border: "none",
-              color: "black",
-              width: "100%",
-            }}
+            type="primary"
+            onClick={() => handleFriendAction("add")}
+            loading={loadingAction}
           >
-            {requestSent
-              ? "Sent. Cancel friend request?"
-              : "Send friend request"}
+            Add Friend
           </Button>
-        )}
+        );
+    }
+  };
 
-        {isOwnProfile && (
-          <Button
-            style={{
-              backgroundColor: "#b2f2bb",
-              border: "none",
-              color: "black",
-              width: "100%",
-            }}
-          >
-            Friend requests
-          </Button>
-        )}
+  if (error) return <div className="error">{error}</div>;
+  if (!user) return <div className="loading">Loading user profile...</div>;
 
-        <div style={{ marginTop: 24 }}>
-          <Title level={5} style={{ color: "black", textAlign: "left" }}>
-            Friends
-          </Title>
-          <Row gutter={[12, 12]} justify="center">
-            {friends.map((friend) => (
-              <Col key={friend}>
-                <div
-                  style={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: "50%",
-                    backgroundColor: "#f0f0f0",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "black",
-                  }}
-                >
-                  {friend}
-                </div>
-              </Col>
-            ))}
-          </Row>
-        </div>
+  const formattedBirthday = user.birthday
+    ? new Date(user.birthday).toLocaleDateString("en-GB", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+    : "";
 
-        <Button className="back-button" onClick={() => router.back()}>
-          Back
-        </Button>
-      </Space>
+  const avatarUrl = `/avatars_118x118/r${100 + user.avatar}.png`;
+
+  return (
+    <div className="user-profile-view">
+      <Image
+        src={avatarUrl}
+        alt={`${user.username}'s Avatar`}
+        width={80}
+        height={80}
+        className="user-avatar"
+      />
+      <h2>{user.username}</h2>
+      <p>Status: {user.status}</p>
+      <p>Birthday: {formattedBirthday}</p>
+      <p>Rating: {user.rating}</p>
+
+      <div className="friend-action-block" style={{ marginTop: "1.5rem" }}>
+        {renderFriendActions()}
+      </div>
+
+      <Button
+        type="default"
+        onClick={() => router.back()}
+        style={{ marginTop: "2rem" }}
+      >
+        Go Back
+      </Button>
     </div>
   );
 };
 
-export default UserProfilePage;
+export default UserProfileView;

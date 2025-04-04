@@ -1,0 +1,15 @@
+.user-search-container {
+  position: relative;
+  max-width: 300px;
+  margin: 1em auto;
+}
+
+.user-search-results {
+  max-height: 200px;
+  overflow-y: auto;
+  cursor: pointer;
+}
+
+.user-search-item:hover {
+  background-color: #f0f0f0;
+}

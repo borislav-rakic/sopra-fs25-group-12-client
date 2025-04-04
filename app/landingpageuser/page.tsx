@@ -73,7 +73,7 @@ const LandingPageUser: React.FC = () => {
             </Col>
           </Row>
 
-          <Row justify="center">
+          <Row gutter={16} justify="center">
             <Col>
               <Button
                 type="primary"
@@ -82,6 +82,16 @@ const LandingPageUser: React.FC = () => {
                 onClick={() => router.push("/leaderboard")}
               >
                 Leaderboard
+              </Button>
+            </Col>
+            <Col>
+              <Button
+                type="primary"
+                color="yellow"
+                variant="solid"
+                onClick={() => router.push("/friends")}
+              >
+                Manage Friendships
               </Button>
             </Col>
           </Row>

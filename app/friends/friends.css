@@ -1,0 +1,48 @@
+.friends-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+h2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0rem;
+}
+
+h3 {
+  text-align: center;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.friend-section {
+  margin-bottom: 0.2rem;
+}
+
+.friend-scroll-wrapper {
+  max-width: 80vw;
+  margin: 0 auto;
+  padding: 0.25rem 0 0.5rem;
+  min-height: 150px;
+  overflow-x: auto;
+}
+
+.friend-scroll {
+  display: inline-flex;
+  gap: 12px;
+  padding-bottom: 4px;
+  align-items: center;
+}
+
+.friend-card-slot {
+  flex: 0 0 auto;
+  width: 130px;
+}
+
+.friend-placeholder {
+  color: #888;
+  font-style: italic;
+  padding: 0.5rem;
+}

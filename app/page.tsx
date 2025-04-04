@@ -13,8 +13,8 @@ export default function Home() {
   const apiService = useApi();
 
   useEffect(() => {
-    console.log("look at populate called");
-    if (true || !sessionStorage.getItem("populateCalled")) {
+    const developmentPhaseIsOver = false;
+    if (!developmentPhaseIsOver || !sessionStorage.getItem("populateCalled")) {
       apiService.post<void>("/leaderboard/populate", null)
         .then(() => {
           console.log("Leaderboard populated (if needed).");
