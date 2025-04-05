@@ -135,7 +135,7 @@ const StartPage: React.FC = () => {
     const interval = setInterval(loadMatch, 5000);
     
     return () => clearInterval(interval);
-  }, [apiService, gameId, router]);
+  }, [apiService, gameId, router, inviteStatus, pendingInvites, selectedDifficulties, selectedPlayers]);
 
   const isHost = currentUsername === hostUsername;
 
@@ -223,7 +223,7 @@ const StartPage: React.FC = () => {
     const isComputer = player === "computer";
     const isInvited = player === "invite";
     const isFilled = player && player !== "computer" && player !== "invite";
-    const isWaiting = inviteStatus[index] === "waiting";
+    // const isWaiting = inviteStatus[index] === "waiting";
     const difficultyLabel = ["Easy", "Medium", "Difficult"];
 
     const handleDifficultySelect = async (difficulty: number) => {
@@ -273,7 +273,7 @@ const StartPage: React.FC = () => {
       {
         title: "",
         key: "action",
-        render: (_: any, record: User) => (
+        render: (record: User) => (
           <Button size="small" onClick={() => handleInvite(index, record.username)}>
             Invite
           </Button>

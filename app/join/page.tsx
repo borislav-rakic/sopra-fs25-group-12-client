@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button, Form, Input, Table, Modal, message, App } from "antd";
+import { Button, Form, Input, Table, Modal, message, /*App*/ } from "antd";
 import { useEffect, useState, useRef } from "react";
 import { Match } from "@/types/match";
 import { useApi } from "@/hooks/useApi";
@@ -20,13 +20,17 @@ const JoinPage: React.FC = () => {
 
   const [modal, contextHolder] = useModal();
 
+  interface ModalInfoInstance {
+    destroy: () => void;
+  }
+
   useEffect(() => {
     const fetchMatches = async () => {
       try {
         const fetchedMatches = await apiService.get<Match[]>("/matches");
         setMatches(fetchedMatches);
         setFilteredMatches(fetchedMatches);
-      } catch (error) {
+      } catch {
         message.error("Could not fetch matches.");
       }
     };
@@ -45,7 +49,7 @@ const JoinPage: React.FC = () => {
     );
   };
 
-  const checkMatchStatusAndRedirect = async (matchId: number, modalInstance: any) => {
+  const checkMatchStatusAndRedirect = async (matchId: number, modalInstance: ModalInfoInstance) => {
     try {
       const match: Match = await apiService.get<Match>(`/matches/${matchId}`);
       if (match.started) {
@@ -70,7 +74,7 @@ const JoinPage: React.FC = () => {
     try {
       await apiService.post(`/matches/${matchId}/join`, {});
       pollingInterval.current = setInterval(() => {
-        checkMatchStatusAndRedirect(matchId, modalInstance);
+        checkMatchStatusAndRedirect(matchId, modalInstance as ModalInfoInstance);
       }, 3000);
     } catch {
       modalInstance.destroy();

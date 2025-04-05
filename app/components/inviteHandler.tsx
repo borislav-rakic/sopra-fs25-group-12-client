@@ -39,8 +39,8 @@ export const InviteHandler: React.FC = () => {
               setInvite(null);
               setModalVisible(false);
             }
-          } catch (error: any) {
-            if (error.message?.includes("401")) {
+          } catch (error) {
+            if ((error as Error).message?.includes("401")) {
               console.warn("Token invalid or expired, skipping invite check.");
             } else {
               console.error("Unexpected error fetching invites:", error);
@@ -75,7 +75,7 @@ export const InviteHandler: React.FC = () => {
       } else {
         message.info("Invite declined.");
       }
-    } catch (err) {
+    } catch {
       message.error("Failed to respond to invite.");
     } finally {
       setInvite(null);
