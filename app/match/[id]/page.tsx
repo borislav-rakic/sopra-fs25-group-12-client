@@ -1,21 +1,48 @@
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 import "@ant-design/v5-patch-for-react-19";
-import { useRouter /*useParams*/ } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import { Button /* , Row, Col, Space */ } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
-// import { useApi } from "@/hooks/useApi";
+import { useApi } from "@/hooks/useApi";
 // import { Match } from "@/types/match";
-import { JSX, useState } from "react";
+import { JSX, useState, useEffect } from "react";
 
 const MatchPage: React.FC = () => {
   const router = useRouter();
-  // const apiService = useApi();
+  const params = useParams();
+  const apiService = useApi();
+
+  const matchId = params?.id?.toString();
 
   const [cardsInHand, setCardsInHand] = useState<JSX.Element[]>([]);
 
   // let playerHand = document.getElementById("hand-0");
+
+  useEffect(() => {
+    // This function runs every 5 seconds to receive the current match information.
+    const matchRefreshIntervalId = setInterval(async () => {
+      console.log("Requesting match update...")
+
+      try {
+        const response = await apiService.post(`/matches/${matchId}`, {"playerToken": localStorage.getItem("token")});
+
+        if (response !== null) {
+
+        }
+      }
+      catch {
+
+      }
+    }, 5000)
+    
+    // When the component unmounts, this stops the function mapped to matchRefreshIntervalId from running every 5 seconds.
+    return () => {
+      clearInterval(matchRefreshIntervalId);
+      console.log('Interval cleared.');
+    };
+  }, [apiService, matchId])
 
   return (
     <div className={`${styles.page} matchPage`}>
