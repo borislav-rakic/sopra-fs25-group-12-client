@@ -5,4 +5,5 @@ export interface Match {
   started: boolean | null;
   invites?: Record<number, number>;
   aiPlayers: number[];
+  joinRequests?: Array<{ userId: number;}>;
 }

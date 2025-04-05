@@ -1,9 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { Button, Form, Input, Table, Modal, message, /*App*/ } from "antd";
+import { useParams, useRouter } from "next/navigation";
+import { Button, Form, Input, Table, Modal, message } from "antd";
 import { useEffect, useState, useRef } from "react";
 import { Match } from "@/types/match";
+import { User } from "@/types/user";
+import { JoinRequest } from "@/types/joinRequest";
 import { useApi } from "@/hooks/useApi";
 import type { TableProps } from "antd";
 
@@ -12,17 +14,16 @@ const { useModal } = Modal;
 const JoinPage: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
+  const params = useParams();
+  const gameId = params?.id?.toString();
 
   const [matches, setMatches] = useState<Match[]>([]);
   const [filteredMatches, setFilteredMatches] = useState<Match[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const pollingInterval = useRef<NodeJS.Timeout | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
 
   const [modal, contextHolder] = useModal();
-
-  interface ModalInfoInstance {
-    destroy: () => void;
-  }
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -35,8 +36,56 @@ const JoinPage: React.FC = () => {
       }
     };
 
+    const loadCurrentUser = async () => {
+      try {
+        const me = await apiService.get<User>("/users/me");
+        setUserId(Number(me.id));  // Store userId in the state
+        localStorage.setItem("userId", me.id.toString()); // Store in localStorage
+      } catch {
+        message.error("Could not load current user.");
+      }
+    };
+    
+    
+    loadCurrentUser();
     fetchMatches();
-  }, [apiService]);
+
+  }, [apiService,gameId,userId,router]);
+  
+  const checkJoinRequestStatus = async (matchId: number,userId: number) => {
+    try {
+      message.info(`Polling: matchId=${matchId}, userId=${userId}`);
+  
+      const joinRequestsObject: JoinRequest[] = await apiService.get(
+        `/matches/${matchId}/joinRequests`
+      );
+  
+      message.info(`All join requests: ${JSON.stringify(joinRequestsObject)}`);
+  
+      const myRequest = joinRequestsObject.find((req) => req.userId === userId);
+  
+      message.info(`Filtered join request: ${JSON.stringify(myRequest)}`);
+  
+      if (!myRequest) {
+        return;
+      }
+  
+      const status = myRequest.status;
+  
+      if (status === "accepted") {
+        message.success("Your request has been accepted. Redirecting...");
+        clearInterval(pollingInterval.current!);
+        router.push(`/start/${matchId}`);
+      } else if (status === "declined") {
+        message.info("Your join request was declined.");
+        clearInterval(pollingInterval.current!);
+      } else {
+        console.log("Join request still pending...");
+      }
+    } catch {
+    }
+  };
+  
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
@@ -47,35 +96,44 @@ const JoinPage: React.FC = () => {
           match.matchId.toString().includes(value)
       )
     );
-  };
-
-  const checkMatchStatusAndRedirect = async (matchId: number, modalInstance: ModalInfoInstance) => {
-    try {
-      const match: Match = await apiService.get<Match>(`/matches/${matchId}`);
-      if (match.started) {
-        if (pollingInterval.current) {
-          clearInterval(pollingInterval.current);
-        }
-        modalInstance.destroy();
-        router.push(`/start/${matchId}`);
-      }
-    } catch {
-      message.error("Failed to check match status.");
-    }
-  };
+  };  
 
   const handleJoin = async (matchId: number) => {
     const modalInstance = modal.info({
-      title: "Join Request Sent",
-      content: "Waiting for host to accept your join request...",
-      okButtonProps: { disabled: true },
+      title: <span style={{ color: 'black' }}>Join Request Sent</span>,
+      content: (
+        <div style={{ color: 'black' }}>
+          Waiting for host to accept your join request...
+        </div>
+      ),
     });
 
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+      modalInstance.destroy();
+      message.error("User not logged in.");
+      return;
+    }
+
+    const parsedUserId = Number(userId);
+
+    if (isNaN(parsedUserId)) {
+      modalInstance.destroy();
+      message.error("Invalid user ID.");
+      return;
+    }
+    if (pollingInterval.current) {
+      clearInterval(pollingInterval.current);
+    }
+
     try {
-      await apiService.post(`/matches/${matchId}/join`, {});
+      await apiService.post(`/matches/${matchId}/join`, { userId: parsedUserId });
+
       pollingInterval.current = setInterval(() => {
-        checkMatchStatusAndRedirect(matchId, modalInstance as ModalInfoInstance);
+        checkJoinRequestStatus(matchId, parsedUserId);
       }, 3000);
+
     } catch {
       modalInstance.destroy();
       message.error("Could not send join request.");
@@ -125,7 +183,15 @@ const JoinPage: React.FC = () => {
         />
 
         <Form.Item style={{ marginTop: "1.5rem" }}>
-          <Button onClick={() => router.back()}>Back</Button>
+          <Button
+            onClick={() => {
+              localStorage.removeItem("userId");
+
+              router.push("/landingpageuser");
+            }}
+          >
+            Back
+          </Button>
         </Form.Item>
       </Form>
     </div>

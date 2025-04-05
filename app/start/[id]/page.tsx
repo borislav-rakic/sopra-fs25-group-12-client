@@ -13,6 +13,7 @@ import {
   Menu,
   Input,
   Table,
+  Modal
 } from "antd";
 import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
@@ -38,11 +39,22 @@ const StartPage: React.FC = () => {
   const [pendingInvites, setPendingInvites] = useState<(number | null)[]>([null, null, null, null]);
   const [hostUsername, setHostUsername] = useState<string>("");
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
+  const [joinRequests, setJoinRequests] = useState<{ userId: string; status: string }[]>([]);
 
+  interface JoinRequest {
+    userId: string;
+    status: string;
+  }
 
   const usersRef = useRef<User[]>([]);
 
   useEffect(() => {
+
+    if (!gameId) {
+      message.error("Invalid game ID.");
+      router.push("/landingpageuser"); // Or handle the case appropriately
+      return;
+    }
     
     const loadUsers = async () => {
       try {
@@ -127,12 +139,34 @@ const StartPage: React.FC = () => {
         message.error("Could not load current user.");
       }
     };
+
+    const fetchJoinRequests = async () => {
+      try {
+        const joinRequestsObject: JoinRequest[] = await apiService.get(`/matches/${gameId}/joinRequests`);
+    
+        message.info(`All join requests: ${JSON.stringify(joinRequestsObject)}`);
+    
+        const filteredRequests = joinRequestsObject
+          .filter((request) => request.status === "pending")
+          .map((request) => ({ userId: request.userId, status: request.status }));
+    
+        message.info(`Filtered join requests: ${JSON.stringify(filteredRequests)}`);
+        setJoinRequests(filteredRequests);
+      } catch {
+        message.error("Failed to fetch join requests.");
+      }
+    };
     
     
     loadUsers();
     loadCurrentUser();
     loadMatch();
-    const interval = setInterval(loadMatch, 5000);
+    fetchJoinRequests();
+
+    const interval = setInterval(() => {
+      loadMatch();
+      fetchJoinRequests(); 
+    }, 5000);
     
     return () => clearInterval(interval);
   }, [apiService, gameId, router, inviteStatus, pendingInvites, selectedDifficulties, selectedPlayers]);
@@ -391,9 +425,62 @@ const StartPage: React.FC = () => {
     );
   };
 
+  const handleAcceptJoin = async (userId: number, matchId: number) => {
+    try {
+      await apiService.post(`/matches/${matchId}/join/accept`, { userId });
+      message.success("User joined the game.");
+      setJoinRequests((prevRequests) => {
+        const updatedRequests = [...prevRequests];  // Create a copy of the array
+        return updatedRequests.filter(request => Number(request.userId) !== userId);  // Remove the accepted request
+      });
+    } catch {
+      message.error("Failed to accept the join request.");
+    }
+  };
+  
+  const handleDeclineJoin = async (userId: number, matchId: number) => {
+    try {
+      await apiService.post(`/matches/${matchId}/join/decline`, { userId });
+      message.info("User's join request declined.");
+      setJoinRequests((prevRequests) => {
+        const updatedRequests = [...prevRequests];  // Create a copy of the array
+        return updatedRequests.filter(request =>  Number(request.userId) !== userId);  // Remove the declined request
+      });
+    } catch {
+      message.error("Failed to decline the join request.");
+    }
+  };
+
+  const renderJoinRequestModal = () => {
+    if (joinRequests.length === 0) {
+      return null;
+    }
+  
+    message.info(`Pending join requests: ${JSON.stringify(joinRequests)}`);
+    
+    return joinRequests.map((request) => (
+      <Modal
+        key={request.userId}
+        title={`Join Request`}
+        open={true}
+        onOk={() => handleAcceptJoin(Number(request.userId), Number(gameId))}
+        onCancel={() => handleDeclineJoin(Number(request.userId), Number(gameId))}
+        okText="Accept"
+        cancelText="Decline"
+        closable={false}
+        maskClosable={false}
+      >
+        <p style={{ color: "black" }}>
+          {`User with ID ${request.userId} has requested to join your game.`}
+        </p>
+      </Modal>
+    ));
+  };
+
   return (
     <div className={styles.page} style={{ backgroundColor: "white", padding: "40px" }}>
       <main className={styles.main}>
+        {renderJoinRequestModal()}
         <p style={{ marginBottom: "20px", fontWeight: "bold", fontSize: "16px", color: "black" }}>
           Game ID: <span style={{ fontFamily: "monospace", color: "black" }}>{gameId}</span>
         </p>
