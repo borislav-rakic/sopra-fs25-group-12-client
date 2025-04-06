@@ -169,7 +169,7 @@ const StartPage: React.FC = () => {
     }, 5000);
     
     return () => clearInterval(interval);
-  }, [apiService, gameId, router, inviteStatus, pendingInvites, selectedDifficulties, selectedPlayers]);
+  }, [apiService, gameId, router]);
 
   const isHost = currentUsername === hostUsername;
 
