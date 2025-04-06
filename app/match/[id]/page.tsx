@@ -8,6 +8,7 @@ import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
 // import { Match } from "@/types/match";
 import { JSX, useState, useEffect } from "react";
+import { PlayerMatchInformation } from "@/types/playerMatchInformation";
 
 const MatchPage: React.FC = () => {
   const router = useRouter();
@@ -17,6 +18,7 @@ const MatchPage: React.FC = () => {
   const matchId = params?.id?.toString();
 
   const [cardsInHand, setCardsInHand] = useState<JSX.Element[]>([]);
+  const [players, setPlayers] = useState<Array<String | null>>([null, null, null, null])
 
   // let playerHand = document.getElementById("hand-0");
 
@@ -26,10 +28,12 @@ const MatchPage: React.FC = () => {
       console.log("Requesting match update...")
 
       try {
-        const response = await apiService.post(`/matches/${matchId}`, {"playerToken": localStorage.getItem("token")});
+        const response = await apiService.post<PlayerMatchInformation>(`/matches/${matchId}/logic`, {});
 
-        if (response !== null) {
+        console.log(response);
 
+        if (response.matchPlayers) {
+          setPlayers(response.matchPlayers);
         }
       }
       catch {
@@ -94,19 +98,19 @@ const MatchPage: React.FC = () => {
             </thead>
             <tbody>
               <tr>
-                <td>Player 1</td>
+                <td>{players[0] ? players[0] : "AI Player"}</td>
                 <td>10</td>
               </tr>
               <tr>
-                <td>Player 2</td>
+                <td>{players[1] ? players[1] : "AI Player"}</td>
                 <td>15</td>
               </tr>
               <tr>
-                <td>Player 3</td>
+                <td>{players[2] ? players[2] : "AI Player"}</td>
                 <td>20</td>
               </tr>
               <tr>
-                <td>Player 4</td>
+                <td>{players[3] ? players[3] : "AI Player"}</td>
                 <td>25</td>
               </tr>
             </tbody>
@@ -440,7 +444,7 @@ const MatchPage: React.FC = () => {
               height={72}
             />
           </div>
-          <div className="game-playername">Player 1</div>
+          <div className="game-playername">{players[0] ? players[0] : "AI Player"}</div>
           <div className="game-playerscore">Score: 10</div>
         </div>
 
@@ -454,7 +458,7 @@ const MatchPage: React.FC = () => {
               height={72}
             />
           </div>
-          <div className="game-playername">Player 2</div>
+          <div className="game-playername">{players[1] ? players[1] : "AI Player"}</div>
           <div className="game-playerscore">Score: 15</div>
         </div>
 
@@ -468,7 +472,7 @@ const MatchPage: React.FC = () => {
               height={72}
             />
           </div>
-          <div className="game-playername">Player 3</div>
+          <div className="game-playername">{players[2] ? players[2] : "AI Player"}</div>
           <div className="game-playerscore">Score: 20</div>
         </div>
 
@@ -482,7 +486,7 @@ const MatchPage: React.FC = () => {
               height={72}
             />
           </div>
-          <div className="game-playername">Player 4</div>
+          <div className="game-playername">{players[3] ? players[3] : "AI Player"}</div>
           <div className="game-playerscore">Score: 25</div>
         </div>
       </div>
