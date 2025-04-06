@@ -18,7 +18,7 @@ const MatchPage: React.FC = () => {
   const matchId = params?.id?.toString();
 
   const [cardsInHand, setCardsInHand] = useState<JSX.Element[]>([]);
-  const [players, setPlayers] = useState<Array<String | null>>([null, null, null, null])
+  const [players, setPlayers] = useState<Array<string | null>>([null, null, null, null])
 
   // let playerHand = document.getElementById("hand-0");
 
