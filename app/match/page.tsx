@@ -16,6 +16,8 @@ const MatchPage: React.FC = () => {
 
   const [cardsInHand, setCardsInHand] = useState<JSX.Element[]>([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [playmat, setPlaymat] = useState("Green"); // Default playmat
+  const [cardback, setCardback] = useState("default"); // Default cardback
 
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
@@ -35,7 +37,14 @@ const MatchPage: React.FC = () => {
         />
       </div>
 
-      <SettingsPopup isOpen={isSettingsOpen} onClose={toggleSettings} />
+      <SettingsPopup 
+      isOpen={isSettingsOpen} 
+      onClose={toggleSettings} 
+      playmat={playmat}
+      setPlaymat={setPlaymat}
+      cardback={cardback}
+      setCardback={setCardback}
+      />
 
       <div
         className="matchtester"

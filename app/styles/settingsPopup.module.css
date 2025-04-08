@@ -4,7 +4,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0.625); /* Semi-transparent background */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,6 +16,7 @@
     padding: 20px;
     border-radius: 8px;
     width: 400px;
+    height: 400px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: relative;
   }
@@ -51,4 +52,50 @@
   .settingsContent label {
     color: white; /* Light label color */
   }
+
+  .settingsContent select {
+    background-color: #2e2e2e; /* Dark background */
+    border: 1px solid #555; /* Darker border */
+    color: rgb(0, 0, 0); /* Light text color */
+  }
+
+  .settingsContent select:focus {
+    border-color: #66b2ff; /* Highlight border on focus for dark mode */
+    background-color: #3a3a3a; /* Slightly lighter background on focus */
+  }
+}
+
+.settingsContent select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  font-size: 14px;
+}
+
+.settingsContent select:focus {
+  outline: none;
+  border-color: #007bff; /* Highlight border on focus */
+  background-color: #fff;
+}
+
+.settingsApply {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  border: 2px solid #000000; /* Blue border */
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.settingsApply:hover {
+  background-color: #b9ffaf; /* Slightly darker on hover */
 }
