@@ -1,13 +1,13 @@
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 import "@ant-design/v5-patch-for-react-19";
-import { useRouter, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button /* , Row, Col, Space */ } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
 // import { Match } from "@/types/match";
-import { JSX, useState, useEffect } from "react";
+import { JSX, useEffect, useState } from "react";
 import { PlayerMatchInformation } from "@/types/playerMatchInformation";
 
 const MatchPage: React.FC = () => {
@@ -18,35 +18,45 @@ const MatchPage: React.FC = () => {
   const matchId = params?.id?.toString();
 
   const [cardsInHand, setCardsInHand] = useState<JSX.Element[]>([]);
-  const [players, setPlayers] = useState<Array<string | null>>([null, null, null, null])
+  const [players, setPlayers] = useState<Array<string | null>>([
+    null,
+    null,
+    null,
+    null,
+  ]);
 
   // let playerHand = document.getElementById("hand-0");
 
   useEffect(() => {
     // This function runs every 5 seconds to receive the current match information.
     const matchRefreshIntervalId = setInterval(async () => {
-      console.log("Requesting match update...")
+      console.log("Requesting match update...");
 
       try {
-        const response = await apiService.post<PlayerMatchInformation>(`/matches/${matchId}/logic`, {});
+        const response = await apiService.post<PlayerMatchInformation>(
+          `/matches/${matchId}/logic`,
+          {},
+        );
 
         console.log(response);
 
         if (response.matchPlayers) {
           setPlayers(response.matchPlayers);
         }
+      } catch (error) {
+        console.error(
+          `Failed to fetch match data for matchId ${matchId}:`,
+          error,
+        );
       }
-      catch {
+    }, 5000);
 
-      }
-    }, 5000)
-    
     // When the component unmounts, this stops the function mapped to matchRefreshIntervalId from running every 5 seconds.
     return () => {
       clearInterval(matchRefreshIntervalId);
-      console.log('Interval cleared.');
+      console.log("Interval cleared.");
     };
-  }, [apiService, matchId])
+  }, [apiService, matchId]);
 
   return (
     <div className={`${styles.page} matchPage`}>
@@ -444,7 +454,9 @@ const MatchPage: React.FC = () => {
               height={72}
             />
           </div>
-          <div className="game-playername">{players[0] ? players[0] : "AI Player"}</div>
+          <div className="game-playername">
+            {players[0] ? players[0] : "AI Player"}
+          </div>
           <div className="game-playerscore">Score: 10</div>
         </div>
 
@@ -458,7 +470,9 @@ const MatchPage: React.FC = () => {
               height={72}
             />
           </div>
-          <div className="game-playername">{players[1] ? players[1] : "AI Player"}</div>
+          <div className="game-playername">
+            {players[1] ? players[1] : "AI Player"}
+          </div>
           <div className="game-playerscore">Score: 15</div>
         </div>
 
@@ -472,7 +486,9 @@ const MatchPage: React.FC = () => {
               height={72}
             />
           </div>
-          <div className="game-playername">{players[2] ? players[2] : "AI Player"}</div>
+          <div className="game-playername">
+            {players[2] ? players[2] : "AI Player"}
+          </div>
           <div className="game-playerscore">Score: 20</div>
         </div>
 
@@ -486,7 +502,9 @@ const MatchPage: React.FC = () => {
               height={72}
             />
           </div>
-          <div className="game-playername">{players[3] ? players[3] : "AI Player"}</div>
+          <div className="game-playername">
+            {players[3] ? players[3] : "AI Player"}
+          </div>
           <div className="game-playerscore">Score: 25</div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Modal, message } from "antd";
+import { message, Modal } from "antd";
 import { useApi } from "@/hooks/useApi";
 import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
@@ -18,42 +18,42 @@ export const InviteHandler: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const apiService = useApi();
   const router = useRouter();
-  
 
-    useEffect(() => {
-        const pollInvites = async () => {
-          const token = localStorage.getItem("token");
-          if (!token) return; // no token means not logged in
-      
-          try {
-            const currentUser = await apiService.get<User>("/users/me");
-            if (!currentUser?.id) return;
-      
-            const invites = await apiService.get<Invite[]>("/users/me/invites");
-            const personalInvite = invites.find(i => Number(i.userId) === Number(currentUser.id));
-      
-            if (personalInvite) {
-              setInvite(personalInvite);
-              setModalVisible(true);
-            } else {
-              setInvite(null);
-              setModalVisible(false);
-            }
-          } catch (error) {
-            if ((error as Error).message?.includes("401")) {
-              console.warn("Token invalid or expired, skipping invite check.");
-            } else {
-              console.error("Unexpected error fetching invites:", error);
-            }
-          }
-        };
-      
-        const interval = setInterval(pollInvites, 5000);
-        pollInvites();
-      
-        return () => clearInterval(interval);
-      }, [apiService]);
-      
+  useEffect(() => {
+    const pollInvites = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return; // no token means not logged in
+
+      try {
+        const currentUser = await apiService.get<User>("/users/me");
+        if (!currentUser?.id) return;
+
+        const invites = await apiService.get<Invite[]>("/users/me/invites");
+        const personalInvite = invites.find((i) =>
+          Number(i.userId) === Number(currentUser.id)
+        );
+
+        if (personalInvite) {
+          setInvite(personalInvite);
+          setModalVisible(true);
+        } else {
+          setInvite(null);
+          setModalVisible(false);
+        }
+      } catch (error) {
+        if ((error as Error).message?.includes("401")) {
+          console.warn("Token invalid or expired, skipping invite check.");
+        } else {
+          console.error("Unexpected error fetching invites:", error);
+        }
+      }
+    };
+
+    const interval = setInterval(pollInvites, 5000);
+    pollInvites();
+
+    return () => clearInterval(interval);
+  }, [apiService]);
 
   const respondToInvite = async (accepted: boolean) => {
     if (!invite) return;
@@ -64,7 +64,6 @@ export const InviteHandler: React.FC = () => {
     });
 
     try {
-        
       await apiService.post(`/matches/${invite.matchId}/invite/respond`, {
         accepted,
       });
@@ -98,14 +97,14 @@ export const InviteHandler: React.FC = () => {
         header: { backgroundColor: "white", color: "black" },
       }}
     >
-      {invite ? (
-        <p>
-          <strong>{invite.fromUsername}</strong> invited you to join game{" "}
-          <strong>{invite.matchId}</strong>.
-        </p>
-      ) : (
-        <p>No invite available.</p>
-      )}
+      {invite
+        ? (
+          <p>
+            <strong>{invite.fromUsername}</strong> invited you to join game{" "}
+            <strong>{invite.matchId}</strong>.
+          </p>
+        )
+        : <p>No invite available.</p>}
     </Modal>
   );
 };

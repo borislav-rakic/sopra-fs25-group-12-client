@@ -1,8 +1,8 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { Button, Form, Input, Table, Modal, message } from "antd";
-import { useEffect, useState, useRef } from "react";
+import { Button, Form, Input, message, Modal, Table } from "antd";
+import { useEffect, useRef, useState } from "react";
 import { Match } from "@/types/match";
 import { User } from "@/types/user";
 import { JoinRequest } from "@/types/joinRequest";
@@ -39,39 +39,37 @@ const JoinPage: React.FC = () => {
     const loadCurrentUser = async () => {
       try {
         const me = await apiService.get<User>("/users/me");
-        setUserId(Number(me.id));  // Store userId in the state
+        setUserId(Number(me.id)); // Store userId in the state
         localStorage.setItem("userId", me.id.toString()); // Store in localStorage
       } catch {
         message.error("Could not load current user.");
       }
     };
-    
-    
+
     loadCurrentUser();
     fetchMatches();
+  }, [apiService, gameId, userId, router]);
 
-  }, [apiService,gameId,userId,router]);
-  
-  const checkJoinRequestStatus = async (matchId: number,userId: number) => {
+  const checkJoinRequestStatus = async (matchId: number, userId: number) => {
     try {
       message.info(`Polling: matchId=${matchId}, userId=${userId}`);
-  
+
       const joinRequestsObject: JoinRequest[] = await apiService.get(
-        `/matches/${matchId}/joinRequests`
+        `/matches/${matchId}/joinRequests`,
       );
-  
+
       message.info(`All join requests: ${JSON.stringify(joinRequestsObject)}`);
-  
+
       const myRequest = joinRequestsObject.find((req) => req.userId === userId);
-  
+
       message.info(`Filtered join request: ${JSON.stringify(myRequest)}`);
-  
+
       if (!myRequest) {
         return;
       }
-  
+
       const status = myRequest.status;
-  
+
       if (status === "accepted") {
         message.success("Your request has been accepted. Redirecting...");
         clearInterval(pollingInterval.current!);
@@ -82,10 +80,13 @@ const JoinPage: React.FC = () => {
       } else {
         console.log("Join request still pending...");
       }
-    } catch {
+    } catch (error) {
+      console.error(
+        `Failed to check join request status for matchId=${matchId}, userId=${userId}:`,
+        error,
+      );
     }
   };
-  
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
@@ -93,16 +94,16 @@ const JoinPage: React.FC = () => {
       matches.filter(
         (match) =>
           match.matchId !== null &&
-          match.matchId.toString().includes(value)
-      )
+          match.matchId.toString().includes(value),
+      ),
     );
-  };  
+  };
 
   const handleJoin = async (matchId: number) => {
     const modalInstance = modal.info({
-      title: <span style={{ color: 'black' }}>Join Request Sent</span>,
+      title: <span style={{ color: "black" }}>Join Request Sent</span>,
       content: (
-        <div style={{ color: 'black' }}>
+        <div style={{ color: "black" }}>
           Waiting for host to accept your join request...
         </div>
       ),
@@ -128,12 +129,13 @@ const JoinPage: React.FC = () => {
     }
 
     try {
-      await apiService.post(`/matches/${matchId}/join`, { userId: parsedUserId });
+      await apiService.post(`/matches/${matchId}/join`, {
+        userId: parsedUserId,
+      });
 
       pollingInterval.current = setInterval(() => {
         checkJoinRequestStatus(matchId, parsedUserId);
       }, 3000);
-
     } catch {
       modalInstance.destroy();
       message.error("Could not send join request.");
@@ -150,8 +152,7 @@ const JoinPage: React.FC = () => {
       render: (_, record) => (
         <Button
           onClick={() =>
-            record.matchId !== null && handleJoin(Number(record.matchId))
-          }
+            record.matchId !== null && handleJoin(Number(record.matchId))}
         >
           Join
         </Button>

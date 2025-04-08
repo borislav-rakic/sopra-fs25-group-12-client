@@ -2,18 +2,18 @@
 
 import "@ant-design/v5-patch-for-react-19";
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Button,
   Card,
   Col,
-  Row,
-  message,
   Dropdown,
-  Menu,
   Input,
+  Menu,
+  message,
+  Modal,
+  Row,
   Table,
-  Modal
 } from "antd";
 import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
@@ -27,19 +27,41 @@ const StartPage: React.FC = () => {
   const apiService = useApi();
 
   const [selectedPlayers, setSelectedPlayers] = useState(["", "", "", ""]);
-  const [showDifficulty, setShowDifficulty] = useState([false, false, false,false]);
-  const [selectedDifficulties, setSelectedDifficulties] = useState<number[]>([0, 0, 0, 0]);
+  const [showDifficulty, setShowDifficulty] = useState([
+    false,
+    false,
+    false,
+    false,
+  ]);
+  const [selectedDifficulties, setSelectedDifficulties] = useState<number[]>([
+    0,
+    0,
+    0,
+    0,
+  ]);
   const [showInvite, setShowInvite] = useState([false, false, false, false]);
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchValues, setSearchValues] = useState(["", "", "", ""]);
   const [selectedPoints, setSelectedPoints] = useState<number | null>(null);
-  const [inviteStatus, setInviteStatus] = useState<(null | "waiting")[]>([null, null, null, null]);
+  const [inviteStatus, setInviteStatus] = useState<(null | "waiting")[]>([
+    null,
+    null,
+    null,
+    null,
+  ]);
   const [playerIds, setPlayerIds] = useState<number[]>([]);
-  const [pendingInvites, setPendingInvites] = useState<(number | null)[]>([null, null, null, null]);
+  const [pendingInvites, setPendingInvites] = useState<(number | null)[]>([
+    null,
+    null,
+    null,
+    null,
+  ]);
   const [hostUsername, setHostUsername] = useState<string>("");
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
-  const [joinRequests, setJoinRequests] = useState<{ userId: string; status: string }[]>([]);
+  const [joinRequests, setJoinRequests] = useState<
+    { userId: string; status: string }[]
+  >([]);
 
   interface JoinRequest {
     userId: string;
@@ -49,13 +71,12 @@ const StartPage: React.FC = () => {
   const usersRef = useRef<User[]>([]);
 
   useEffect(() => {
-
     if (!gameId) {
       message.error("Invalid game ID.");
       router.push("/landingpageuser"); // Or handle the case appropriately
       return;
     }
-    
+
     const loadUsers = async () => {
       try {
         const result = await apiService.get<User[]>("/users");
@@ -75,19 +96,19 @@ const StartPage: React.FC = () => {
         const numberIds = ids.map(Number);
         setPlayerIds(numberIds);
         setHostUsername(match.host);
-    
+
         const updatedSelectedPlayers = [...selectedPlayers];
         const updatedInviteStatus = [...inviteStatus];
         const updatedPendingInvites = [...pendingInvites];
         const updatedDifficulties = [...selectedDifficulties];
-    
+
         for (let i = 0; i < 4; i++) {
           updatedSelectedPlayers[i] = "";
           updatedInviteStatus[i] = null;
           updatedPendingInvites[i] = null;
           updatedDifficulties[i] = 0;
         }
-        
+
         // Fill user players
         numberIds.forEach((playerId, index) => {
           const user = usersRef.current.find((u) => Number(u.id) === playerId);
@@ -95,7 +116,7 @@ const StartPage: React.FC = () => {
             updatedSelectedPlayers[index] = user.username;
           }
         });
-        
+
         // Fill invites
         Object.entries(match.invites || {}).forEach(([slotStr, userId]) => {
           const slot = Number(slotStr);
@@ -104,7 +125,7 @@ const StartPage: React.FC = () => {
           updatedInviteStatus[slot] = "waiting";
           updatedPendingInvites[slot] = userId;
         });
-        
+
         // Fill AI players in remaining slots
         let slotIndex = 0;
         match.aiPlayers?.forEach((difficulty) => {
@@ -120,7 +141,7 @@ const StartPage: React.FC = () => {
             updatedDifficulties[slotIndex] = difficulty;
           }
         });
-        
+
         setSelectedPlayers(updatedSelectedPlayers);
         setInviteStatus(updatedInviteStatus);
         setPendingInvites(updatedPendingInvites);
@@ -142,22 +163,30 @@ const StartPage: React.FC = () => {
 
     const fetchJoinRequests = async () => {
       try {
-        const joinRequestsObject: JoinRequest[] = await apiService.get(`/matches/${gameId}/joinRequests`);
-    
-        message.info(`All join requests: ${JSON.stringify(joinRequestsObject)}`);
-    
+        const joinRequestsObject: JoinRequest[] = await apiService.get(
+          `/matches/${gameId}/joinRequests`,
+        );
+
+        message.info(
+          `All join requests: ${JSON.stringify(joinRequestsObject)}`,
+        );
+
         const filteredRequests = joinRequestsObject
           .filter((request) => request.status === "pending")
-          .map((request) => ({ userId: request.userId, status: request.status }));
-    
-        message.info(`Filtered join requests: ${JSON.stringify(filteredRequests)}`);
+          .map((request) => ({
+            userId: request.userId,
+            status: request.status,
+          }));
+
+        message.info(
+          `Filtered join requests: ${JSON.stringify(filteredRequests)}`,
+        );
         setJoinRequests(filteredRequests);
       } catch {
         message.error("Failed to fetch join requests.");
       }
     };
-    
-    
+
     loadUsers();
     loadCurrentUser();
     loadMatch();
@@ -165,9 +194,9 @@ const StartPage: React.FC = () => {
 
     const interval = setInterval(() => {
       loadMatch();
-      fetchJoinRequests(); 
+      fetchJoinRequests();
     }, 5000);
-    
+
     return () => clearInterval(interval);
   }, [apiService, gameId, router]);
 
@@ -180,7 +209,7 @@ const StartPage: React.FC = () => {
 
     const filtered = users.filter((user) =>
       user.username.toLowerCase().includes(value.toLowerCase()) &&
-    !playerIds.includes(Number(user.id))
+      !playerIds.includes(Number(user.id))
     );
     setFilteredUsers(filtered);
   };
@@ -248,7 +277,9 @@ const StartPage: React.FC = () => {
         alignItems: "center",
       }}
     >
-      <p style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}>{hostUsername}</p>
+      <p style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}>
+        {hostUsername}
+      </p>
     </Card>
   );
 
@@ -264,28 +295,28 @@ const StartPage: React.FC = () => {
       const updated = [...selectedPlayers];
       updated[index] = "computer";
       setSelectedPlayers(updated);
-    
+
       const toggle = [...showDifficulty];
       toggle[index] = true;
       setShowDifficulty(toggle);
-    
+
       const toggleInvite = [...showInvite];
       toggleInvite[index] = false;
       setShowInvite(toggleInvite);
-    
+
       const difficulties = [...selectedDifficulties];
       difficulties[index] = difficulty;
       setSelectedDifficulties(difficulties);
-    
+
       try {
         await apiService.post(`/matches/${gameId}/ai`, {
-          difficulty: difficulty
+          difficulty: difficulty,
         });
         message.success(`Computer added at position ${index + 1}`);
       } catch {
         message.error("Failed to add computer opponent.");
       }
-    };    
+    };
 
     const difficultyMenu = (
       <Menu
@@ -293,7 +324,10 @@ const StartPage: React.FC = () => {
         items={[
           { label: <span style={{ color: "black" }}>Easy</span>, key: "0" },
           { label: <span style={{ color: "black" }}>Medium</span>, key: "1" },
-          { label: <span style={{ color: "black" }}>Difficult</span>, key: "2" },
+          {
+            label: <span style={{ color: "black" }}>Difficult</span>,
+            key: "2",
+          },
         ]}
       />
     );
@@ -308,7 +342,10 @@ const StartPage: React.FC = () => {
         title: "",
         key: "action",
         render: (record: User) => (
-          <Button size="small" onClick={() => handleInvite(index, record.username)}>
+          <Button
+            size="small"
+            onClick={() => handleInvite(index, record.username)}
+          >
             Invite
           </Button>
         ),
@@ -328,98 +365,130 @@ const StartPage: React.FC = () => {
           alignItems: "center",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column", gap: "6px", width: "100%" }}>
-          {inviteStatus[index] === "waiting" ? (
-            <p style={{ fontWeight: "bold", fontSize: "16px", color: "gray" }}>Waiting...</p>
-          ) : isComputer ? (
-            <p style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}>
-              AI Player: {difficultyLabel[selectedDifficulties[index]]}
-            </p>
-          ) : isFilled ? (
-            <p style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}>{player}</p>
-          ) : !isHost ? (
-            <p style={{ fontSize: "16px", color: "gray" }}>Waiting for other players...</p>
-          ) : (
-            <>
-              <Button
-                style={{
-                  backgroundColor: isInvited ? "#b2f2bb" : "#d9d9d9",
-                  border: "none",
-                  width: "100%",
-                }}
-                onClick={() => {
-                  const updated = [...selectedPlayers];
-                  const toggleInvite = [...showInvite];
-                  const toggleDiff = [...showDifficulty];
-
-                  const isOpen = updated[index] === "invite" && toggleInvite[index];
-
-                  if (isOpen) {
-                    updated[index] = "";
-                    toggleInvite[index] = false;
-                  } else {
-                    updated[index] = "invite";
-                    toggleInvite[index] = true;
-
-                    setFilteredUsers(users.filter(
-                      (u) => u.status === "ONLINE" && !playerIds.includes(Number(u.id))
-                    ));
-                  }
-
-                  toggleDiff[index] = false;
-
-                  setSelectedPlayers(updated);
-                  setShowInvite(toggleInvite);
-                  setShowDifficulty(toggleDiff);
-                }}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "6px",
+            width: "100%",
+          }}
+        >
+          {inviteStatus[index] === "waiting"
+            ? (
+              <p
+                style={{ fontWeight: "bold", fontSize: "16px", color: "gray" }}
               >
-                Invite Player
-              </Button>
-
-              <Dropdown overlay={difficultyMenu} trigger={["click"]}>
+                Waiting...
+              </p>
+            )
+            : isComputer
+            ? (
+              <p
+                style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
+              >
+                AI Player: {difficultyLabel[selectedDifficulties[index]]}
+              </p>
+            )
+            : isFilled
+            ? (
+              <p
+                style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
+              >
+                {player}
+              </p>
+            )
+            : !isHost
+            ? (
+              <p style={{ fontSize: "16px", color: "gray" }}>
+                Waiting for other players...
+              </p>
+            )
+            : (
+              <>
                 <Button
                   style={{
-                    backgroundColor: isComputer ? "#b2f2bb" : "#d9d9d9",
+                    backgroundColor: isInvited ? "#b2f2bb" : "#d9d9d9",
                     border: "none",
                     width: "100%",
                   }}
                   onClick={() => {
-                    const toggleDiff = [...showDifficulty];
+                    const updated = [...selectedPlayers];
                     const toggleInvite = [...showInvite];
-                  
-                    toggleDiff[index] = !toggleDiff[index];
-                    toggleInvite[index] = false;
-                  
-                    setShowDifficulty(toggleDiff);
+                    const toggleDiff = [...showDifficulty];
+
+                    const isOpen = updated[index] === "invite" &&
+                      toggleInvite[index];
+
+                    if (isOpen) {
+                      updated[index] = "";
+                      toggleInvite[index] = false;
+                    } else {
+                      updated[index] = "invite";
+                      toggleInvite[index] = true;
+
+                      setFilteredUsers(users.filter(
+                        (u) =>
+                          u.status === "ONLINE" &&
+                          !playerIds.includes(Number(u.id)),
+                      ));
+                    }
+
+                    toggleDiff[index] = false;
+
+                    setSelectedPlayers(updated);
                     setShowInvite(toggleInvite);
+                    setShowDifficulty(toggleDiff);
                   }}
                 >
-                  {isComputer
-                    ? `Computer (${difficultyLabel[selectedDifficulties[index]]})`
-                    : "Computer opponent"}
+                  Invite Player
                 </Button>
-              </Dropdown>
 
-              {showInvite[index] && (
-                <div style={{ marginTop: 8 }}>
-                  <Input
-                    placeholder="Search user..."
-                    size="small"
-                    value={searchValues[index]}
-                    onChange={(e) => handleSearch(index, e.target.value)}
-                  />
-                  <Table
-                    size="small"
-                    dataSource={filteredUsers}
-                    columns={columns}
-                    rowKey="id"
-                    pagination={{ pageSize: 3 }}
-                    style={{ marginTop: 8 }}
-                  />
-                </div>
-              )}
-            </>
-          )}
+                <Dropdown overlay={difficultyMenu} trigger={["click"]}>
+                  <Button
+                    style={{
+                      backgroundColor: isComputer ? "#b2f2bb" : "#d9d9d9",
+                      border: "none",
+                      width: "100%",
+                    }}
+                    onClick={() => {
+                      const toggleDiff = [...showDifficulty];
+                      const toggleInvite = [...showInvite];
+
+                      toggleDiff[index] = !toggleDiff[index];
+                      toggleInvite[index] = false;
+
+                      setShowDifficulty(toggleDiff);
+                      setShowInvite(toggleInvite);
+                    }}
+                  >
+                    {isComputer
+                      ? `Computer (${
+                        difficultyLabel[selectedDifficulties[index]]
+                      })`
+                      : "Computer opponent"}
+                  </Button>
+                </Dropdown>
+
+                {showInvite[index] && (
+                  <div style={{ marginTop: 8 }}>
+                    <Input
+                      placeholder="Search user..."
+                      size="small"
+                      value={searchValues[index]}
+                      onChange={(e) => handleSearch(index, e.target.value)}
+                    />
+                    <Table
+                      size="small"
+                      dataSource={filteredUsers}
+                      columns={columns}
+                      rowKey="id"
+                      pagination={{ pageSize: 3 }}
+                      style={{ marginTop: 8 }}
+                    />
+                  </div>
+                )}
+              </>
+            )}
         </div>
       </Card>
     );
@@ -430,21 +499,25 @@ const StartPage: React.FC = () => {
       await apiService.post(`/matches/${matchId}/join/accept`, { userId });
       message.success("User joined the game.");
       setJoinRequests((prevRequests) => {
-        const updatedRequests = [...prevRequests];  // Create a copy of the array
-        return updatedRequests.filter(request => Number(request.userId) !== userId);  // Remove the accepted request
+        const updatedRequests = [...prevRequests]; // Create a copy of the array
+        return updatedRequests.filter((request) =>
+          Number(request.userId) !== userId
+        ); // Remove the accepted request
       });
     } catch {
       message.error("Failed to accept the join request.");
     }
   };
-  
+
   const handleDeclineJoin = async (userId: number, matchId: number) => {
     try {
       await apiService.post(`/matches/${matchId}/join/decline`, { userId });
       message.info("User's join request declined.");
       setJoinRequests((prevRequests) => {
-        const updatedRequests = [...prevRequests];  // Create a copy of the array
-        return updatedRequests.filter(request =>  Number(request.userId) !== userId);  // Remove the declined request
+        const updatedRequests = [...prevRequests]; // Create a copy of the array
+        return updatedRequests.filter((request) =>
+          Number(request.userId) !== userId
+        ); // Remove the declined request
       });
     } catch {
       message.error("Failed to decline the join request.");
@@ -455,16 +528,17 @@ const StartPage: React.FC = () => {
     if (joinRequests.length === 0) {
       return null;
     }
-  
+
     message.info(`Pending join requests: ${JSON.stringify(joinRequests)}`);
-    
+
     return joinRequests.map((request) => (
       <Modal
         key={request.userId}
         title={`Join Request`}
         open={true}
         onOk={() => handleAcceptJoin(Number(request.userId), Number(gameId))}
-        onCancel={() => handleDeclineJoin(Number(request.userId), Number(gameId))}
+        onCancel={() =>
+          handleDeclineJoin(Number(request.userId), Number(gameId))}
         okText="Accept"
         cancelText="Decline"
         closable={false}
@@ -478,20 +552,31 @@ const StartPage: React.FC = () => {
   };
 
   return (
-    <div className={styles.page} style={{ backgroundColor: "white", padding: "40px" }}>
+    <div
+      className={styles.page}
+      style={{ backgroundColor: "white", padding: "40px" }}
+    >
       <main className={styles.main}>
         {renderJoinRequestModal()}
-        <p style={{ marginBottom: "20px", fontWeight: "bold", fontSize: "16px", color: "black" }}>
-          Game ID: <span style={{ fontFamily: "monospace", color: "black" }}>{gameId}</span>
+        <p
+          style={{
+            marginBottom: "20px",
+            fontWeight: "bold",
+            fontSize: "16px",
+            color: "black",
+          }}
+        >
+          Game ID:{" "}
+          <span style={{ fontFamily: "monospace", color: "black" }}>
+            {gameId}
+          </span>
         </p>
-  
+
         <Row gutter={[12, 12]} justify="center">
           <Col>{renderHostCard()}</Col>
-          {[1, 2, 3].map((i) => (
-            <Col key={i}>{renderPlayerCard(i)}</Col>
-          ))}
+          {[1, 2, 3].map((i) => <Col key={i}>{renderPlayerCard(i)}</Col>)}
         </Row>
-  
+
         {isHost && (
           <>
             <div style={{ marginTop: 40, textAlign: "center" }}>
@@ -505,14 +590,18 @@ const StartPage: React.FC = () => {
                       onClick={async () => {
                         setSelectedPoints(points);
                         try {
-                          await apiService.post(`/matches/${gameId}/length`, { length: points });
+                          await apiService.post(`/matches/${gameId}/length`, {
+                            length: points,
+                          });
                           message.success(`Points set to ${points}`);
                         } catch {
                           message.error("Could not set match points.");
                         }
                       }}
                       style={{
-                        backgroundColor: selectedPoints === points ? "#b2f2bb" : "#d9d9d9",
+                        backgroundColor: selectedPoints === points
+                          ? "#b2f2bb"
+                          : "#d9d9d9",
                         border: "none",
                         color: "black",
                         width: "60px",
@@ -524,8 +613,15 @@ const StartPage: React.FC = () => {
                 ))}
               </Row>
             </div>
-  
-            <div style={{ marginTop: 40, display: "flex", justifyContent: "center", gap: "20px" }}>
+
+            <div
+              style={{
+                marginTop: 40,
+                display: "flex",
+                justifyContent: "center",
+                gap: "20px",
+              }}
+            >
               <Button className="login-button" onClick={handleStart}>
                 Start
               </Button>
@@ -538,7 +634,6 @@ const StartPage: React.FC = () => {
       </main>
     </div>
   );
-  
 };
 
 export default StartPage;

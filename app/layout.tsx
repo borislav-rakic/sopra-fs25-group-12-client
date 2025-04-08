@@ -61,7 +61,10 @@ export default function RootLayout({
             },
           }}
         >
-          <AntdRegistry>{children}<InviteHandler /> </AntdRegistry>
+          <AntdRegistry>
+            {children}
+            <InviteHandler />
+          </AntdRegistry>
         </ConfigProvider>
       </body>
     </html>
