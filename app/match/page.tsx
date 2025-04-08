@@ -8,12 +8,18 @@ import styles from "@/styles/page.module.css";
 // import { useApi } from "@/hooks/useApi";
 // import { Match } from "@/types/match";
 import { JSX, useState } from "react";
+import SettingsPopup from "../components/SettingsPopup";
 
 const MatchPage: React.FC = () => {
   const router = useRouter();
   // const apiService = useApi();
 
   const [cardsInHand, setCardsInHand] = useState<JSX.Element[]>([]);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const toggleSettings = () => {
+    setIsSettingsOpen(!isSettingsOpen);
+  };
 
   // let playerHand = document.getElementById("hand-0");
 
@@ -25,9 +31,11 @@ const MatchPage: React.FC = () => {
           alt="Settings"
           width={50}
           height={50}
-          onClick={() => router.push("/settings")}
+          onClick={() => {toggleSettings()}}
         />
       </div>
+
+      <SettingsPopup isOpen={isSettingsOpen} onClose={toggleSettings} />
 
       <div
         className="matchtester"
@@ -49,6 +57,8 @@ const MatchPage: React.FC = () => {
                 className="playingcard"
                 src="https://deckofcardsapi.com/static/img/AS.png"
                 alt="PLACEHOLDER"
+                width={113}
+                height={157}
               />,
             ])}
         >
