@@ -72,7 +72,10 @@ const StartPage: React.FC = () => {
 
   useEffect(() => {
     if (!gameId) {
-      message.error("Invalid game ID.");
+      message.open({
+        type: "error",
+        content: "Invalid game ID.",
+      });
       router.push("/landingpageuser"); // Or handle the case appropriately
       return;
     }
@@ -85,7 +88,10 @@ const StartPage: React.FC = () => {
         setFilteredUsers(onlineUsers);
         usersRef.current = onlineUsers;
       } catch {
-        message.error("Could not load user list.");
+        message.open({
+          type: "error",
+          content: "Could not load user list.",
+        });
       }
     };
 
@@ -147,7 +153,10 @@ const StartPage: React.FC = () => {
         setPendingInvites(updatedPendingInvites);
         setSelectedDifficulties(updatedDifficulties);
       } catch {
-        message.error("Could not load match info.");
+        message.open({
+          type: "error",
+          content: "Could not load match info.",
+        });
         router.push("/landingpageuser");
       }
     };
@@ -157,7 +166,10 @@ const StartPage: React.FC = () => {
         const me = await apiService.get<User>("/users/me");
         setCurrentUsername(me.username);
       } catch {
-        message.error("Could not load current user.");
+        message.open({
+          type: "error",
+          content: "Could not load current user.",
+        });
       }
     };
 
@@ -167,9 +179,10 @@ const StartPage: React.FC = () => {
           `/matches/${gameId}/joinRequests`,
         );
 
-        message.info(
-          `All join requests: ${JSON.stringify(joinRequestsObject)}`,
-        );
+        message.open({
+          type: "info",
+          content: `All join requests: ${JSON.stringify(joinRequestsObject)}`,
+        });
 
         const filteredRequests = joinRequestsObject
           .filter((request) => request.status === "pending")
@@ -178,12 +191,18 @@ const StartPage: React.FC = () => {
             status: request.status,
           }));
 
-        message.info(
-          `Filtered join requests: ${JSON.stringify(filteredRequests)}`,
-        );
+        message.open({
+          type: "info",
+          content: `Filtered join requests: ${
+            JSON.stringify(filteredRequests)
+          }`,
+        });
         setJoinRequests(filteredRequests);
       } catch {
-        message.error("Failed to fetch join requests.");
+        message.open({
+          type: "error",
+          content: "Failed to fetch join requests.",
+        });
       }
     };
 
@@ -217,14 +236,20 @@ const StartPage: React.FC = () => {
   const handleInvite = async (index: number, username: string) => {
     const user = users.find((u) => u.username === username);
     if (!user || !gameId) {
-      message.error("User not found or invalid match.");
+      message.open({
+        type: "error",
+        content: "User not found or invalid match.",
+      });
       return;
     }
 
     try {
       const currentUser = await apiService.get<User>("/users/me");
       if (user.id === currentUser.id) {
-        message.warning("You cannot invite yourself.");
+        message.open({
+          type: "warning",
+          content: "You cannot invite yourself.",
+        });
         return;
       }
       await apiService.post(`/matches/${gameId}/invite`, {
@@ -244,9 +269,15 @@ const StartPage: React.FC = () => {
       updatedPending[index] = Number(user.id);
       setPendingInvites(updatedPending);
 
-      message.success(`Invitation sent to ${username}`);
+      message.open({
+        type: "success",
+        content: `Invitation sent to ${username}`,
+      });
     } catch (err) {
-      message.error("Failed to send invite.");
+      message.open({
+        type: "error",
+        content: "Failed to send invite.",
+      });
       console.error(err);
     }
   };
@@ -258,10 +289,16 @@ const StartPage: React.FC = () => {
   const handleCancelMatch = async () => {
     try {
       await apiService.delete(`/matches/${gameId}`);
-      message.info("Match has been cancelled.");
+      message.open({
+        type: "info",
+        content: "Match has been cancelled.",
+      });
       router.push("/landingpageuser");
     } catch {
-      message.error("Could not cancel the match.");
+      message.open({
+        type: "error",
+        content: "Could not cancel the match.",
+      });
     }
   };
 
@@ -312,9 +349,15 @@ const StartPage: React.FC = () => {
         await apiService.post(`/matches/${gameId}/ai`, {
           difficulty: difficulty,
         });
-        message.success(`Computer added at position ${index + 1}`);
+        message.open({
+          type: "success",
+          content: `Computer added at position ${index + 1}`,
+        });
       } catch {
-        message.error("Failed to add computer opponent.");
+        message.open({
+          type: "error",
+          content: "Failed to add computer opponent.",
+        });
       }
     };
 
@@ -497,7 +540,10 @@ const StartPage: React.FC = () => {
   const handleAcceptJoin = async (userId: number, matchId: number) => {
     try {
       await apiService.post(`/matches/${matchId}/join/accept`, { userId });
-      message.success("User joined the game.");
+      message.open({
+        type: "success",
+        content: "User joined the game.",
+      });
       setJoinRequests((prevRequests) => {
         const updatedRequests = [...prevRequests]; // Create a copy of the array
         return updatedRequests.filter((request) =>
@@ -505,14 +551,20 @@ const StartPage: React.FC = () => {
         ); // Remove the accepted request
       });
     } catch {
-      message.error("Failed to accept the join request.");
+      message.open({
+        type: "error",
+        content: "Failed to accept the join request.",
+      });
     }
   };
 
   const handleDeclineJoin = async (userId: number, matchId: number) => {
     try {
       await apiService.post(`/matches/${matchId}/join/decline`, { userId });
-      message.info("User's join request declined.");
+      message.open({
+        type: "info",
+        content: "User's join request declined.",
+      });
       setJoinRequests((prevRequests) => {
         const updatedRequests = [...prevRequests]; // Create a copy of the array
         return updatedRequests.filter((request) =>
@@ -520,7 +572,10 @@ const StartPage: React.FC = () => {
         ); // Remove the declined request
       });
     } catch {
-      message.error("Failed to decline the join request.");
+      message.open({
+        type: "error",
+        content: "Failed to decline the join request.",
+      });
     }
   };
 
@@ -529,7 +584,10 @@ const StartPage: React.FC = () => {
       return null;
     }
 
-    message.info(`Pending join requests: ${JSON.stringify(joinRequests)}`);
+    message.open({
+      type: "info",
+      content: `Pending join requests: ${JSON.stringify(joinRequests)}`,
+    });
 
     return joinRequests.map((request) => (
       <Modal
@@ -593,9 +651,15 @@ const StartPage: React.FC = () => {
                           await apiService.post(`/matches/${gameId}/length`, {
                             length: points,
                           });
-                          message.success(`Points set to ${points}`);
+                          message.open({
+                            type: "success",
+                            content: `Points set to ${points}`,
+                          });
                         } catch {
-                          message.error("Could not set match points.");
+                          message.open({
+                            type: "error",
+                            content: "Could not set match points.",
+                          });
                         }
                       }}
                       style={{

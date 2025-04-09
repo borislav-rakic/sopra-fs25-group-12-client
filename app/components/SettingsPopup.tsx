@@ -10,31 +10,32 @@ interface SettingsPopupProps {
   setCardback: (value: string) => void;
 }
 
-const SettingsPopup: React.FC<SettingsPopupProps> = ({ 
-  isOpen, 
+const SettingsPopup: React.FC<SettingsPopupProps> = ({
+  isOpen,
   onClose,
   playmat,
   setPlaymat,
   cardback,
-  setCardback, }) => {
-    const [oldPlaymat, setOldPlaymat] = useState(playmat);
-    const [oldCardback, setOldCardback] = useState(cardback);
+  setCardback,
+}) => {
+  const [oldPlaymat, setOldPlaymat] = useState(playmat);
+  const [oldCardback, setOldCardback] = useState(cardback);
 
-    if (!isOpen) return null; // Don't render if the popup is closed
+  if (!isOpen) return null; // Don't render if the popup is closed
 
   const handleApply = () => {
     localStorage.setItem("playmat", playmat);
     localStorage.setItem("cardback", cardback);
     setOldPlaymat(playmat);
-    setOldCardback(cardback); 
+    setOldCardback(cardback);
     onClose(); // Close the popup when applying settings
-  }
+  };
 
   const handleCancel = () => {
     setPlaymat(oldPlaymat);
     setCardback(oldCardback);
     onClose(); // Close the popup when canceling settings
-  }
+  };
 
   return (
     <div className={styles.settingsPopupOverlay}>
@@ -47,7 +48,10 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
           {/* Add your settings options here */}
           <label>
             Playmat:
-            <select value={playmat} onChange={(e) => setPlaymat(e.target.value)}>
+            <select
+              value={playmat}
+              onChange={(e) => setPlaymat(e.target.value)}
+            >
               <option value="Green">Green</option>
               <option value="Blue">Blue</option>
               <option value="Red">Red</option>
@@ -55,14 +59,23 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
           </label>
           <label>
             Cardback:
-            <select value={cardback} onChange={(e) => setCardback(e.target.value)}>
-              <option value="https://deckofcardsapi.com/static/img/back.png">Default</option>
+            <select
+              value={cardback}
+              onChange={(e) => setCardback(e.target.value)}
+            >
+              <option value="https://deckofcardsapi.com/static/img/back.png">
+                Default
+              </option>
               <option value="/testCardBack.jpg">test</option>
-              <option value="https://deckofcardsapi.com/static/img/back.png">Temp 2</option>
+              <option value="https://deckofcardsapi.com/static/img/back.png">
+                Temp 2
+              </option>
             </select>
           </label>
         </div>
-        <button className={styles.settingsApply} onClick ={handleApply}>Apply</button>
+        <button className={styles.settingsApply} onClick={handleApply}>
+          Apply
+        </button>
       </div>
     </div>
   );
