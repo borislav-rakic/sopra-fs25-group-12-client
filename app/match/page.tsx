@@ -9,12 +9,34 @@ import styles from "@/styles/page.module.css";
 // import { Match } from "@/types/match";
 import { JSX, useEffect, useState } from "react";
 import SettingsPopup from "../components/SettingsPopup";
+import Card from "../components/card";
 
 const MatchPage: React.FC = () => {
   const router = useRouter();
   // const apiService = useApi();
 
-  const [cardsInHand, setCardsInHand] = useState<JSX.Element[]>([]);
+  const [cardsInHand, setCardsInHand] = useState([
+    {
+      code: "AS",
+      suit: "Spades",
+      value: BigInt(1),
+      image: "https://deckofcardsapi.com/static/img/AS.png",
+      onClick: (code: string) => {
+        console.log(`Card clicked: ${code}`);
+      },
+    },
+    {
+      code: "KH",
+      suit: "Hearts",
+      value: BigInt(13),
+      image: "https://deckofcardsapi.com/static/img/KH.png",
+      onClick: (code: string) => {
+        console.log(`Card clicked: ${code}`);
+      },
+    },
+  ]);
+
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
@@ -47,7 +69,7 @@ const MatchPage: React.FC = () => {
       gameboard.style.backgroundColor = playmat.toLowerCase();
     }
   }, [playmat]);
-  
+
 /* 
   useEffect(() => {
     console.log(`Cardback changed to: ${cardback}`);
@@ -92,18 +114,20 @@ const MatchPage: React.FC = () => {
         }}
       >
         <Button
-          onClick={() =>
-            setCardsInHand([
-              ...cardsInHand,
-              <Image
-                key="PLACEHOLDER"
-                className="playingcard"
-                src="https://deckofcardsapi.com/static/img/AS.png"
-                alt="PLACEHOLDER"
-                width={113}
-                height={157}
-              />,
-            ])}
+        onClick={() =>
+        setCardsInHand([
+          ...cardsInHand, // Keep the existing cards
+          {
+            code: "2H", // Example: Two of Hearts
+            suit: "Hearts",
+            value: BigInt(2),
+            image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+            onClick: (code: string) => {
+              console.log(`Card clicked: ${code}`);
+            },
+          },
+        ])
+      }
         >
           test
         </Button>
@@ -140,7 +164,15 @@ const MatchPage: React.FC = () => {
         </div>
 
         <div className="hand-0">
-          {cardsInHand}
+          {cardsInHand.map((card, index) => (
+            <Card
+            key={index}
+            code={card.code}
+            suit={card.suit}
+            value={card.value}
+            image={card.image}
+            onClick={card.onClick}
+          />))}
         </div>
 
         <div className="hand-1">
