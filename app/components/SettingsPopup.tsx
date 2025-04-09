@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "@/styles/settingsPopup.module.css"; // Assuming you have a CSS file for styling
 
 interface SettingsPopupProps {
@@ -17,14 +17,16 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
   setPlaymat,
   cardback,
   setCardback, }) => {
-  if (!isOpen) return null; // Don't render if the popup is closed
+    const [oldPlaymat, setOldPlaymat] = useState(playmat);
+    const [oldCardback, setOldCardback] = useState(cardback);
 
-  const [oldPlaymat, setOldPlaymat] = useState(playmat);
-  const [oldCardback, setOldCardback] = useState(cardback);
+    if (!isOpen) return null; // Don't render if the popup is closed
 
   const handleApply = () => {
     localStorage.setItem("playmat", playmat);
     localStorage.setItem("cardback", cardback);
+    setOldPlaymat(playmat);
+    setOldCardback(cardback); 
     onClose(); // Close the popup when applying settings
   }
 

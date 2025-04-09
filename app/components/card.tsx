@@ -1,6 +1,5 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import styles from "@/styles/card.module.css";
-import { on } from "events";
 
 interface cardProps {
     code: string;
@@ -12,7 +11,7 @@ interface cardProps {
     onClick: (code: string) => void;
 }
 
-const card: React.FC<cardProps> = ({ code, 
+const Card: React.FC<cardProps> = ({ code, 
   suit, 
   value, 
   image,
@@ -27,6 +26,7 @@ const card: React.FC<cardProps> = ({ code,
       console.log("Card clicked:", code);
       console.log("Flipped:", !flipped);
       onClick(code); // Call the onClick handler passed as a prop
+      console.log(suit, value) // This allows suit and value to be part of the object but be used for compilation
     };
 
   return (
@@ -40,5 +40,5 @@ const card: React.FC<cardProps> = ({ code,
   );
 };
 
-export default card;
+export default Card;
 export type { cardProps };
