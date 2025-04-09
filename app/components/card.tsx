@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "@/styles/card.module.css";
+import Image from "next/image"
 
 interface cardProps {
     code: string;
@@ -32,9 +33,9 @@ const Card: React.FC<cardProps> = ({ code,
   return (
     <div className={`${styles.cardContainer} ${flipped ? styles.scalable : ""}`} onClick={handleCardClick}>
       {flipped ? (
-        <img className={styles.cardFront} src={image} alt={`${code} front`} />
+        <Image className={styles.cardFront} src={image} alt={`${code} front`} />
       ) : (
-        <img className={styles.cardBack} src={backimage} alt={`${code} back`} />
+        <Image className={styles.cardBack} src={backimage} alt={`${code} back`} />
       )}
     </div>
   );

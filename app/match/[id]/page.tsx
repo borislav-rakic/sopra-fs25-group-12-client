@@ -10,7 +10,7 @@ import { useApi } from "@/hooks/useApi";
 import { useEffect, useState } from "react";
 import { PlayerMatchInformation } from "@/types/playerMatchInformation";
 import SettingsPopup from "@/components/SettingsPopup";
-import Card, { cardProps } from "@/components/Card";
+import Card, { cardProps } from "@/components/card";
 
 const MatchPage: React.FC = () => {
   //const router = useRouter();
