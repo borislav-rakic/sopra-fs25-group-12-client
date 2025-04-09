@@ -98,9 +98,14 @@ const StartPage: React.FC = () => {
     const loadMatch = async () => {
       try {
         const match = await apiService.get<Match>(`/matches/${gameId}`);
-        const ids = match.playerIds ?? [];
-        const numberIds = ids.map(Number);
-        setPlayerIds(numberIds);
+        const playerIdList = [
+          match.player1Id,
+          match.player2Id,
+          match.player3Id,
+          match.player4Id,
+        ].filter((id): id is number => id !== null);
+        
+        setPlayerIds(playerIdList);
         setHostUsername(match.host);
 
         const updatedSelectedPlayers = [...selectedPlayers];
@@ -116,10 +121,12 @@ const StartPage: React.FC = () => {
         }
 
         // Fill user players
-        numberIds.forEach((playerId, index) => {
+        playerIdList.forEach((playerId, index) => {
           const user = usersRef.current.find((u) => Number(u.id) === playerId);
           if (user) {
             updatedSelectedPlayers[index] = user.username;
+          } else {
+            updatedSelectedPlayers[index] = "Waiting...";
           }
         });
 
