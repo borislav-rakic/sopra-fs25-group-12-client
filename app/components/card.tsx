@@ -26,7 +26,7 @@ const Card: React.FC<cardProps> = ({ code,
       console.log("Card clicked:", code);
       console.log("Flipped:", !flipped);
       onClick(code); // Call the onClick handler passed as a prop
-      console.log(suit, value) // This allows suit and value to be part of the object but be used for compilation
+      console.log(suit, value) // This allows suit and value to be part of the object but be used for compilation with npm build
     };
 
   return (
