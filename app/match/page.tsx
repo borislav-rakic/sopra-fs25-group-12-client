@@ -36,6 +36,16 @@ const MatchPage: React.FC = () => {
     },
   ]);
 
+  const [opponent1Cards, setOpponent1Cards] = useState([{
+    code: "2H",
+    suit: "Hearts",
+    value: BigInt(2),
+    image: "https://deckofcardsapi.com/static/img/2H.png",
+    onClick: (code: string) => {
+      console.log(`Card clicked: ${code}`);
+    },
+  }])
+
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
@@ -131,6 +141,25 @@ const MatchPage: React.FC = () => {
         >
           test
         </Button>
+
+        <Button
+        onClick={() =>
+        setOpponent1Cards([
+          ...opponent1Cards, // Keep the existing cards
+          {
+            code: "2H", // Example: Two of Hearts
+            suit: "Hearts",
+            value: BigInt(2),
+            image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+            onClick: (code: string) => {
+              console.log(`Card clicked: ${code}`);
+            },
+          },
+        ])
+      }
+        >
+          testAddOpponentCard
+        </Button>
       </div>
 
       <div className="gameboard">
@@ -171,102 +200,24 @@ const MatchPage: React.FC = () => {
             suit={card.suit}
             value={card.value}
             image={card.image}
+            backimage={cardback}
+            flipped={true}
             onClick={card.onClick}
           />))}
         </div>
 
         <div className="hand-1">
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-back"
-            src="https://deckofcardsapi.com/static/img/back.png"
-            alt="playingcard-back"
-            width={113}
-            height={157}
-          />
+        {opponent1Cards.map((card, index) => (
+            <Card
+            key={index}
+            code={card.code}
+            suit={card.suit}
+            value={card.value}
+            image={card.image}
+            backimage={cardback}
+            flipped={false}
+            onClick={card.onClick}
+          />))}
         </div>
 
         <div className="hand-2">
