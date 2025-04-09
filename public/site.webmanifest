@@ -1,0 +1,24 @@
+{
+  "name": "SoPra Group 12: Hearts Attack",
+  "short_name": "Hearts Attack",
+  "description": "A fast-paced card game of strategy and sabotage. Can you survive the Hearts Attack?",
+  "icons": [
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
+}

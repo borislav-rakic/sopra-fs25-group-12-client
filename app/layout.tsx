@@ -16,8 +16,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Group 12",
+  title: "SoPra Group 12: Hearts Attack",
   description: "sopra-fs25-template-client",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", type: "image/x-icon" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: [
+      { url: "/web-app-manifest-192x192.png", sizes: "192x192" },
+      { url: "/web-app-manifest-512x512.png", sizes: "512x512" },
+    ],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
