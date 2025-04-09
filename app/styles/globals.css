@@ -223,6 +223,7 @@ a {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
   align-items: center; /* Center child elements vertically */
+  justify-content: center;
 }
 
 .hand-1 {
@@ -242,6 +243,7 @@ a {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
   align-items: center; /* Center child elements vertically */
+  justify-content: center;
 }
 
 .hand-2 {
@@ -260,6 +262,7 @@ a {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
   align-items: center; /* Center child elements vertically */
+  justify-content: center;
 }
 
 .hand-3 {
@@ -279,6 +282,7 @@ a {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
   align-items: center; /* Center child elements vertically */
+  justify-content: center;
 }
 
 .playingcard {
