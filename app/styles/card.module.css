@@ -1,0 +1,67 @@
+.cardContainer {
+    position: relative;
+    height: 75%;
+    max-height: 75%;
+    aspect-ratio: 2/3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.0);
+    border: 1px solid rgb(0, 0, 0);
+    font-size: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    overflow: hidden;
+
+}
+
+.cardContainer.scalable:hover {
+    transform: scale(1.1); /* Scale up the image on hover */
+    z-index: 30; /* Bring the image to the front on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Add a shadow */
+  }
+
+.cardFront {
+    width: 100%; /* Fill the width of the container */
+    height: 100%; /* Fill the height of the container */
+    object-fit: fill; /* Ensure the image scales without distortion */
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0);
+    border: 1px solid rgba(0, 0, 0, 0);
+    z-index: 20;
+    transition: transform 0.2s ease-in-out;
+  
+
+}
+
+.cardBackContainer {
+    position: relative;
+    height: 75%;
+    max-height: 100%;
+    aspect-ratio: 2/3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.0);
+    border: 1px solid rgb(0, 0, 0);
+    font-size: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    overflow: visible;
+}
+
+.cardBack {
+    width: 100%; /* Fill the width of the container */
+    height: 100%; /* Fill the height of the container */
+    object-fit: fill; /* Ensure the image scales without distortion */
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0);
+    border: 1px solid rgba(0, 0, 0, 0);
+    z-index: 20;
+    transition: transform 0.2s ease-in-out;
+
+}
