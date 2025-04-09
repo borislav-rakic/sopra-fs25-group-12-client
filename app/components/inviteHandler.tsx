@@ -69,13 +69,22 @@ export const InviteHandler: React.FC = () => {
       });
 
       if (accepted) {
-        message.success("Joining game...");
+        message.open({
+          type: "success",
+          content: "Joining game...",
+        });
         router.push(`/start/${invite.matchId}`);
       } else {
-        message.info("Invite declined.");
+        message.open({
+          type: "info",
+          content: "Invite declined.",
+        });
       }
     } catch {
-      message.error("Failed to respond to invite.");
+      message.open({
+        type: "error",
+        content: "Failed to respond to invite.",
+      });
     } finally {
       setInvite(null);
       setModalVisible(false);

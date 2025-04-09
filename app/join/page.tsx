@@ -32,7 +32,10 @@ const JoinPage: React.FC = () => {
         setMatches(fetchedMatches);
         setFilteredMatches(fetchedMatches);
       } catch {
-        message.error("Could not fetch matches.");
+        message.open({
+          type: "error",
+          content: "Could not fetch matches.",
+        });
       }
     };
 
@@ -42,7 +45,10 @@ const JoinPage: React.FC = () => {
         setUserId(Number(me.id)); // Store userId in the state
         localStorage.setItem("userId", me.id.toString()); // Store in localStorage
       } catch {
-        message.error("Could not load current user.");
+        message.open({
+          type: "error",
+          content: "Could not load current user.",
+        });
       }
     };
 
@@ -52,17 +58,26 @@ const JoinPage: React.FC = () => {
 
   const checkJoinRequestStatus = async (matchId: number, userId: number) => {
     try {
-      message.info(`Polling: matchId=${matchId}, userId=${userId}`);
+      message.open({
+        type: "info",
+        content: `Polling: matchId=${matchId}, userId=${userId}`,
+      });
 
       const joinRequestsObject: JoinRequest[] = await apiService.get(
         `/matches/${matchId}/joinRequests`,
       );
 
-      message.info(`All join requests: ${JSON.stringify(joinRequestsObject)}`);
+      message.open({
+        type: "info",
+        content: `All join requests: ${JSON.stringify(joinRequestsObject)}`,
+      });
 
       const myRequest = joinRequestsObject.find((req) => req.userId === userId);
 
-      message.info(`Filtered join request: ${JSON.stringify(myRequest)}`);
+      message.open({
+        type: "info",
+        content: `Filtered join request: ${JSON.stringify(myRequest)}`,
+      });
 
       if (!myRequest) {
         return;
@@ -71,11 +86,17 @@ const JoinPage: React.FC = () => {
       const status = myRequest.status;
 
       if (status === "accepted") {
-        message.success("Your request has been accepted. Redirecting...");
+        message.open({
+          type: "success",
+          content: "Your request has been accepted. Redirecting...",
+        });
         clearInterval(pollingInterval.current!);
         router.push(`/start/${matchId}`);
       } else if (status === "declined") {
-        message.info("Your join request was declined.");
+        message.open({
+          type: "info",
+          content: "Your join request was declined.",
+        });
         clearInterval(pollingInterval.current!);
       } else {
         console.log("Join request still pending...");
@@ -113,7 +134,10 @@ const JoinPage: React.FC = () => {
 
     if (!userId) {
       modalInstance.destroy();
-      message.error("User not logged in.");
+      message.open({
+        type: "error",
+        content: "User not logged in.",
+      });
       return;
     }
 
@@ -121,7 +145,10 @@ const JoinPage: React.FC = () => {
 
     if (isNaN(parsedUserId)) {
       modalInstance.destroy();
-      message.error("Invalid user ID.");
+      message.open({
+        type: "error",
+        content: "Invalid user ID.",
+      });
       return;
     }
     if (pollingInterval.current) {
@@ -138,7 +165,10 @@ const JoinPage: React.FC = () => {
       }, 3000);
     } catch {
       modalInstance.destroy();
-      message.error("Could not send join request.");
+      message.open({
+        type: "error",
+        content: "Could not send join request.",
+      });
     }
   };
 
