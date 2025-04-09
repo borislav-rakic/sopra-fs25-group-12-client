@@ -7,7 +7,7 @@ import { Button /* , Row, Col, Space */ } from "antd";
 import styles from "@/styles/page.module.css";
 // import { useApi } from "@/hooks/useApi";
 // import { Match } from "@/types/match";
-import { JSX, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import SettingsPopup from "../components/SettingsPopup";
 
 const MatchPage: React.FC = () => {
@@ -16,14 +16,48 @@ const MatchPage: React.FC = () => {
 
   const [cardsInHand, setCardsInHand] = useState<JSX.Element[]>([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [playmat, setPlaymat] = useState("Green"); // Default playmat
-  const [cardback, setCardback] = useState("default"); // Default cardback
+  const [playmat, setPlaymat] = useState("");
+  const [cardback, setCardback] = useState("");
 
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
   };
 
-  // let playerHand = document.getElementById("hand-0");
+
+  // sets default settings and sets them to local storage, unless they already exist
+  useEffect(() => {
+    if (localStorage.getItem("playmat")) {
+      setPlaymat(localStorage.getItem("playmat") || "");
+    } else {
+        setPlaymat("Green"); // Default playmat
+        localStorage.setItem("playmat", "Green");
+        }
+    if (localStorage.getItem("cardback")) {
+      setCardback(localStorage.getItem("cardback") || "");
+    } else {
+        setCardback("Default"); // Default cardback
+        localStorage.setItem("cardback", "Default");
+        }   
+  }, []);
+
+  useEffect(() => {
+    console.log(`Playmat changed to: ${playmat}`);
+    const gameboard = document.getElementsByClassName("gameboard")[0] as HTMLElement;
+    if (gameboard) {
+      gameboard.style.backgroundColor = playmat.toLowerCase();
+    }
+  }, [playmat]);
+  
+/* 
+  useEffect(() => {
+    console.log(`Cardback changed to: ${cardback}`);
+    const cardbacks = document.getElementsByClassName("playingcard-back") as HTMLCollectionOf<HTMLElement>;
+    for (let i = 0; i < cardbacks.length; i++) {
+      cardbacks[i].style.backgroundImage = `url(${cardback})`;
+    }
+  }, [cardback]);
+
+ */  // let playerHand = document.getElementById("hand-0");
 
   return (
     <div className={`${styles.page} matchPage`}>
@@ -31,8 +65,8 @@ const MatchPage: React.FC = () => {
         <Image
           src="/setting-gear.svg"
           alt="Settings"
-          width={50}
-          height={50}
+          width={100}
+          height={100}
           onClick={() => {toggleSettings()}}
         />
       </div>

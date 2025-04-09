@@ -54,9 +54,9 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
           <label>
             Cardback:
             <select value={cardback} onChange={(e) => setCardback(e.target.value)}>
-              <option value="default">Default</option>
-              <option value="temp1">Temp 1</option>
-              <option value="temp2">Temp 2</option>
+              <option value="https://deckofcardsapi.com/static/img/back.png">Default</option>
+              <option value="/testCardBack.jpg">test</option>
+              <option value="https://deckofcardsapi.com/static/img/back.png">Temp 2</option>
             </select>
           </label>
         </div>
