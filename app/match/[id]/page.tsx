@@ -1,6 +1,6 @@
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 import "@ant-design/v5-patch-for-react-19";
-import { useParams, useRouter } from "next/navigation";
+import { useParams/*, useRouter */ } from "next/navigation";
 import Image from "next/image";
 import { Button /* , Row, Col, Space */ } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
@@ -9,23 +9,30 @@ import { useApi } from "@/hooks/useApi";
 // import { Match } from "@/types/match";
 import { useEffect, useState } from "react";
 import { PlayerMatchInformation } from "@/types/playerMatchInformation";
-import SettingsPopup from "../components/SettingsPopup";
-import Card, { cardProps } from "../components/Card";
+import SettingsPopup from "@/components/SettingsPopup";
+import Card, { cardProps } from "@/components/Card";
 
 const MatchPage: React.FC = () => {
-  const router = useRouter();
+  //const router = useRouter();
   const params = useParams();
   const apiService = useApi();
 
   const matchId = params?.id?.toString();
 
   const [cardsInHand, setCardsInHand] = useState<cardProps[]>([]);
+  const [opponent1Cards, setOpponent1Cards] = useState<cardProps[]>([]);
+  const [opponent2Cards, setOpponent2Cards] = useState<cardProps[]>([]);
+  const [opponent3Cards, setOpponent3Cards] = useState<cardProps[]>([]);
   const [players, setPlayers] = useState<Array<string | null>>([
     null,
     null,
     null,
     null,
   ]);
+  
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [playmat, setPlaymat] = useState("");
+  const [cardback, setCardback] = useState("");
 
   // let playerHand = document.getElementById("hand-0");
 
@@ -59,18 +66,7 @@ const MatchPage: React.FC = () => {
       console.log("Interval cleared.");
     };
   }, [apiService, matchId]);
-  const [cardsInHand, setCardsInHand] = useState<cardProps[]>([]);
 
-  const [opponent1Cards, setOpponent1Cards] = useState<cardProps[]>([]);
-
-  const [opponent2Cards, setOpponent2Cards] = useState<cardProps[]>([]);
-
-  const [opponent3Cards, setOpponent3Cards] = useState<cardProps[]>([]);
-
-
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [playmat, setPlaymat] = useState("");
-  const [cardback, setCardback] = useState("");
 
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
