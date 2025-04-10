@@ -7,10 +7,23 @@ import { Button, Col, Row, Space } from "antd";
 import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
 import { Match } from "@/types/match";
+import SettingsPopup from "@/components/SettingsPopup";
+import { useEffect, useState } from "react";
 
 const LandingPageUser: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [playmat, setPlaymat] = useState("#42db83"); // default green
+  const [cardback, setCardback] = useState("b101.png"); // default
+
+  useEffect(() => {
+    const storedPlaymat = localStorage.getItem("playmat");
+    const storedCardback = localStorage.getItem("cardback");
+    if (storedPlaymat) setPlaymat(storedPlaymat);
+    if (storedCardback) setCardback(storedCardback);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -125,7 +138,7 @@ const LandingPageUser: React.FC = () => {
                 type="primary"
                 color="yellow"
                 variant="solid"
-                onClick={() => router.push("/settings")}
+                onClick={() => setSettingsOpen(true)}
               >
                 Settings
               </Button>
@@ -145,6 +158,15 @@ const LandingPageUser: React.FC = () => {
             </Col>
           </Row>
         </Space>
+
+        <SettingsPopup
+          isOpen={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          playmat={playmat}
+          setPlaymat={setPlaymat}
+          cardback={cardback}
+          setCardback={setCardback}
+        />
       </main>
     </div>
   );

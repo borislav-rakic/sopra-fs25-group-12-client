@@ -1,5 +1,7 @@
+"use client";
+
 import React, { useState } from "react";
-import styles from "@/styles/settingsPopup.module.css"; // Assuming you have a CSS file for styling
+import styles from "@/styles/settingsPopup.module.css";
 
 interface SettingsPopupProps {
   isOpen: boolean;
@@ -9,6 +11,12 @@ interface SettingsPopupProps {
   cardback: string;
   setCardback: (value: string) => void;
 }
+
+const playMatColors = [
+  "#ec4d40", "#57d2e4", "#42db83", "#f4e841", "#040400", "#fffefa"
+];
+
+const cardBackFiles = Array.from({ length: 6 }, (_, i) => `b10${i + 1}.png`);
 
 const SettingsPopup: React.FC<SettingsPopupProps> = ({
   isOpen,
@@ -21,20 +29,20 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
   const [oldPlaymat, setOldPlaymat] = useState(playmat);
   const [oldCardback, setOldCardback] = useState(cardback);
 
-  if (!isOpen) return null; // Don't render if the popup is closed
+  if (!isOpen) return null;
 
   const handleApply = () => {
     localStorage.setItem("playmat", playmat);
     localStorage.setItem("cardback", cardback);
     setOldPlaymat(playmat);
     setOldCardback(cardback);
-    onClose(); // Close the popup when applying settings
+    onClose();
   };
 
   const handleCancel = () => {
     setPlaymat(oldPlaymat);
     setCardback(oldCardback);
-    onClose(); // Close the popup when canceling settings
+    onClose();
   };
 
   return (
@@ -45,33 +53,33 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
         </button>
         <h2>Settings</h2>
         <div className={styles.settingsContent}>
-          {/* Add your settings options here */}
-          <label>
-            Playmat:
-            <select
-              value={playmat}
-              onChange={(e) => setPlaymat(e.target.value)}
-            >
-              <option value="Green">Green</option>
-              <option value="Blue">Blue</option>
-              <option value="Red">Red</option>
-            </select>
-          </label>
-          <label>
-            Cardback:
-            <select
-              value={cardback}
-              onChange={(e) => setCardback(e.target.value)}
-            >
-              <option value="https://deckofcardsapi.com/static/img/back.png">
-                Default
-              </option>
-              <option value="/testCardBack.jpg">test</option>
-              <option value="https://deckofcardsapi.com/static/img/back.png">
-                Temp 2
-              </option>
-            </select>
-          </label>
+          <label>Playmat:</label>
+          <div className={styles.colorSelector}>
+            {playMatColors.map((color) => (
+              <div
+                key={color}
+                className={styles.colorSquare}
+                style={{
+                  backgroundColor: color,
+                  border: playmat === color ? "3px solid #1890ff" : "2px solid #ccc",
+                }}
+                onClick={() => setPlaymat(color)}
+              />
+            ))}
+          </div>
+
+          <label>Cardback:</label>
+          <div className={styles.cardbackSelector}>
+            {cardBackFiles.map((file) => (
+              <img
+                key={file}
+                src={`/card_back/${file}`}
+                alt={file}
+                className={`${styles.cardbackImage} ${cardback === file ? styles.selected : ""}`}
+                onClick={() => setCardback(file)}
+              />
+            ))}
+          </div>
         </div>
         <button className={styles.settingsApply} onClick={handleApply}>
           Apply

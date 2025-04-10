@@ -99,3 +99,49 @@
 .settingsApply:hover {
   background-color: #b9ffaf; /* Slightly darker on hover */
 }
+
+.colorSelector {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.colorSquare {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border 0.2s ease-in-out;
+}
+
+.cardbackSelector {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.cardbackImage {
+  width: 60px;
+  height: 90px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid #ccc;
+  transition: border 0.2s;
+}
+
+.cardbackImage.selected {
+  border: 3px solid #1890ff;
+}
+
+/* Dark mode tweaks for image selector */
+@media (prefers-color-scheme: dark) {
+  .cardbackImage {
+    border: 2px solid #444;
+  }
+
+  .cardbackImage.selected {
+    border: 3px solid #66b2ff;
+  }
+}

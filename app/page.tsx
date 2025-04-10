@@ -7,6 +7,7 @@ import { Button } from "antd";
 import styles from "@/styles/page.module.css";
 import { useEffect } from "react";
 import { useApi } from "@/hooks/useApi";
+import { generateUUID } from "@/utils/uuid";
 
 export default function Home() {
   const router = useRouter();
@@ -26,6 +27,20 @@ export default function Home() {
       sessionStorage.setItem("populateCalled", "true");
     }
   }, [apiService]);
+
+  const handleGuestLogin = () => {
+    const guestId = "guest-" + generateUUID();
+    const guestUser = {
+      id: guestId,
+      username: guestId,
+      token: "guest-token",
+      is_guest: true,
+    };
+
+    localStorage.setItem("user", JSON.stringify(guestUser));
+    router.push("/landingpageuser");
+  };
+
 
   return (
     <div className={styles.page}>
@@ -65,7 +80,7 @@ export default function Home() {
             type="primary"
             color="blue"
             variant="solid"
-            onClick={() => router.push("/landingpageuser")}
+            onClick={() => {handleGuestLogin}}
             target="_blank"
             rel="noopener noreferrer"
           >
