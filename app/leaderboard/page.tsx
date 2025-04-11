@@ -7,11 +7,10 @@ import { Button, Space, Table } from "antd";
 import { useApi } from "@/hooks/useApi";
 import "@/styles/globals.css";
 
-
 type User = {
   id: number;
   username: string;
-  rating: number;
+  scoreTotal: number;
 };
 
 type LeaderboardRow = {
@@ -35,6 +34,7 @@ const columns = [
     title: "Points",
     dataIndex: "points",
     key: "points",
+    render: (points: number) => points.toFixed(3), // 👈 Format to 1 decimal place
   },
 ];
 
@@ -49,7 +49,6 @@ const LeaderboardPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
-
   useEffect(() => {
     const fetchLeaderboard = async () => {
       setLoading(true);
@@ -57,7 +56,7 @@ const LeaderboardPage: React.FC = () => {
         const params = {
           page,
           pageSize,
-          sortBy: "rating",
+          sortBy: "scoreTotal",
           order: "desc",
         };
 
@@ -69,7 +68,7 @@ const LeaderboardPage: React.FC = () => {
         const ranked = response.content.map((user, index) => ({
           key: user.id,
           username: user.username,
-          points: user.rating,
+          points: user.scoreTotal,
           rank: page * pageSize + index + 1,
         }));
 
@@ -89,7 +88,6 @@ const LeaderboardPage: React.FC = () => {
     setSearchValue(value);
   };
 
-
   return (
     <div className="login-container">
       <div style={{ width: "100%", maxWidth: "800px" }}>
@@ -100,35 +98,35 @@ const LeaderboardPage: React.FC = () => {
         >
           {/* Top-right controls */}
           <Space style={{ justifyContent: "flex-end", width: "100%" }}>
-                    <input
-            type="text"
-            placeholder="Search username..."
-            value={searchValue}
-            onChange={(e) => handleSearch(e.target.value)}
-            style={{
-              height: "36px", // Match AntD small button height
-              padding: "0 8px", // Tight horizontal space
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-              fontSize: "14px",
-              width: "200px",
-              lineHeight: "24px", // vertically centers text
-            }}
-          />
+            <input
+              type="text"
+              placeholder="Search username..."
+              value={searchValue}
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{
+                height: "36px", // Match AntD small button height
+                padding: "0 8px", // Tight horizontal space
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                fontSize: "14px",
+                width: "200px",
+                lineHeight: "24px", // vertically centers text
+              }}
+            />
             <Button className="login-button">Filter</Button>
           </Space>
-  
+
           {/* Leaderboard Table */}
           <Table
             columns={columns}
             dataSource={data.filter((user) =>
-                        user.username.toLowerCase().includes(searchValue.toLowerCase())
-                        )}
+              user.username.toLowerCase().includes(searchValue.toLowerCase())
+            )}
             pagination={false}
             bordered
             loading={loading}
           />
-  
+
           {/* Below-table buttons */}
           <div
             style={{
@@ -140,12 +138,12 @@ const LeaderboardPage: React.FC = () => {
             {/* Back to Home */}
             <Button
               className="back-button"
-              style={{maxWidth: "fit-content" }}
+              style={{ maxWidth: "fit-content" }}
               onClick={() => router.push("/landingpageuser")}
             >
               Back To Home Page
             </Button>
-  
+
             {/* Pagination Buttons */}
             <Space>
               <Button
@@ -172,7 +170,6 @@ const LeaderboardPage: React.FC = () => {
       </div>
     </div>
   );
-  
 };
 
 export default LeaderboardPage;

@@ -13,7 +13,12 @@ interface SettingsPopupProps {
 }
 
 const playMatColors = [
-  "#ec4d40", "#57d2e4", "#42db83", "#f4e841", "#040400", "#fffefa"
+  "#ec4d40",
+  "#57d2e4",
+  "#42db83",
+  "#f4e841",
+  "#040400",
+  "#fffefa",
 ];
 
 const cardBackFiles = Array.from({ length: 6 }, (_, i) => `b10${i + 1}.png`);
@@ -61,7 +66,9 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
                 className={styles.colorSquare}
                 style={{
                   backgroundColor: color,
-                  border: playmat === color ? "3px solid #1890ff" : "2px solid #ccc",
+                  border: playmat === color
+                    ? "3px solid #1890ff"
+                    : "2px solid #ccc",
                 }}
                 onClick={() => setPlaymat(color)}
               />
@@ -75,7 +82,9 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
                 key={file}
                 src={`/card_back/${file}`}
                 alt={file}
-                className={`${styles.cardbackImage} ${cardback === file ? styles.selected : ""}`}
+                className={`${styles.cardbackImage} ${
+                  cardback === file ? styles.selected : ""
+                }`}
                 onClick={() => setCardback(file)}
               />
             ))}

@@ -104,7 +104,7 @@ const StartPage: React.FC = () => {
           match.player3Id,
           match.player4Id,
         ].filter((id): id is number => id !== null);
-        
+
         setPlayerIds(playerIdList);
         setHostUsername(match.host);
 

@@ -41,7 +41,6 @@ export default function Home() {
     router.push("/landingpageuser");
   };
 
-
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -54,7 +53,10 @@ export default function Home() {
         />
 
         <h1>HEARTS ATTACK</h1>
-        <p>A fast-paced card game of strategy and sabotage.<br/>Can you survive the Hearts Attack?</p>
+        <p>
+          A fast-paced card game of strategy and sabotage.<br />Can you survive
+          the Hearts Attack?
+        </p>
         <div className={styles.ctas}>
           <Button
             type="primary" // as defined in the ConfigProvider in [layout.tsx](./layout.tsx), all primary antd elements are colored #22426b, with buttons #75bd9d as override
@@ -80,7 +82,9 @@ export default function Home() {
             type="primary"
             color="blue"
             variant="solid"
-            onClick={() => {handleGuestLogin}}
+            onClick={() => {
+              handleGuestLogin;
+            }}
             target="_blank"
             rel="noopener noreferrer"
           >
