@@ -72,8 +72,8 @@ reason).
 
 | **Student**          | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | -------------------- | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **@stevaniaeilyn**   | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@stevaniaeilyn**   | 10.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/68440e47f6f0864cd4d49c60d9a5d7fb86e1b20c | added card back options & reimplemented settings pop up / page | Users can now choose their preferred visual settings |
+|                      | 12.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/520c46b12ab8732aa4e082d13dc498e28c3cc5d4 | implemented leaderboard page with all functionality| Users can compare themselves with other users based on different filters |
 | **@diderot5038**     | 11.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/78ab27d14f8acad49fd7b2bc3bb3bac613b768eb | Conceived point allocation scheme and extended User entity to accomodate it. | Users can collect points based on their performance both in individual games and matches and we had to agree on a system. |
 |                      | 12.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/cd45314e5a8b4c599ce3eae5657c44ef2d1d5266 | Implemented GameStats entity to track the evolution of a game. | The AI players can now make informed decisions what card to play next by keeping track of the cards that have already been played; game logic can infer from the data who is to play next and which cards may be dealt by (both human and AI) players. |
 | **@borislav-rakic**  | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
