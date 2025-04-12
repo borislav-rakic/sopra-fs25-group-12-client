@@ -3,40 +3,31 @@
 import "@ant-design/v5-patch-for-react-19";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button, Space, Table } from "antd";
+import { Button, Space, Table, Dropdown, Menu } from "antd";
 import { useApi } from "@/hooks/useApi";
+import { User } from "@/types/user";
+import Link from "next/link";
 import "@/styles/globals.css";
 
-type User = {
-  id: number;
-  username: string;
-  scoreTotal: number;
-};
-
 type LeaderboardRow = {
-  key: number;
+  key: string;
   username: string;
-  points: number;
+  stat: number | string | null;
   rank: number;
 };
-const columns = [
-  {
-    title: "Rank",
-    dataIndex: "rank",
-    key: "rank",
-  },
-  {
-    title: "Username",
-    dataIndex: "username",
-    key: "username",
-  },
-  {
-    title: "Points",
-    dataIndex: "points",
-    key: "points",
-    render: (points: number) => points.toFixed(3), // 👈 Format to 1 decimal place
-  },
+
+
+const filterOptions = [
+  { key: "scoreTotal", label: "Score Total" },
+  { key: "gamesPlayed", label: "Games Played" },
+  { key: "avgPlacement", label: "Avg. Placement" },
+  { key: "moonShots", label: "Moon Shots" },
+  { key: "perfectGames", label: "Perfect Games" },
+  { key: "perfectMatches", label: "Perfect Matches" },
+  { key: "currentStreak", label: "Current Streak" },
+  { key: "longestStreak", label: "Longest Streak" },
 ];
+
 
 const LeaderboardPage: React.FC = () => {
   const apiService = useApi();
@@ -48,15 +39,40 @@ const LeaderboardPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState<string>("scoreTotal");
+
+  const columns = [
+    {
+      title: "Rank",
+      dataIndex: "rank",
+      key: "rank",
+    },
+    {
+      title: "Username",
+      dataIndex: "username",
+      key: "username",
+      render: (_: any, record: LeaderboardRow) => (
+        <Link href={`/users/${record.key}`} style={{ color: "#1890ff" }}>
+          {record.username}
+        </Link>
+      ),
+    },
+    {
+      title: filterOptions.find((f) => f.key === selectedFilter)?.label || selectedFilter,
+      dataIndex: "stat",
+      key: "stat",
+      render: (value: number) => value?.toFixed?.(3) ?? value, // Format number if possible
+    },
+  ];
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
       setLoading(true);
       try {
         const params = {
-          page,
-          pageSize,
-          sortBy: "scoreTotal",
+          page: searchValue ? 0 : page, // fetch all when searching
+          pageSize: searchValue ? 9999 : pageSize, // arbitrarily large page to get everything
+          sortBy: selectedFilter,
           order: "desc",
         };
 
@@ -68,8 +84,8 @@ const LeaderboardPage: React.FC = () => {
         const ranked = response.content.map((user, index) => ({
           key: user.id,
           username: user.username,
-          points: user.scoreTotal,
-          rank: page * pageSize + index + 1,
+          stat: user[selectedFilter as keyof User],
+          rank: searchValue ? index + 1 : page * pageSize + index + 1,
         }));
 
         setData(ranked);
@@ -82,7 +98,11 @@ const LeaderboardPage: React.FC = () => {
     };
 
     fetchLeaderboard();
-  }, [page, apiService, pageSize]);
+  }, [page, apiService, pageSize, searchValue, selectedFilter]);
+
+  const filteredData = data.filter((user) =>
+    user.username.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
@@ -113,19 +133,40 @@ const LeaderboardPage: React.FC = () => {
                 lineHeight: "24px", // vertically centers text
               }}
             />
-            <Button className="login-button">Filter</Button>
+                    <Dropdown
+          overlay={
+            <Menu
+              onClick={({ key }) => setSelectedFilter(key)}
+              items={filterOptions}
+            />
+          }
+          trigger={["click"]}
+        >
+          <Button className="login-button">
+            Filter: {filterOptions.find((item) => item.key === selectedFilter)?.label}
+          </Button>
+        </Dropdown>
           </Space>
 
           {/* Leaderboard Table */}
           <Table
-            columns={columns}
-            dataSource={data.filter((user) =>
-              user.username.toLowerCase().includes(searchValue.toLowerCase())
-            )}
-            pagination={false}
-            bordered
-            loading={loading}
-          />
+  columns={columns}
+  dataSource={filteredData}
+  pagination={
+    searchValue
+      ? false
+      : {
+          current: page + 1,
+          pageSize,
+          total,
+          onChange: (newPage) => setPage(newPage - 1),
+          showSizeChanger: false,
+        }
+  }
+  bordered
+  loading={loading}
+/>
+
 
           {/* Below-table buttons */}
           <div
@@ -144,27 +185,6 @@ const LeaderboardPage: React.FC = () => {
               Back To Home Page
             </Button>
 
-            {/* Pagination Buttons */}
-            <Space>
-              <Button
-                className="back-button"
-                onClick={() => {
-                  if (page > 0) setPage(page - 1);
-                }}
-                disabled={page === 0}
-              >
-                Back Page
-              </Button>
-              <Button
-                className="login-button"
-                onClick={() => {
-                  if ((page + 1) * pageSize < total) setPage(page + 1);
-                }}
-                disabled={(page + 1) * pageSize >= total}
-              >
-                Next Page
-              </Button>
-            </Space>
           </div>
         </Space>
       </div>
