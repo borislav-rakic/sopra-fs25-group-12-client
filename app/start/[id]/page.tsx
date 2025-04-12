@@ -291,7 +291,8 @@ const StartPage: React.FC = () => {
     }
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
+    await apiService.post(`/matches/${gameId}/start`, {});
     router.push(`/match/${gameId}`);
   };
 
