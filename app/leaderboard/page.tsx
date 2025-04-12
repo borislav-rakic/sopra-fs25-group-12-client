@@ -51,7 +51,7 @@ const LeaderboardPage: React.FC = () => {
       title: "Username",
       dataIndex: "username",
       key: "username",
-      render: (_: any, record: LeaderboardRow) => (
+      render: (_: unknown, record: LeaderboardRow) => (
         <Link href={`/users/${record.key}`} style={{ color: "#1890ff" }}>
           {record.username}
         </Link>
