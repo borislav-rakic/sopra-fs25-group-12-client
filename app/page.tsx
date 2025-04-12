@@ -82,9 +82,7 @@ export default function Home() {
             type="primary"
             color="blue"
             variant="solid"
-            onClick={() => {
-              handleGuestLogin;
-            }}
+            onClick={() => handleGuestLogin}
             target="_blank"
             rel="noopener noreferrer"
           >

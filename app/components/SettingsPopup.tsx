@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import styles from "@/styles/settingsPopup.module.css";
+import Image from "next/image";
 
 interface SettingsPopupProps {
   isOpen: boolean;
@@ -78,7 +79,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
           <label>Cardback:</label>
           <div className={styles.cardbackSelector}>
             {cardBackFiles.map((file) => (
-              <img
+              <Image
                 key={file}
                 src={`/card_back/${file}`}
                 alt={file}

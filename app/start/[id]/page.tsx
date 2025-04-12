@@ -224,6 +224,8 @@ const StartPage: React.FC = () => {
     }, 5000);
 
     return () => clearInterval(interval);
+  
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiService, gameId, router]);
 
   const isHost = currentUsername === hostUsername;
