@@ -82,7 +82,10 @@ const StartPage: React.FC = () => {
     const loadUsers = async () => {
       try {
         const result = await apiService.get<User[]>("/users");
-        const onlineUsers = result.filter((user) => user.status === "ONLINE");
+        const onlineUsers = result.filter((user) =>
+           user.status === "ONLINE"
+            && !user.isAiPlayer
+        );
         setUsers(onlineUsers);
         setFilteredUsers(onlineUsers);
         usersRef.current = onlineUsers;

@@ -1,5 +1,7 @@
 export interface User {
   id: string;
+  isAiPlayer: boolean;
+  isGuest: boolean;
   username: string;
   token: string | null;
   status: string | null;
