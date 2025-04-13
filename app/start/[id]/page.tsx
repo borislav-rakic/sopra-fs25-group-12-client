@@ -83,8 +83,8 @@ const StartPage: React.FC = () => {
       try {
         const result = await apiService.get<User[]>("/users");
         const onlineUsers = result.filter((user) =>
-           user.status === "ONLINE"
-            && !user.isAiPlayer
+          user.status === "ONLINE" &&
+          !user.isAiPlayer
         );
         setUsers(onlineUsers);
         setFilteredUsers(onlineUsers);

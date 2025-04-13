@@ -12,7 +12,7 @@ import "@/styles/globals.css";
 type LeaderboardRow = {
   key: string;
   username: string;
-  stat: number | string | null;
+  score_total: number | string | boolean | null;
   rank: number;
 };
 
@@ -58,8 +58,8 @@ const LeaderboardPage: React.FC = () => {
     {
       title: filterOptions.find((f) => f.key === selectedFilter)?.label ||
         selectedFilter,
-      dataIndex: "stat",
-      key: "stat",
+      dataIndex: "score_total",
+      key: "score_total",
       render: (value: number) => value?.toFixed?.(3) ?? value, // Format number if possible
     },
   ];
@@ -83,7 +83,7 @@ const LeaderboardPage: React.FC = () => {
         const ranked = response.content.map((user, index) => ({
           key: user.id,
           username: user.username,
-          stat: user[selectedFilter as keyof User],
+          score_total: user[selectedFilter as keyof User],
           rank: searchValue ? index + 1 : page * pageSize + index + 1,
         }));
 

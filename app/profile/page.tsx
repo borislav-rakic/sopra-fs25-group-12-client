@@ -10,12 +10,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image"; // Add this to your imports
 import { UserPrivateDTO } from "@/types/user";
 
-type UserProfile = {
-  username: string;
-  birthday: string;
-  avatar: number;
-};
-
 const MyProfile: React.FC = () => {
   const router = useRouter();
   const [form, setForm] = useState({

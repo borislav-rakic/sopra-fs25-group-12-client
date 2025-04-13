@@ -9,7 +9,7 @@ import { useApi } from "@/hooks/useApi";
 import { Match } from "@/types/match";
 import SettingsPopup from "@/components/SettingsPopup";
 import { useEffect, useState } from "react";
-import type { UserPrivateDTO } from "@/types/User";
+import type { UserPrivateDTO } from "@/types/user";
 
 const LandingPageUser: React.FC = () => {
   const router = useRouter();
@@ -52,7 +52,7 @@ const LandingPageUser: React.FC = () => {
     };
 
     fetchUser();
-  }, [router]);
+  }, [router, apiService]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
