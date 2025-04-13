@@ -8,6 +8,7 @@ import "./profile.css";
 import { useApi } from "@/hooks/useApi";
 import { useRouter } from "next/navigation";
 import Image from "next/image"; // Add this to your imports
+import { UserPrivateDTO } from "@/types/user";
 
 type UserProfile = {
   username: string;
@@ -22,7 +23,7 @@ const MyProfile: React.FC = () => {
     password: "",
     passwordConfirmed: "",
     birthday: "",
-    avatar: 1,
+    avatar: 101,
   });
   const formattedBirthday = form.birthday
     ? new Date(form.birthday).toLocaleDateString("en-GB", {
@@ -39,23 +40,44 @@ const MyProfile: React.FC = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        router.push("/");
+        return;
+      }
+
       try {
-        const user = await apiService.get<UserProfile>("/users/me");
+        const user = await apiService.get<UserPrivateDTO>("/users/me");
+
+        // If user is a guest, redirect to /landingpageuser
+        if (user.isGuest) {
+          router.push("/landingpageuser");
+          return;
+        }
 
         setForm((prev) => ({
           ...prev,
           username: user.username || "",
           birthday: user.birthday || "",
-          avatar: user.avatar || 1,
+          avatar: user.avatar || 101,
         }));
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        alert("Failed to load profile.");
+      } catch (err: unknown) {
+        console.error("Error fetching profile:", err);
+
+        const error = err as { status?: number; message?: string };
+
+        if (error.status === 401 || error.message?.includes("Invalid token")) {
+          localStorage.removeItem("token");
+          router.push("/");
+        } else {
+          alert("Failed to load profile.");
+        }
       }
     };
 
     fetchProfile();
-  }, [apiService]); // Removed profileId from dependency array as it's no longer a prop
+  }, [apiService, router]);
 
   const handleAvatarSelect = (avatarNumber: number) => {
     setForm((prev) => ({ ...prev, avatar: avatarNumber }));
@@ -131,7 +153,7 @@ const MyProfile: React.FC = () => {
     }
   };
 
-  const avatarUrl = `/avatars_118x118/r${100 + form.avatar}.png`;
+  const avatarUrl = `/avatars_118x118/a${form.avatar}.png`;
 
   return (
     <div className="profile-container">

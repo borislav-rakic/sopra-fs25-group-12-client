@@ -3,7 +3,7 @@
 import "@ant-design/v5-patch-for-react-19";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button, Space, Table, Dropdown, Menu } from "antd";
+import { Button, Dropdown, Space, Table } from "antd";
 import { useApi } from "@/hooks/useApi";
 import { User } from "@/types/user";
 import Link from "next/link";
@@ -16,7 +16,6 @@ type LeaderboardRow = {
   rank: number;
 };
 
-
 const filterOptions = [
   { key: "scoreTotal", label: "Score Total" },
   { key: "gamesPlayed", label: "Games Played" },
@@ -27,7 +26,6 @@ const filterOptions = [
   { key: "currentStreak", label: "Current Streak" },
   { key: "longestStreak", label: "Longest Streak" },
 ];
-
 
 const LeaderboardPage: React.FC = () => {
   const apiService = useApi();
@@ -58,7 +56,8 @@ const LeaderboardPage: React.FC = () => {
       ),
     },
     {
-      title: filterOptions.find((f) => f.key === selectedFilter)?.label || selectedFilter,
+      title: filterOptions.find((f) => f.key === selectedFilter)?.label ||
+        selectedFilter,
       dataIndex: "stat",
       key: "stat",
       render: (value: number) => value?.toFixed?.(3) ?? value, // Format number if possible
@@ -133,40 +132,35 @@ const LeaderboardPage: React.FC = () => {
                 lineHeight: "24px", // vertically centers text
               }}
             />
-                    <Dropdown
-          overlay={
-            <Menu
-              onClick={({ key }) => setSelectedFilter(key)}
-              items={filterOptions}
-            />
-          }
-          trigger={["click"]}
-        >
-          <Button className="login-button">
-            Filter: {filterOptions.find((item) => item.key === selectedFilter)?.label}
-          </Button>
-        </Dropdown>
+            <Dropdown
+              menu={{
+                items: filterOptions,
+                onClick: ({ key }) => setSelectedFilter(key),
+              }}
+              trigger={["click"]}
+            >
+              <Button className="login-button">
+                Filter:{" "}
+                {filterOptions.find((item) => item.key === selectedFilter)
+                  ?.label}
+              </Button>
+            </Dropdown>
           </Space>
 
           {/* Leaderboard Table */}
           <Table
-  columns={columns}
-  dataSource={filteredData}
-  pagination={
-    searchValue
-      ? false
-      : {
-          current: page + 1,
-          pageSize,
-          total,
-          onChange: (newPage) => setPage(newPage - 1),
-          showSizeChanger: false,
-        }
-  }
-  bordered
-  loading={loading}
-/>
-
+            columns={columns}
+            dataSource={filteredData}
+            pagination={searchValue ? false : {
+              current: page + 1,
+              pageSize,
+              total,
+              onChange: (newPage) => setPage(newPage - 1),
+              showSizeChanger: false,
+            }}
+            bordered
+            loading={loading}
+          />
 
           {/* Below-table buttons */}
           <div
@@ -184,7 +178,6 @@ const LeaderboardPage: React.FC = () => {
             >
               Back To Home Page
             </Button>
-
           </div>
         </Space>
       </div>

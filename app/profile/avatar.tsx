@@ -12,7 +12,7 @@ interface AvatarSelectorProps {
 const AvatarSelector: React.FC<AvatarSelectorProps> = (
   { selected, onSelect },
 ) => {
-  const avatars = Array.from({ length: 49 }, (_, i) => i + 1);
+  const avatars = Array.from({ length: 49 }, (_, i) => 101 + i);
 
   return (
     <div className="avatar-selector">
@@ -21,7 +21,7 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = (
         {avatars.map((num) => (
           <Image
             key={num}
-            src={`/avatars_118x118/r${100 + num}.png`}
+            src={`/avatars_118x118/a${num}.png`}
             alt={`Avatar ${num}`}
             className={selected === num ? "selected" : ""}
             onClick={() => onSelect(num)}

@@ -349,7 +349,7 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src="/avatars/actor-chaplin-comedy.png"
+              src="/avatars_118x118/a101.png"
               alt="avatar"
               width={72}
               height={72}
@@ -365,7 +365,7 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src="/avatars/addicted-draw-love.png"
+              src="/avatars_118x118/a102.png"
               alt="avatar"
               width={72}
               height={72}
@@ -381,7 +381,7 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src="/avatars/afro-avatar-male.png"
+              src="/avatars_118x118/a103.png"
               alt="avatar"
               width={72}
               height={72}
@@ -397,7 +397,7 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src="/avatars/alien-avatar-space.png"
+              src="/avatars_118x118/a104.png"
               alt="avatar"
               width={72}
               height={72}

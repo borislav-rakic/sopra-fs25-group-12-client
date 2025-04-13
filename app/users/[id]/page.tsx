@@ -214,7 +214,7 @@ const UserProfileView: React.FC = () => {
     })
     : "";
 
-  const avatarUrl = `/avatars_118x118/r${100 + user.avatar}.png`;
+  const avatarUrl = `/avatars_118x118/a${user.avatar}.png`;
 
   return (
     <div className="user-profile-view">

@@ -9,7 +9,6 @@ import {
   Col,
   Dropdown,
   Input,
-  Menu,
   message,
   Modal,
   Row,
@@ -224,7 +223,7 @@ const StartPage: React.FC = () => {
     }, 5000);
 
     return () => clearInterval(interval);
-  
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiService, gameId, router]);
 
@@ -335,7 +334,6 @@ const StartPage: React.FC = () => {
     const isComputer = player === "computer";
     const isInvited = player === "invite";
     const isFilled = player && player !== "computer" && player !== "invite";
-    // const isWaiting = inviteStatus[index] === "waiting";
     const difficultyLabel = ["Easy", "Medium", "Difficult"];
 
     const handleDifficultySelect = async (difficulty: number) => {
@@ -371,19 +369,11 @@ const StartPage: React.FC = () => {
       }
     };
 
-    const difficultyMenu = (
-      <Menu
-        onClick={({ key }) => handleDifficultySelect(Number(key))}
-        items={[
-          { label: <span style={{ color: "black" }}>Easy</span>, key: "0" },
-          { label: <span style={{ color: "black" }}>Medium</span>, key: "1" },
-          {
-            label: <span style={{ color: "black" }}>Difficult</span>,
-            key: "2",
-          },
-        ]}
-      />
-    );
+    const difficultyItems = [
+      { label: <span style={{ color: "black" }}>Easy</span>, key: "0" },
+      { label: <span style={{ color: "black" }}>Medium</span>, key: "1" },
+      { label: <span style={{ color: "black" }}>Difficult</span>, key: "2" },
+    ];
 
     const columns = [
       {
@@ -496,22 +486,18 @@ const StartPage: React.FC = () => {
                   Invite Player
                 </Button>
 
-                <Dropdown overlay={difficultyMenu} trigger={["click"]}>
+                <Dropdown
+                  menu={{
+                    items: difficultyItems,
+                    onClick: ({ key }) => handleDifficultySelect(Number(key)),
+                  }}
+                  trigger={["click"]}
+                >
                   <Button
                     style={{
                       backgroundColor: isComputer ? "#b2f2bb" : "#d9d9d9",
                       border: "none",
                       width: "100%",
-                    }}
-                    onClick={() => {
-                      const toggleDiff = [...showDifficulty];
-                      const toggleInvite = [...showInvite];
-
-                      toggleDiff[index] = !toggleDiff[index];
-                      toggleInvite[index] = false;
-
-                      setShowDifficulty(toggleDiff);
-                      setShowInvite(toggleInvite);
                     }}
                   >
                     {isComputer

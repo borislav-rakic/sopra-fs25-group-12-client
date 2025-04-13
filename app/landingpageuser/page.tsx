@@ -9,6 +9,7 @@ import { useApi } from "@/hooks/useApi";
 import { Match } from "@/types/match";
 import SettingsPopup from "@/components/SettingsPopup";
 import { useEffect, useState } from "react";
+import type { UserPrivateDTO } from "@/types/User";
 
 const LandingPageUser: React.FC = () => {
   const router = useRouter();
@@ -17,6 +18,7 @@ const LandingPageUser: React.FC = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("#42db83"); // default green
   const [cardback, setCardback] = useState("b101.png"); // default
+  const [user, setUser] = useState<UserPrivateDTO | null>(null);
 
   useEffect(() => {
     const storedPlaymat = localStorage.getItem("playmat");
@@ -24,6 +26,33 @@ const LandingPageUser: React.FC = () => {
     if (storedPlaymat) setPlaymat(storedPlaymat);
     if (storedCardback) setCardback(storedCardback);
   }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/"); // No token = send back to home
+        return;
+      }
+
+      try {
+        const userData = await apiService.get<UserPrivateDTO>("/users/me");
+        setUser(userData);
+      } catch (err: unknown) {
+        console.error("Failed to fetch user data:", err);
+        setUser(null);
+
+        const error = err as { status?: number; message?: string };
+
+        if (error.status === 401 || error.message?.includes("Invalid token")) {
+          localStorage.removeItem("token");
+          router.push("/");
+        }
+      }
+    };
+
+    fetchUser();
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -54,6 +83,10 @@ const LandingPageUser: React.FC = () => {
         />
 
         <h1>HEARTS ATTACK</h1>
+        <p>
+          A fast-paced card game of strategy and sabotage.<br />Can you survive
+          the Hearts Attack?
+        </p>
 
         <Space direction="vertical" size="middle" style={{ marginTop: 24 }}>
           <Row gutter={16} justify="center">
@@ -100,16 +133,18 @@ const LandingPageUser: React.FC = () => {
                 Leaderboard
               </Button>
             </Col>
-            <Col>
-              <Button
-                type="primary"
-                color="yellow"
-                variant="solid"
-                onClick={() => router.push("/friends")}
-              >
-                Manage Friendships
-              </Button>
-            </Col>
+            {user && !user.isGuest && (
+              <Col>
+                <Button
+                  type="primary"
+                  color="yellow"
+                  variant="solid"
+                  onClick={() => router.push("/friends")}
+                >
+                  Manage Friendships
+                </Button>
+              </Col>
+            )}
           </Row>
 
           <Row gutter={16} justify="center">
@@ -123,39 +158,75 @@ const LandingPageUser: React.FC = () => {
                 Rules
               </Button>
             </Col>
-            <Col>
-              <Button
-                type="primary"
-                color="yellow"
-                variant="solid"
-                onClick={() => router.push("/profile")}
-              >
-                Profile
-              </Button>
-            </Col>
-            <Col>
-              <Button
-                type="primary"
-                color="yellow"
-                variant="solid"
-                onClick={() => setSettingsOpen(true)}
-              >
-                Settings
-              </Button>
-            </Col>
+            {user && !user.isGuest && (
+              <Col>
+                <Button
+                  type="primary"
+                  color="yellow"
+                  variant="solid"
+                  onClick={() => router.push("/profile")}
+                >
+                  Profile
+                </Button>
+              </Col>
+            )}
+            {user && !user.isGuest && (
+              <Col>
+                <Button
+                  type="primary"
+                  color="yellow"
+                  variant="solid"
+                  onClick={() => setSettingsOpen(true)}
+                >
+                  Settings
+                </Button>
+              </Col>
+            )}
           </Row>
-
           <Row justify="center">
-            <Col>
-              <Button
-                type="primary"
-                color="red"
-                variant="solid"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            </Col>
+            {user && user.isGuest && (
+              <>
+                <Col>
+                  <span style={{ marginLeft: "1em" }}>
+                    You are logged in as a guest only.
+                  </span>
+                  <Button
+                    type="primary"
+                    color="green"
+                    variant="solid"
+                    onClick={() => router.push("/login")}
+                    style={{ marginLeft: "1em" }}
+                  >
+                    Login
+                  </Button>
+                </Col>
+
+                <Col>
+                  <Button
+                    type="primary"
+                    color="green"
+                    variant="solid"
+                    onClick={() => router.push("/register")}
+                    style={{ marginLeft: "1em" }}
+                  >
+                    Register
+                  </Button>
+                </Col>
+              </>
+            )}
+
+            {user && !user.isGuest && (
+              <Col>
+                <Button
+                  type="primary"
+                  color="red"
+                  variant="solid"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </Col>
+            )}
           </Row>
         </Space>
 

@@ -34,7 +34,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ id, username, avatar }) => {
           >
             <Image
               alt="avatar"
-              src={`/avatars_118x118/r${100 + avatar}.png`}
+              src={`/avatars_118x118/a${avatar}.png`}
               width={90}
               height={90}
               style={{ objectFit: "cover", borderRadius: 4 }}

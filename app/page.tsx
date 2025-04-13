@@ -7,38 +7,61 @@ import { Button } from "antd";
 import styles from "@/styles/page.module.css";
 import { useEffect } from "react";
 import { useApi } from "@/hooks/useApi";
-import { generateUUID } from "@/utils/uuid";
+import { User, UserAuthDTO } from "./types/user";
 
 export default function Home() {
   const router = useRouter();
   const apiService = useApi();
 
   useEffect(() => {
-    const developmentPhaseIsOver = false;
-    if (!developmentPhaseIsOver || !sessionStorage.getItem("populateCalled")) {
-      apiService.post<void>("/leaderboard/populate", null)
-        .then(() => {
+    const checkLoginAndPopulate = async () => {
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        try {
+          const user = await apiService.get<UserAuthDTO>("/users/me");
+          if (user?.id) {
+            router.push("/landingpageuser");
+            return;
+          }
+        } catch (error: unknown) {
+          const err = error as { status?: number };
+
+          if (err.status !== 404 && err.status !== 401) {
+            console.error("Unexpected error checking login:", error);
+          }
+        }
+      }
+
+      // 👇 this was incorrectly inside the token-check block
+      const developmentPhaseIsOver = false;
+      if (
+        !developmentPhaseIsOver ||
+        !sessionStorage.getItem("populateCalled")
+      ) {
+        try {
+          await apiService.post<void>("/leaderboard/populate", null);
           console.log("Leaderboard populated (if needed).");
-        })
-        .catch((err) => {
+          sessionStorage.setItem("populateCalled", "true");
+        } catch (err) {
           console.error("Failed to populate leaderboard:", err);
-        });
-
-      sessionStorage.setItem("populateCalled", "true");
-    }
-  }, [apiService]);
-
-  const handleGuestLogin = () => {
-    const guestId = "guest-" + generateUUID();
-    const guestUser = {
-      id: guestId,
-      username: guestId,
-      token: "guest-token",
-      is_guest: true,
+        }
+      }
     };
 
-    localStorage.setItem("user", JSON.stringify(guestUser));
-    router.push("/landingpageuser");
+    checkLoginAndPopulate();
+  }, [apiService, router]);
+
+  const handleGuestLogin = async () => {
+    try {
+      const guestUser = await apiService.post<User>("/users/guest", {});
+      if (guestUser.token) {
+        localStorage.setItem("token", guestUser.token);
+      }
+      router.push("/landingpageuser");
+    } catch (err) {
+      console.error("Guest login failed:", err);
+    }
   };
 
   return (
@@ -82,7 +105,7 @@ export default function Home() {
             type="primary"
             color="blue"
             variant="solid"
-            onClick={() => handleGuestLogin}
+            onClick={() => handleGuestLogin()}
             target="_blank"
             rel="noopener noreferrer"
           >
