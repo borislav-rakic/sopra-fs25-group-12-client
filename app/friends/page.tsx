@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { message } from "antd";
+import { Button, message } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 import { useApi } from "@/hooks/useApi";
 import "./friends.css";
 import FriendCard from "@/components/FriendCard";
 import UserSearchPanel from "@/components/UserSearchPanel";
+import { useRouter } from "next/navigation";
 
 type UserSummary = {
   id: number;
@@ -19,6 +20,7 @@ const FriendsPage: React.FC = () => {
   const [acceptedRequests, setAcceptedRequests] = useState<UserSummary[]>([]);
   const [pendingRequests, setPendingRequests] = useState<UserSummary[]>([]);
   const [declinedRequests, setDeclinedRequests] = useState<UserSummary[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -74,6 +76,14 @@ const FriendsPage: React.FC = () => {
   return (
     <div className="friends-page">
       <h2>My Friends</h2>
+      <Button
+        type="primary"
+        color="green"
+        onClick={() => router.push("/landingpageuser")}
+        style={{ marginBottom: "1em" }}
+      >
+        Back to Landing Page
+      </Button>
       {renderFriendSection(
         "My Friend List",
         acceptedRequests,

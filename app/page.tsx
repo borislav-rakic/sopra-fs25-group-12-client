@@ -33,7 +33,6 @@ export default function Home() {
         }
       }
 
-      // 👇 this was incorrectly inside the token-check block
       const developmentPhaseIsOver = false;
       if (
         !developmentPhaseIsOver ||
