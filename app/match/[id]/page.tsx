@@ -124,12 +124,13 @@ const MatchPage: React.FC = () => {
       }
 
     } else if (currentGamePhase === "playing") {
-      if (currentPlayer === "User1") {
+      if (currentPlayer === players[0]) {
         const updatedCardsInHand = cardsInHand.filter((c) => c.code !== card.code);
         const updatedTrick0 = [card];
     
         setCardsInHand(updatedCardsInHand);
         setTrickSlot0(updatedTrick0);
+        setCurrentPlayer(players[1] || "AI Player 1"); // Set the next player to play
 
       } else {
         console.log("You may not play cards while it is not your turn.");
@@ -187,6 +188,7 @@ const MatchPage: React.FC = () => {
     const sortedCards = sortCards(cardsInHand);
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
+
 
   return (
     <div className={`${styles.page} matchPage`}>
@@ -524,14 +526,6 @@ const MatchPage: React.FC = () => {
           SetOpponentToPassTo3
           
         </Button>
-
-        <Button
-          onClick={() => console.log(BigInt("7") > BigInt("13"))}
-        >
-          SetOpponentToPassTo3
-          
-        </Button>
-
 
       </div>
 
