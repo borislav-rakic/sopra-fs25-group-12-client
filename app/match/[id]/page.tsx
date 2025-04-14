@@ -139,6 +139,20 @@ const MatchPage: React.FC = () => {
     }
   }
 
+  const handlePassCards = () => {
+    if(cardsToPass.length < 3) {
+      console.log("You must pass 3 cards.");
+    } else {
+      const updatedCardsInHand = cardsInHand.filter((c) => !cardsToPass.some((card) => card.code === c.code));
+      const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
+
+      console.log("new cards in hand: ", updatedCardsInHand)
+      
+      setCardsInHand(updatedCardsInHand);
+      setOpponent1Cards(updatedEnemyHand);
+    }
+  }
+
   const handleClearTrick = () => {
     setTrickSlot0([]);
     setTrickSlot1([]);
@@ -420,6 +434,12 @@ const MatchPage: React.FC = () => {
           onClick={() => console.log("current cardsToPass: ", cardsToPass)}
         >
           logCardsToPass
+          
+        </Button>
+        <Button
+          onClick={() => handlePassCards()}
+        >
+          PassCardsToOpponent
           
         </Button>
 
