@@ -38,6 +38,7 @@ const MatchPage: React.FC = () => {
   const [currentPlayer, setCurrentPlayer] = useState("");
   const [currentGamePhase, setCurrentGamePhase] = useState("");
   const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
+  const [opponentToPassTo, setOpponentToPassTo] = useState("");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
@@ -144,12 +145,21 @@ const MatchPage: React.FC = () => {
       console.log("You must pass 3 cards.");
     } else {
       const updatedCardsInHand = cardsInHand.filter((c) => !cardsToPass.some((card) => card.code === c.code));
-      const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
-
-      console.log("new cards in hand: ", updatedCardsInHand)
+      
+      if (opponentToPassTo === "Opponent1") {
+        const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
+        setOpponent1Cards(updatedEnemyHand);
+      } else if(opponentToPassTo === "Opponent2") {
+        const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
+        setOpponent2Cards(updatedEnemyHand);
+      } else if(opponentToPassTo === "Opponent3") {
+        const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
+        setOpponent3Cards(updatedEnemyHand);
+      } 
       
       setCardsInHand(updatedCardsInHand);
-      setOpponent1Cards(updatedEnemyHand);
+      setCardsToPass([]);
+      setCurrentGamePhase("playing");
     }
   }
 
@@ -425,10 +435,32 @@ const MatchPage: React.FC = () => {
           logCardsToPass
           
         </Button>
+
         <Button
-          onClick={() => handlePassCards()}
+          onClick={() => {handlePassCards()}}
         >
           PassCardsToOpponent
+          
+        </Button>
+
+        <Button
+          onClick={() => {setOpponentToPassTo("Opponent1"), console.log("Opponent to pass to set to Opponent1")}}
+        >
+          SetOpponentToPassTo1
+          
+        </Button>
+
+        <Button
+          onClick={() => {setOpponentToPassTo("Opponent2"), console.log("Opponent to pass to set to Opponent2")}}
+        >
+          SetOpponentToPassTo2
+          
+        </Button>
+
+        <Button
+          onClick={() => {setOpponentToPassTo("Opponent3"), console.log("Opponent to pass to set to Opponent3")}}
+        >
+          SetOpponentToPassTo3
           
         </Button>
 
