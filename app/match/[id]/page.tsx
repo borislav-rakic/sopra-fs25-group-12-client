@@ -37,6 +37,7 @@ const MatchPage: React.FC = () => {
   const [currentTrick, setCurrentTrick] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState("");
   const [currentGamePhase, setCurrentGamePhase] = useState("");
+  const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
@@ -109,6 +110,17 @@ const MatchPage: React.FC = () => {
     console.log("Selected card in Match Page:", card.code);
 
     if (currentGamePhase === "passing"){
+      if (cardsToPass.find((c) => c.code === card.code)) {
+        setCardsToPass(cardsToPass.filter((c) => c.code !== card.code));
+        console.log("removed card from cardsToPass: ", card.code);
+        console.log("cardsToPass: ", cardsToPass);
+      } else if(cardsToPass.length < 3) {
+        setCardsToPass([...cardsToPass, card]);
+        console.log("added card to cardsToPass: ", card.code);
+        console.log("cardsToPass: ", cardsToPass);
+      } else {
+        console.log("You may not pass more than 3 cards.");
+      }
 
     } else if (currentGamePhase === "playing") {
       if (currentPlayer === "User1") {
@@ -402,6 +414,13 @@ const MatchPage: React.FC = () => {
           onClick={() => {setCurrentPlayer("User1"), console.log("Player set to User1")}}
         >
           setPlayerUser1
+        </Button>
+
+        <Button
+          onClick={() => console.log("current cardsToPass: ", cardsToPass)}
+        >
+          logCardsToPass
+          
         </Button>
 
       </div>
