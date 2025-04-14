@@ -28,13 +28,10 @@ const Card: React.FC<cardProps> = (
 
   return (
     <div
-      className={`${styles.cardContainer} ${flipped ? styles.scalable : ""}`}
+    className={`${styles.cardContainer} ${flipped ? styles.scalable : ""} ${
+      isSelected ? styles.selected : ""
+    }`}
       onClick={handleCardClick}
-      style={{
-        transform: isSelected ? "translateY(-20px)" : "translateY(0)", // Move the card up if selected
-        transition: "transform 0.2s ease", // Smooth transition
-        cursor: "pointer", // Indicate the card is clickable
-      }}
     >
       {flipped
         ? (

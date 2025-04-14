@@ -22,6 +22,16 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Add a shadow */
 }
 
+.cardContainer.selected {
+  transform: translateY(-20px); /* Move the card up if selected */
+}
+
+.cardContainer.selected.scalable:hover {
+  transform: translateY(-20px) scale(1.1); /* Combine translateY and scale */
+  z-index: 30; /* Bring the image to the front on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Add a shadow */
+}
+
 .cardFront {
   width: 100%; /* Fill the width of the container */
   height: 100%; /* Fill the height of the container */
