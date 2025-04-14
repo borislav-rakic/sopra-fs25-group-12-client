@@ -160,17 +160,6 @@ const MatchPage: React.FC = () => {
     setTrickSlot3([]);
   };
 
-  /*
-  useEffect(() => {
-    console.log(`Cardback changed to: ${cardback}`);
-    const cardbacks = document.getElementsByClassName("playingcard-back") as HTMLCollectionOf<HTMLElement>;
-    for (let i = 0; i < cardbacks.length; i++) {
-      cardbacks[i].style.backgroundImage = `url(${cardback})`;
-    }
-  }, [cardback]);
-
- */
-  // let playerHand = document.getElementById("hand-0");
 
   return (
     <div className={`${styles.page} matchPage`}>
@@ -486,6 +475,7 @@ const MatchPage: React.FC = () => {
               backimage={cardback}
               flipped={true}
               onClick={() => handlePlayCard(card)}
+              isSelected={cardsToPass.some((c) => c.code === card.code)}
             />
           ))}
         </div>

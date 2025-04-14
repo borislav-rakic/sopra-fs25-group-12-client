@@ -10,10 +10,11 @@ interface cardProps {
   backimage: string;
   flipped: boolean;
   onClick: (code: string) => void;
+  isSelected?: boolean;
 }
 
 const Card: React.FC<cardProps> = (
-  { code, suit, value, image, flipped: initialFlipped, backimage, onClick },
+  { code, suit, value, image, flipped: initialFlipped, backimage, onClick, isSelected=false },
 ) => {
   const [flipped, setFlipped] = useState(initialFlipped);
 
@@ -29,6 +30,11 @@ const Card: React.FC<cardProps> = (
     <div
       className={`${styles.cardContainer} ${flipped ? styles.scalable : ""}`}
       onClick={handleCardClick}
+      style={{
+        transform: isSelected ? "translateY(-20px)" : "translateY(0)", // Move the card up if selected
+        transition: "transform 0.2s ease", // Smooth transition
+        cursor: "pointer", // Indicate the card is clickable
+      }}
     >
       {flipped
         ? (
