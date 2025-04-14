@@ -18,10 +18,10 @@ const Card: React.FC<cardProps> = (
   const [flipped, setFlipped] = useState(initialFlipped);
 
   const handleCardClick = () => {
-    setFlipped(!flipped); // Toggle the flipped state
+/*     setFlipped(!flipped); // Toggle the flipped state
     console.log("Card clicked:", code);
     console.log("Flipped:", !flipped);
-    onClick(code); // Call the onClick handler passed as a prop
+ */ onClick(code); // Call the onClick handler passed as a prop
     console.log(suit, value); // This allows suit and value to be part of the object but be used for compilation with npm build
   };
 
@@ -32,14 +32,14 @@ const Card: React.FC<cardProps> = (
     >
       {flipped
         ? (
-          <Image
+          <img
             className={styles.cardFront}
             src={image}
             alt={`${code} front`}
           />
         )
         : (
-          <Image
+          <img
             className={styles.cardBack}
             src={backimage}
             alt={`${code} back`}

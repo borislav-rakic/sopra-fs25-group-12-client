@@ -29,6 +29,14 @@ const MatchPage: React.FC = () => {
     null,
     null,
   ]);
+  const [trickSlot0, setTrickSlot0] = useState<cardProps[]>([]);
+  const [trickSlot1, setTrickSlot1] = useState<cardProps[]>([]);
+  const [trickSlot2, setTrickSlot2] = useState<cardProps[]>([]);
+  const [trickSlot3, setTrickSlot3] = useState<cardProps[]>([]);
+
+  const [currentTrick, setCurrentTrick] = useState("");
+  const [currentPlayer, setCurrentPlayer] = useState("");
+  const [currentGamePhase, setCurrentGamePhase] = useState("");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
@@ -97,6 +105,35 @@ const MatchPage: React.FC = () => {
     }
   }, [playmat]);
 
+  const handlePlayCard = (card: cardProps) => {
+    console.log("Selected card in Match Page:", card.code);
+
+    if (currentGamePhase === "passing"){
+
+    } else if (currentGamePhase === "playing") {
+      if (currentPlayer === "User1") {
+        const updatedCardsInHand = cardsInHand.filter((c) => c.code !== card.code);
+        const updatedTrick0 = [card];
+    
+        setCardsInHand(updatedCardsInHand);
+        setTrickSlot0(updatedTrick0);
+
+      } else {
+        console.log("You may not play cards while it is not your turn.");
+      }
+
+    } else {
+      console.log("currently unused game phase option")
+    }
+  }
+
+  const handleClearTrick = () => {
+    setTrickSlot0([]);
+    setTrickSlot1([]);
+    setTrickSlot2([]);
+    setTrickSlot3([]);
+  };
+
   /*
   useEffect(() => {
     console.log(`Cardback changed to: ${cardback}`);
@@ -154,9 +191,7 @@ const MatchPage: React.FC = () => {
                 image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
                 flipped: true,
                 backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
+                onClick: () => {},
               },
             ])}
         >
@@ -222,6 +257,153 @@ const MatchPage: React.FC = () => {
         >
           testAddOpponent3Card
         </Button>
+
+        <Button
+          onClick={() =>
+            setTrickSlot1([
+              {
+                code: "2H", // Example: Two of Hearts
+                suit: "Hearts",
+                value: BigInt(2),
+                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+            ])}
+        >
+          testAddTrick1Card
+        </Button>
+
+        <Button
+          onClick={() =>
+            setTrickSlot2([
+              {
+                code: "2H", // Example: Two of Hearts
+                suit: "Hearts",
+                value: BigInt(2),
+                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+            ])}
+        >
+          testAddTrick2Card
+        </Button>
+
+        <Button
+          onClick={() =>
+            setTrickSlot3([
+              {
+                code: "2H", // Example: Two of Hearts
+                suit: "Hearts",
+                value: BigInt(2),
+                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+            ])}
+        >
+          testAddTrick3Card
+        </Button>
+
+        <Button
+          onClick={() => handleClearTrick()}
+        >
+          EmptyTrick
+        </Button>
+
+        <Button
+          onClick={() =>
+            setCardsInHand([
+              {
+                code: "2H", // Example: Two of Hearts
+                suit: "Hearts",
+                value: BigInt(2),
+                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+              {
+                code: "3H", // Example: Two of Hearts
+                suit: "Hearts",
+                value: BigInt(3),
+                image: "https://deckofcardsapi.com/static/img/3H.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+              {
+                code: "4H", // Example: Two of Hearts
+                suit: "Hearts",
+                value: BigInt(4),
+                image: "https://deckofcardsapi.com/static/img/4H.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+              {
+                code: "5H", // Example: Two of Hearts
+                suit: "Hearts",
+                value: BigInt(5),
+                image: "https://deckofcardsapi.com/static/img/5H.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+              {
+                code: "6H", // Example: Two of Hearts
+                suit: "Hearts",
+                value: BigInt(6),
+                image: "https://deckofcardsapi.com/static/img/6H.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+              
+
+            ])}
+        >
+          testAddVariousCards
+        </Button>
+
+        <Button
+          onClick={() => {setCurrentGamePhase("passing"), console.log("Game phase set to passing")}}
+        >
+          setGamePhasePassing
+        </Button>
+
+        <Button
+          onClick={() => {setCurrentGamePhase("playing"), console.log("Game phase set to playing")}}
+        >
+          setGamePhasePlaying
+        </Button>
+
+        <Button
+          onClick={() => {setCurrentPlayer("User1"), console.log("Player set to User1")}}
+        >
+          setPlayerUser1
+        </Button>
+
       </div>
 
       <div className="gameboard">
@@ -264,7 +446,7 @@ const MatchPage: React.FC = () => {
               image={card.image}
               backimage={cardback}
               flipped={true}
-              onClick={card.onClick}
+              onClick={() => handlePlayCard(card)}
             />
           ))}
         </div>
@@ -315,34 +497,59 @@ const MatchPage: React.FC = () => {
         </div>
 
         <div className="pile">
-          <Image
-            className="playingcard-pile-0"
-            src="https://deckofcardsapi.com/static/img/AS.png"
-            alt="PLACEHOLDER"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-pile-1"
-            src="https://deckofcardsapi.com/static/img/AS.png"
-            alt="PLACEHOLDER"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-pile-2"
-            src="https://deckofcardsapi.com/static/img/AS.png"
-            alt="PLACEHOLDER"
-            width={113}
-            height={157}
-          />
-          <Image
-            className="playingcard-pile-3"
-            src="https://deckofcardsapi.com/static/img/AS.png"
-            alt="PLACEHOLDER"
-            width={113}
-            height={157}
-          />
+          <div className="playingcard-pile-0">
+            {trickSlot0.map((card, index) => ( 
+              <Card
+                key={index}
+                code={card.code}
+                suit={card.suit}
+                value={card.value}
+                image={card.image}
+                backimage={cardback}
+                flipped={true}
+                onClick={card.onClick}/>
+            ))}
+          </div>
+
+          <div className="playingcard-pile-1">
+            {trickSlot1.map((card, index) => ( 
+              <Card
+                key={index}
+                code={card.code}
+                suit={card.suit}
+                value={card.value}
+                image={card.image}
+                backimage={cardback}
+                flipped={true}
+                onClick={card.onClick}/>
+            ))}
+          </div>
+          <div className="playingcard-pile-2">
+            {trickSlot2.map((card, index) => ( 
+              <Card
+                key={index}
+                code={card.code}
+                suit={card.suit}
+                value={card.value}
+                image={card.image}
+                backimage={cardback}
+                flipped={true}
+                onClick={card.onClick}/>
+            ))}
+          </div>
+          <div className="playingcard-pile-3">
+            {trickSlot3.map((card, index) => ( 
+              <Card
+                key={index}
+                code={card.code}
+                suit={card.suit}
+                value={card.value}
+                image={card.image}
+                backimage={cardback}
+                flipped={true}
+                onClick={card.onClick}/>
+            ))}
+          </div>
         </div>
 
         <div className="game-playerscore0">
