@@ -7,7 +7,7 @@ import { Button /* , Row, Col, Space */ } from "antd";
 import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
 // import { Match } from "@/types/match";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { PlayerMatchInformation } from "@/types/playerMatchInformation";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
@@ -170,6 +170,23 @@ const MatchPage: React.FC = () => {
     setTrickSlot3([]);
   };
 
+  const sortCards = (cards: cardProps[]) => {
+    return cards.sort((a, b) => {
+      console.log("Comparing cards:", a.code, " | ", b.code);
+      if (a.suit < b.suit) {return -1;}
+      if (a.suit > b.suit) {return 1;}
+
+      if (a.value < b.value) {return -1;}
+      if (a.value > b.value) {return 1;}
+
+      return 0;
+    });
+  }
+
+  useEffect(() => {
+    const sortedCards = sortCards(cardsInHand);
+    setCardsInHand(sortedCards);
+  }, [cardsInHand]);
 
   return (
     <div className={`${styles.page} matchPage`}>
@@ -361,6 +378,28 @@ const MatchPage: React.FC = () => {
                 },
               },
               {
+                code: "5H", // Example: Two of Hearts
+                suit: "Hearts",
+                value: BigInt(5),
+                image: "https://deckofcardsapi.com/static/img/5H.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+              {
+                code: "QS", // Example: Two of Hearts
+                suit: "Spades",
+                value: BigInt(12),
+                image: "https://deckofcardsapi.com/static/img/QS.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+              {
                 code: "3H", // Example: Two of Hearts
                 suit: "Hearts",
                 value: BigInt(3),
@@ -383,10 +422,10 @@ const MatchPage: React.FC = () => {
                 },
               },
               {
-                code: "5H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(5),
-                image: "https://deckofcardsapi.com/static/img/5H.png", // Example image URL
+                code: "7S", // Example: Two of Hearts
+                suit: "Spades",
+                value: BigInt(7),
+                image: "https://deckofcardsapi.com/static/img/7S.png", // Example image URL
                 flipped: false,
                 backimage: cardback,
                 onClick: (code: string) => {
@@ -398,6 +437,28 @@ const MatchPage: React.FC = () => {
                 suit: "Hearts",
                 value: BigInt(6),
                 image: "https://deckofcardsapi.com/static/img/6H.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+              {
+                code: "7C", 
+                suit: "Clubs",
+                value: BigInt(7),
+                image: "https://deckofcardsapi.com/static/img/7C.png", 
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+              {
+                code: "3C", 
+                suit: "Clubs",
+                value: BigInt(3),
+                image: "https://deckofcardsapi.com/static/img/3C.png", 
                 flipped: false,
                 backimage: cardback,
                 onClick: (code: string) => {
@@ -463,6 +524,14 @@ const MatchPage: React.FC = () => {
           SetOpponentToPassTo3
           
         </Button>
+
+        <Button
+          onClick={() => console.log(BigInt("7") > BigInt("13"))}
+        >
+          SetOpponentToPassTo3
+          
+        </Button>
+
 
       </div>
 
