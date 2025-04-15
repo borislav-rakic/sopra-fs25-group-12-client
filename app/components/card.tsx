@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import styles from "@/styles/card.module.css";
-import Image from "next/image";
 
 interface cardProps {
   code: string;
@@ -16,7 +15,7 @@ interface cardProps {
 const Card: React.FC<cardProps> = (
   { code, suit, value, image, flipped: initialFlipped, backimage, onClick, isSelected=false },
 ) => {
-  const [flipped, setFlipped] = useState(initialFlipped);
+  const [flipped] = useState(initialFlipped);
 
   const handleCardClick = () => {
 /*     setFlipped(!flipped); // Toggle the flipped state

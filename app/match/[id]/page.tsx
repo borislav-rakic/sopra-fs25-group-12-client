@@ -7,7 +7,7 @@ import { Button /* , Row, Col, Space */ } from "antd";
 import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
 // import { Match } from "@/types/match";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { PlayerMatchInformation } from "@/types/playerMatchInformation";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
@@ -541,19 +541,19 @@ const MatchPage: React.FC = () => {
         </Button>
 
         <Button
-          onClick={() => {setCurrentGamePhase("passing"), console.log("Game phase set to passing")}}
+          onClick={() => {setCurrentGamePhase("passing"); console.log("Game phase set to passing")}}
         >
           setGamePhasePassing
         </Button>
 
         <Button
-          onClick={() => {setCurrentGamePhase("playing"), console.log("Game phase set to playing")}}
+          onClick={() => {setCurrentGamePhase("playing"); console.log("Game phase set to playing")}}
         >
           setGamePhasePlaying
         </Button>
 
         <Button
-          onClick={() => {setCurrentPlayer("User1"), console.log("Player set to User1")}}
+          onClick={() => {setCurrentPlayer("User1"); console.log("Player set to User1")}}
         >
           setPlayerUser1
         </Button>
@@ -573,57 +573,57 @@ const MatchPage: React.FC = () => {
         </Button>
 
         <Button
-          onClick={() => {setOpponentToPassTo("Opponent1"), console.log("Opponent to pass to set to Opponent1")}}
+          onClick={() => {setOpponentToPassTo("Opponent1"); console.log("Opponent to pass to set to Opponent1")}}
         >
           SetOpponentToPassTo1
           
         </Button>
 
         <Button
-          onClick={() => {setOpponentToPassTo("Opponent2"), console.log("Opponent to pass to set to Opponent2")}}
+          onClick={() => {setOpponentToPassTo("Opponent2"); console.log("Opponent to pass to set to Opponent2")}}
         >
           SetOpponentToPassTo2
           
         </Button>
 
         <Button
-          onClick={() => {setOpponentToPassTo("Opponent3"), console.log("Opponent to pass to set to Opponent3")}}
+          onClick={() => {setOpponentToPassTo("Opponent3"); console.log("Opponent to pass to set to Opponent3")}}
         >
           SetOpponentToPassTo3
         </Button>
 
         <Button
-          onClick={() => {setCurrentTrick(""), console.log("Current trick set to empty")}}
+          onClick={() => {setCurrentTrick(""); console.log("Current trick set to empty")}}
         >
           SetTrickEmpty
         </Button>
 
         <Button
-          onClick={() => {setCurrentTrick("Hearts"), console.log("Current trick set to Hearts")}}
+          onClick={() => {setCurrentTrick("Hearts"); console.log("Current trick set to Hearts")}}
         >
           SetTrickHearts
         </Button>
         
         <Button
-          onClick={() => {setCurrentTrick("Spades"), console.log("Current trick set to Spades")}}
+          onClick={() => {setCurrentTrick("Spades"); console.log("Current trick set to Spades")}}
         >
           SetTrickSpades
         </Button>
 
         <Button
-          onClick={() => {setHeartsBroken(!heartsBroken), console.log("Hearts broken set to: ", !heartsBroken)}}
+          onClick={() => {setHeartsBroken(!heartsBroken); console.log("Hearts broken set to: ", heartsBroken)}}
         >
           ToggleHeartsBroken
         </Button>
 
         <Button
-          onClick={() => {setIsFirstRound(!isFirstRound), console.log("Set isFirstRound: ", !isFirstRound)}}
+          onClick={() => {setIsFirstRound(!isFirstRound); console.log("Set isFirstRound: ", isFirstRound)}}
         >
           ToggleIsFirstRound
         </Button>
 
         <Button
-          onClick={() => {setFirstCardPlayed(!firstCardPlayed), console.log("Set FirstCardPlayed: ", !firstCardPlayed)}}
+          onClick={() => {setFirstCardPlayed(!firstCardPlayed); console.log("Set FirstCardPlayed: ", firstCardPlayed)}}
         >
           ToggleIsFirstCard
         </Button>
