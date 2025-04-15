@@ -39,6 +39,9 @@ const MatchPage: React.FC = () => {
   const [currentGamePhase, setCurrentGamePhase] = useState("");
   const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
   const [opponentToPassTo, setOpponentToPassTo] = useState("");
+  const [heartsBroken, setHeartsBroken] = useState(false);
+  const [firstCardPlayed, setFirstCardPlayed] = useState(false);
+  const [isFirstRound, setIsFirstRound] = useState(true);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
@@ -49,7 +52,7 @@ const MatchPage: React.FC = () => {
   useEffect(() => {
     // This function runs every 5 seconds to receive the current match information.
     const matchRefreshIntervalId = setInterval(async () => {
-      console.log("Requesting match update...");
+      //console.log("Requesting match update...");
 
       try {
         const response = await apiService.post<PlayerMatchInformation>(
@@ -57,7 +60,7 @@ const MatchPage: React.FC = () => {
           {},
         );
 
-        console.log(response);
+        //console.log(response);
 
         if (response.matchPlayers) {
           setPlayers(response.matchPlayers);
@@ -125,19 +128,71 @@ const MatchPage: React.FC = () => {
 
     } else if (currentGamePhase === "playing") {
       if (currentPlayer === players[0]) {
-        const updatedCardsInHand = cardsInHand.filter((c) => c.code !== card.code);
-        const updatedTrick0 = [card];
-    
-        setCardsInHand(updatedCardsInHand);
-        setTrickSlot0(updatedTrick0);
-        setCurrentPlayer(players[1] || "AI Player 1"); // Set the next player to play
-
+        if (!verifyTrick(card)) {
+        } else {
+          const updatedCardsInHand = cardsInHand.filter((c) => c.code !== card.code);
+          const updatedTrick0 = [card];
+      
+          setCardsInHand(updatedCardsInHand);
+          setTrickSlot0(updatedTrick0);
+          setCurrentPlayer(players[1] || "AI Player 1"); // Set the next player to play
+        }
       } else {
         console.log("You may not play cards while it is not your turn.");
       }
 
     } else {
       console.log("currently unused game phase option")
+    }
+  }
+
+  // Checks if the played card is a valid play in the current trick.
+  // uses the played card, the existing trick, and the player's hand to determine if the play is valid.
+  // We use the status of trickslot3 to determine if the player is playing the first card of the trick or not. 
+  const verifyTrick = (card:cardProps) => {
+    console.log("Verifying trick for card: ", card.code);
+    if(!firstCardPlayed) {
+      if (card.code === "2C") {
+        setFirstCardPlayed(false);
+        setCurrentTrick(card.suit);
+        console.log("First card played in the game is 2 of clubs.");
+        return true; // 2 of clubs is played first
+      }
+      console.log("First card played in the game must be 2 of clubs.");
+      return false
+    } 
+    if (isFirstRound) {
+      if (card.code === "QS" || card.suit === "Hearts") {
+        console.log("Queen of Spades or Hearts cannot be played in the first round.");
+        return false; // Queen of Spades or Hearts cannot be played in the first round
+      }
+    } 
+    if (trickSlot3.length === 0) {
+      console.log("First card played in the trick.");
+      if (heartsBroken) {
+        console.log("Hearts are broken, any card can be played.");
+        setCurrentTrick(card.suit)
+        return true; // Any card can be played if hearts are broken
+      } else if (card.suit === "Hearts") {
+        console.log("Hearts cannot be played until they are broken.");
+        return false; // Hearts cannot be played if they haven't been broken
+      } else {
+        console.log("No constraints on the first card played.");
+        setCurrentTrick(card.suit)
+        return true; // Any non-heart card can be played
+      }
+    } else {
+      console.log("Subsequent card played in the trick.");
+      if (card.suit === currentTrick) {
+        console.log("Card matches the suit of the trick.");
+        return true; // Card matches the suit of the trick
+      } else if (cardsInHand.some((c) => c.suit === currentTrick)) {
+        console.log("Player must follow the suit.");
+        return false; // Player must follow the suit if they have it in hand
+      } else {
+        console.log("Player can play any card if they don't have the trick's suit.");
+        return true; // Player can play any card if they don't have the trick's suit
+      }
     }
   }
 
@@ -391,6 +446,17 @@ const MatchPage: React.FC = () => {
                 },
               },
               {
+                code: "2C", // Example: Two of Hearts
+                suit: "Clubs",
+                value: BigInt(2),
+                image: "https://deckofcardsapi.com/static/img/2C.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+              {
                 code: "QS", // Example: Two of Hearts
                 suit: "Spades",
                 value: BigInt(12),
@@ -524,8 +590,44 @@ const MatchPage: React.FC = () => {
           onClick={() => {setOpponentToPassTo("Opponent3"), console.log("Opponent to pass to set to Opponent3")}}
         >
           SetOpponentToPassTo3
-          
         </Button>
+
+        <Button
+          onClick={() => {setCurrentTrick(""), console.log("Current trick set to empty")}}
+        >
+          SetTrickEmpty
+        </Button>
+
+        <Button
+          onClick={() => {setCurrentTrick("Hearts"), console.log("Current trick set to Hearts")}}
+        >
+          SetTrickHearts
+        </Button>
+        
+        <Button
+          onClick={() => {setCurrentTrick("Spades"), console.log("Current trick set to Spades")}}
+        >
+          SetTrickSpades
+        </Button>
+
+        <Button
+          onClick={() => {setHeartsBroken(!heartsBroken), console.log("Hearts broken set to: ", !heartsBroken)}}
+        >
+          ToggleHeartsBroken
+        </Button>
+
+        <Button
+          onClick={() => {setIsFirstRound(!isFirstRound), console.log("Set isFirstRound: ", !isFirstRound)}}
+        >
+          ToggleIsFirstRound
+        </Button>
+
+        <Button
+          onClick={() => {setFirstCardPlayed(!firstCardPlayed), console.log("Set FirstCardPlayed: ", !firstCardPlayed)}}
+        >
+          ToggleIsFirstCard
+        </Button>
+
 
       </div>
 
