@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "@/styles/card.module.css";
+import Image from "next/image";
 
 interface cardProps {
   code: string;
@@ -34,18 +35,26 @@ const Card: React.FC<cardProps> = (
     >
       {flipped
         ? (
-          <img
-            className={styles.cardFront}
+          <div className={styles.imageWrapper}>
+          <Image
             src={image}
             alt={`${code} front`}
+            className={styles.cardFront}
+            layout="fill" // Make the image fill its container
+            objectFit="cover" // Ensure the image scales properly
+            priority // Optional: Preload the image for better performance
           />
-        )
-        : (
-          <img
-            className={styles.cardBack}
+        </div>
+      ) : (
+        <div className={styles.imageWrapper}>
+          <Image
             src={backimage}
             alt={`${code} back`}
+            layout="fill" // Make the image fill its container
+            objectFit="cover" // Ensure the image scales properly
+            priority // Optional: Preload the image for better performance
           />
+        </div>
         )}
     </div>
   );

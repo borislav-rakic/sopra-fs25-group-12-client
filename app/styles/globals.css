@@ -221,7 +221,7 @@ a {
   left: 25%;
 
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
+  grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
   align-items: center; /* Center child elements vertically */
   justify-content: center;
 }
@@ -241,7 +241,7 @@ a {
   text-align: left;
 
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
+  grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
   align-items: center; /* Center child elements vertically */
   justify-content: center;
 }
@@ -260,7 +260,7 @@ a {
   text-align: left;
 
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
+  grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
   align-items: center; /* Center child elements vertically */
   justify-content: center;
 }
@@ -280,7 +280,7 @@ a {
   text-align: left;
 
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10px, max-content));
+  grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
   align-items: center; /* Center child elements vertically */
   justify-content: center;
 }

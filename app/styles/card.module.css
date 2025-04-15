@@ -43,6 +43,14 @@
   transition: transform 0.2s ease-in-out;
 }
 
+.imageWrapper {
+  position: relative; /* Required for layout="fill" */
+  width: 100%; /* Ensure the wrapper fills the card container */
+  height: 100%; /* Ensure the wrapper fills the card container */
+  border-radius: 10px; /* Add rounded corners to the image wrapper */
+  overflow: hidden; /* Ensure the image respects the rounded corners */
+}
+
 .cardBackContainer {
   position: relative;
   height: 75%;
