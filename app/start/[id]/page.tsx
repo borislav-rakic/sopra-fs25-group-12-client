@@ -284,12 +284,21 @@ const StartPage: React.FC = () => {
         type: "success",
         content: `Invitation sent to ${username}`,
       });
-    } catch (err) {
-      message.open({
-        type: "error",
-        content: "Failed to send invite.",
-      });
-      console.error(err);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        message.open({
+          type: "error",
+          content: `Failed to send invite: ${error.message}`,
+          duration: 3,
+        });
+      } else {
+        console.error("Unknown error when sending invitation:", error);
+        message.open({
+          type: "error",
+          content: "An unknown error occurred when trying to send invitation.",
+          duration: 3,
+        });
+      }
     }
   };
 
