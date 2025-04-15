@@ -294,8 +294,25 @@ const StartPage: React.FC = () => {
   };
 
   const handleStart = async () => {
-    await apiService.post(`/matches/${gameId}/start`, {});
-    router.push(`/match/${gameId}`);
+    try {
+      await apiService.post(`/matches/${gameId}/start`, {});
+      router.push(`/match/${gameId}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        message.open({
+          type: "error",
+          content: `Failed to start match: ${error.message}`,
+          duration: 3,
+        });
+      } else {
+        console.error("Unknown error during match start:", error);
+        message.open({
+          type: "error",
+          content: "An unknown error occurred while starting the match.",
+          duration: 3,
+        });
+      }
+    }
   };
 
   const handleCancelMatch = async () => {

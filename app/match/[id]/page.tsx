@@ -113,26 +113,28 @@ const MatchPage: React.FC = () => {
   const handlePlayCard = (card: cardProps) => {
     console.log("Selected card in Match Page:", card.code);
 
-    if (currentGamePhase === "passing"){
+    if (currentGamePhase === "passing") {
       if (cardsToPass.find((c) => c.code === card.code)) {
         setCardsToPass(cardsToPass.filter((c) => c.code !== card.code));
         console.log("removed card from cardsToPass: ", card.code);
         console.log("cardsToPass: ", cardsToPass);
-      } else if(cardsToPass.length < 3) {
+      } else if (cardsToPass.length < 3) {
         setCardsToPass([...cardsToPass, card]);
         console.log("added card to cardsToPass: ", card.code);
         console.log("cardsToPass: ", cardsToPass);
       } else {
         console.log("You may not pass more than 3 cards.");
       }
-
     } else if (currentGamePhase === "playing") {
       if (currentPlayer === players[0]) {
         if (!verifyTrick(card)) {
+          // the linter abhors empty blocks
         } else {
-          const updatedCardsInHand = cardsInHand.filter((c) => c.code !== card.code);
+          const updatedCardsInHand = cardsInHand.filter((c) =>
+            c.code !== card.code
+          );
           const updatedTrick0 = [card];
-      
+
           setCardsInHand(updatedCardsInHand);
           setTrickSlot0(updatedTrick0);
           setCurrentPlayer(players[1] || "AI Player 1"); // Set the next player to play
@@ -140,18 +142,17 @@ const MatchPage: React.FC = () => {
       } else {
         console.log("You may not play cards while it is not your turn.");
       }
-
     } else {
-      console.log("currently unused game phase option")
+      console.log("currently unused game phase option");
     }
-  }
+  };
 
   // Checks if the played card is a valid play in the current trick.
   // uses the played card, the existing trick, and the player's hand to determine if the play is valid.
-  // We use the status of trickslot3 to determine if the player is playing the first card of the trick or not. 
-  const verifyTrick = (card:cardProps) => {
+  // We use the status of trickslot3 to determine if the player is playing the first card of the trick or not.
+  const verifyTrick = (card: cardProps) => {
     console.log("Verifying trick for card: ", card.code);
-    if(!firstCardPlayed) {
+    if (!firstCardPlayed) {
       if (card.code === "2C") {
         setFirstCardPlayed(false);
         setCurrentTrick(card.suit);
@@ -159,26 +160,28 @@ const MatchPage: React.FC = () => {
         return true; // 2 of clubs is played first
       }
       console.log("First card played in the game must be 2 of clubs.");
-      return false
-    } 
+      return false;
+    }
     if (isFirstRound) {
       if (card.code === "QS" || card.suit === "Hearts") {
-        console.log("Queen of Spades or Hearts cannot be played in the first round.");
+        console.log(
+          "Queen of Spades or Hearts cannot be played in the first round.",
+        );
         return false; // Queen of Spades or Hearts cannot be played in the first round
       }
-    } 
+    }
     if (trickSlot3.length === 0) {
       console.log("First card played in the trick.");
       if (heartsBroken) {
         console.log("Hearts are broken, any card can be played.");
-        setCurrentTrick(card.suit)
+        setCurrentTrick(card.suit);
         return true; // Any card can be played if hearts are broken
       } else if (card.suit === "Hearts") {
         console.log("Hearts cannot be played until they are broken.");
         return false; // Hearts cannot be played if they haven't been broken
       } else {
         console.log("No constraints on the first card played.");
-        setCurrentTrick(card.suit)
+        setCurrentTrick(card.suit);
         return true; // Any non-heart card can be played
       }
     } else {
@@ -190,34 +193,38 @@ const MatchPage: React.FC = () => {
         console.log("Player must follow the suit.");
         return false; // Player must follow the suit if they have it in hand
       } else {
-        console.log("Player can play any card if they don't have the trick's suit.");
+        console.log(
+          "Player can play any card if they don't have the trick's suit.",
+        );
         return true; // Player can play any card if they don't have the trick's suit
       }
     }
-  }
+  };
 
   const handlePassCards = () => {
-    if(cardsToPass.length < 3) {
+    if (cardsToPass.length < 3) {
       console.log("You must pass 3 cards.");
     } else {
-      const updatedCardsInHand = cardsInHand.filter((c) => !cardsToPass.some((card) => card.code === c.code));
-      
+      const updatedCardsInHand = cardsInHand.filter((c) =>
+        !cardsToPass.some((card) => card.code === c.code)
+      );
+
       if (opponentToPassTo === "Opponent1") {
         const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
         setOpponent1Cards(updatedEnemyHand);
-      } else if(opponentToPassTo === "Opponent2") {
+      } else if (opponentToPassTo === "Opponent2") {
         const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
         setOpponent2Cards(updatedEnemyHand);
-      } else if(opponentToPassTo === "Opponent3") {
+      } else if (opponentToPassTo === "Opponent3") {
         const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
         setOpponent3Cards(updatedEnemyHand);
-      } 
-      
+      }
+
       setCardsInHand(updatedCardsInHand);
       setCardsToPass([]);
       setCurrentGamePhase("playing");
     }
-  }
+  };
 
   const handleClearTrick = () => {
     setTrickSlot0([]);
@@ -229,21 +236,20 @@ const MatchPage: React.FC = () => {
   const sortCards = (cards: cardProps[]) => {
     return cards.sort((a, b) => {
       console.log("Comparing cards:", a.code, " | ", b.code);
-      if (a.suit < b.suit) {return -1;}
-      if (a.suit > b.suit) {return 1;}
+      if (a.suit < b.suit) return -1;
+      if (a.suit > b.suit) return 1;
 
-      if (a.value < b.value) {return -1;}
-      if (a.value > b.value) {return 1;}
+      if (a.value < b.value) return -1;
+      if (a.value > b.value) return 1;
 
       return 0;
     });
-  }
+  };
 
   useEffect(() => {
     const sortedCards = sortCards(cardsInHand);
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
-
 
   return (
     <div className={`${styles.page} matchPage`}>
@@ -512,10 +518,10 @@ const MatchPage: React.FC = () => {
                 },
               },
               {
-                code: "7C", 
+                code: "7C",
                 suit: "Clubs",
                 value: BigInt(7),
-                image: "https://deckofcardsapi.com/static/img/7C.png", 
+                image: "https://deckofcardsapi.com/static/img/7C.png",
                 flipped: false,
                 backimage: cardback,
                 onClick: (code: string) => {
@@ -523,37 +529,44 @@ const MatchPage: React.FC = () => {
                 },
               },
               {
-                code: "3C", 
+                code: "3C",
                 suit: "Clubs",
                 value: BigInt(3),
-                image: "https://deckofcardsapi.com/static/img/3C.png", 
+                image: "https://deckofcardsapi.com/static/img/3C.png",
                 flipped: false,
                 backimage: cardback,
                 onClick: (code: string) => {
                   console.log(`Card clicked: ${code}`);
                 },
               },
-              
-
             ])}
         >
           testAddVariousCards
         </Button>
 
         <Button
-          onClick={() => {setCurrentGamePhase("passing"); console.log("Game phase set to passing")}}
+          onClick={() => {
+            setCurrentGamePhase("passing");
+            console.log("Game phase set to passing");
+          }}
         >
           setGamePhasePassing
         </Button>
 
         <Button
-          onClick={() => {setCurrentGamePhase("playing"); console.log("Game phase set to playing")}}
+          onClick={() => {
+            setCurrentGamePhase("playing");
+            console.log("Game phase set to playing");
+          }}
         >
           setGamePhasePlaying
         </Button>
 
         <Button
-          onClick={() => {setCurrentPlayer("User1"); console.log("Player set to User1")}}
+          onClick={() => {
+            setCurrentPlayer("User1");
+            console.log("Player set to User1");
+          }}
         >
           setPlayerUser1
         </Button>
@@ -562,73 +575,96 @@ const MatchPage: React.FC = () => {
           onClick={() => console.log("current cardsToPass: ", cardsToPass)}
         >
           logCardsToPass
-          
         </Button>
 
         <Button
-          onClick={() => {handlePassCards()}}
+          onClick={() => {
+            handlePassCards();
+          }}
         >
           PassCardsToOpponent
-          
         </Button>
 
         <Button
-          onClick={() => {setOpponentToPassTo("Opponent1"); console.log("Opponent to pass to set to Opponent1")}}
+          onClick={() => {
+            setOpponentToPassTo("Opponent1");
+            console.log("Opponent to pass to set to Opponent1");
+          }}
         >
           SetOpponentToPassTo1
-          
         </Button>
 
         <Button
-          onClick={() => {setOpponentToPassTo("Opponent2"); console.log("Opponent to pass to set to Opponent2")}}
+          onClick={() => {
+            setOpponentToPassTo("Opponent2");
+            console.log("Opponent to pass to set to Opponent2");
+          }}
         >
           SetOpponentToPassTo2
-          
         </Button>
 
         <Button
-          onClick={() => {setOpponentToPassTo("Opponent3"); console.log("Opponent to pass to set to Opponent3")}}
+          onClick={() => {
+            setOpponentToPassTo("Opponent3");
+            console.log("Opponent to pass to set to Opponent3");
+          }}
         >
           SetOpponentToPassTo3
         </Button>
 
         <Button
-          onClick={() => {setCurrentTrick(""); console.log("Current trick set to empty")}}
+          onClick={() => {
+            setCurrentTrick("");
+            console.log("Current trick set to empty");
+          }}
         >
           SetTrickEmpty
         </Button>
 
         <Button
-          onClick={() => {setCurrentTrick("Hearts"); console.log("Current trick set to Hearts")}}
+          onClick={() => {
+            setCurrentTrick("Hearts");
+            console.log("Current trick set to Hearts");
+          }}
         >
           SetTrickHearts
         </Button>
-        
+
         <Button
-          onClick={() => {setCurrentTrick("Spades"); console.log("Current trick set to Spades")}}
+          onClick={() => {
+            setCurrentTrick("Spades");
+            console.log("Current trick set to Spades");
+          }}
         >
           SetTrickSpades
         </Button>
 
         <Button
-          onClick={() => {setHeartsBroken(!heartsBroken); console.log("Hearts broken set to: ", heartsBroken)}}
+          onClick={() => {
+            setHeartsBroken(!heartsBroken);
+            console.log("Hearts broken set to: ", heartsBroken);
+          }}
         >
           ToggleHeartsBroken
         </Button>
 
         <Button
-          onClick={() => {setIsFirstRound(!isFirstRound); console.log("Set isFirstRound: ", isFirstRound)}}
+          onClick={() => {
+            setIsFirstRound(!isFirstRound);
+            console.log("Set isFirstRound: ", isFirstRound);
+          }}
         >
           ToggleIsFirstRound
         </Button>
 
         <Button
-          onClick={() => {setFirstCardPlayed(!firstCardPlayed); console.log("Set FirstCardPlayed: ", firstCardPlayed)}}
+          onClick={() => {
+            setFirstCardPlayed(!firstCardPlayed);
+            console.log("Set FirstCardPlayed: ", firstCardPlayed);
+          }}
         >
           ToggleIsFirstCard
         </Button>
-
-
       </div>
 
       <div className="gameboard">
@@ -724,7 +760,7 @@ const MatchPage: React.FC = () => {
 
         <div className="pile">
           <div className="playingcard-pile-0">
-            {trickSlot0.map((card, index) => ( 
+            {trickSlot0.map((card, index) => (
               <Card
                 key={index}
                 code={card.code}
@@ -733,12 +769,13 @@ const MatchPage: React.FC = () => {
                 image={card.image}
                 backimage={cardback}
                 flipped={true}
-                onClick={card.onClick}/>
+                onClick={card.onClick}
+              />
             ))}
           </div>
 
           <div className="playingcard-pile-1">
-            {trickSlot1.map((card, index) => ( 
+            {trickSlot1.map((card, index) => (
               <Card
                 key={index}
                 code={card.code}
@@ -747,11 +784,12 @@ const MatchPage: React.FC = () => {
                 image={card.image}
                 backimage={cardback}
                 flipped={true}
-                onClick={card.onClick}/>
+                onClick={card.onClick}
+              />
             ))}
           </div>
           <div className="playingcard-pile-2">
-            {trickSlot2.map((card, index) => ( 
+            {trickSlot2.map((card, index) => (
               <Card
                 key={index}
                 code={card.code}
@@ -760,11 +798,12 @@ const MatchPage: React.FC = () => {
                 image={card.image}
                 backimage={cardback}
                 flipped={true}
-                onClick={card.onClick}/>
+                onClick={card.onClick}
+              />
             ))}
           </div>
           <div className="playingcard-pile-3">
-            {trickSlot3.map((card, index) => ( 
+            {trickSlot3.map((card, index) => (
               <Card
                 key={index}
                 code={card.code}
@@ -773,7 +812,8 @@ const MatchPage: React.FC = () => {
                 image={card.image}
                 backimage={cardback}
                 flipped={true}
-                onClick={card.onClick}/>
+                onClick={card.onClick}
+              />
             ))}
           </div>
         </div>

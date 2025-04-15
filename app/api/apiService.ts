@@ -46,7 +46,7 @@ export class ApiService {
       }
 
       const fullMessage =
-        `[${method}] ${url} → ${status} ${statusText}\n${contextMessage}${errorDetail}`;
+        `[${method}] ${url}: ${status} ${statusText}\n${contextMessage}${errorDetail}`;
       const error = new Error(fullMessage) as Error & { status?: number };
       error.status = status;
       throw error;
@@ -64,7 +64,7 @@ export class ApiService {
     try {
       return JSON.parse(text);
     } catch {
-      throw new Error(`[${method}] ${url} → Invalid JSON response`);
+      throw new Error(`[${method}] ${url}: Invalid JSON response`);
     }
   }
 
