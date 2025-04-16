@@ -122,16 +122,36 @@ const StartPage: React.FC = () => {
           updatedDifficulties[i] = 0;
         }
 
-        // Fill user players
-        playerIdList.forEach((playerId, index) => {
-          const user = usersRef.current.find((u) => Number(u.id) === playerId);
-          if (user) {
-            updatedSelectedPlayers[index] = user.username;
-          } else {
-            updatedSelectedPlayers[index] = "Waiting...";
+        const playerIdsArray = [
+          match.player1Id,
+          match.player2Id,
+          match.player3Id,
+          match.player4Id,
+        ];
+        
+        let aiIndex = 0;
+        
+        for (let i = 0; i < playerIdsArray.length; i++) {
+          const pid = playerIdsArray[i];
+        
+          if (pid === null || pid === undefined) {
+            updatedSelectedPlayers[i] = "";
+            continue;
           }
-        });
-
+        
+          if ([1, 2, 3].includes(pid)) {
+            // It's an AI player
+            const difficulty = match.aiPlayers?.[aiIndex] ?? 1;
+            updatedSelectedPlayers[i] = "computer";
+            updatedDifficulties[i] = difficulty;
+            aiIndex++;
+          } else {
+            // It's a real user
+            const user = usersRef.current.find((u) => Number(u.id) === pid);
+            updatedSelectedPlayers[i] = user?.username ?? "Unknown User";
+          }
+        };
+        
         // Fill invites
         Object.entries(match.invites || {}).forEach(([slotStr, userId]) => {
           const slot = Number(slotStr);
@@ -139,22 +159,6 @@ const StartPage: React.FC = () => {
           updatedSelectedPlayers[slot] = user?.username ?? "Waiting...";
           updatedInviteStatus[slot] = "waiting";
           updatedPendingInvites[slot] = userId;
-        });
-
-        // Fill AI players in remaining slots
-        let slotIndex = 0;
-        match.aiPlayers?.forEach((difficulty) => {
-          // Skip over already-filled slots
-          while (
-            updatedSelectedPlayers[slotIndex] &&
-            slotIndex < updatedSelectedPlayers.length
-          ) {
-            slotIndex++;
-          }
-          if (slotIndex < 4) {
-            updatedSelectedPlayers[slotIndex] = "computer";
-            updatedDifficulties[slotIndex] = difficulty;
-          }
         });
 
         setSelectedPlayers(updatedSelectedPlayers);
@@ -385,6 +389,7 @@ const StartPage: React.FC = () => {
       try {
         await apiService.post(`/matches/${gameId}/ai`, {
           difficulty: difficulty,
+          slot: index,
         });
         message.open({
           type: "success",
@@ -397,6 +402,33 @@ const StartPage: React.FC = () => {
         });
       }
     };
+
+    // const handleRemoveAi = async (index: number) => {
+    //   if (!gameId) return;
+    
+    //   try {
+    //     await apiService.post(`/matches/${gameId}/ai/remove`, { slot: index +1 });
+    
+    //     const updatedPlayers = [...selectedPlayers];
+    //     updatedPlayers[index] = "";
+    //     setSelectedPlayers(updatedPlayers);
+    
+    //     const updatedDiffs = [...selectedDifficulties];
+    //     updatedDiffs[index] = 0;
+    //     setSelectedDifficulties(updatedDiffs);
+    
+    //     message.open({
+    //       type: "success",
+    //       content: `AI player removed from slot ${index + 1}`,
+    //     });
+    //   } catch {
+    //     message.open({
+    //       type: "error",
+    //       content: "Could not remove AI player.",
+    //     });
+    //   }
+    // };
+    
 
     const difficultyItems = [
       { label: <span style={{ color: "black" }}>Easy</span>, key: "0" },
@@ -455,11 +487,22 @@ const StartPage: React.FC = () => {
             )
             : isComputer
             ? (
-              <p
-                style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
-              >
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <p style={{ fontWeight: "bold", fontSize: "16px", color: "black", marginBottom: 0 }}>
                 AI Player: {difficultyLabel[selectedDifficulties[index]]}
               </p>
+{/*               {isHost && (
+                <Button
+                  size="small"
+                  danger
+                  type="link"
+                  onClick={() => handleRemoveAi(index)}
+                >
+                  Remove
+                </Button>
+              )} */}
+            </div>
+
             )
             : isFilled
             ? (
