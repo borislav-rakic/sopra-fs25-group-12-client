@@ -85,11 +85,11 @@ reason).
 
 ---
 
-## Contributions Week 4 - [Begin Date] to [End Date]
+## Contributions Week 4 - 17.04.2025 to 23.04.2025
 
 | **Student**          | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | -------------------- | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **@stevaniaeilyn**   | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@stevaniaeilyn**   | 17.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/3649bb847676fec9f26f3e417bc3406a271361b7 | added features, fixed bugs & defensive coding on start page  | users can no kick out players, leave, join another lobby while in a lobby|
 |                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **@diderot5038**     | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
