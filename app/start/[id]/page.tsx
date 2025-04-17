@@ -128,9 +128,7 @@ const StartPage: React.FC = () => {
           match.player3Id,
           match.player4Id,
         ];
-        
-        let aiIndex = 0;
-        
+                
         for (let i = 0; i < playerIdsArray.length; i++) {
           const pid = playerIdsArray[i];
         
@@ -141,10 +139,10 @@ const StartPage: React.FC = () => {
         
           if ([1, 2, 3].includes(pid)) {
             // It's an AI player
-            const difficulty = match.aiPlayers?.[aiIndex] ?? 1;
+            const slot = i + 1;
+            const difficulty = match.aiPlayers?.[slot] ?? 1;
             updatedSelectedPlayers[i] = "computer";
             updatedDifficulties[i] = difficulty;
-            aiIndex++;
           } else {
             // It's a real user
             const user = usersRef.current.find((u) => Number(u.id) === pid);
@@ -306,6 +304,37 @@ const StartPage: React.FC = () => {
     }
   };
 
+  const handleCancelInvite = async (index: number) => {
+    if (!gameId) return;
+  
+    try {
+      await apiService.delete(`/matches/${gameId}/invite/${index}`);
+  
+      const updatedPlayers = [...selectedPlayers];
+      updatedPlayers[index] = "";
+      setSelectedPlayers(updatedPlayers);
+  
+      const updatedStatuses = [...inviteStatus];
+      updatedStatuses[index] = null;
+      setInviteStatus(updatedStatuses);
+  
+      const updatedPending = [...pendingInvites];
+      updatedPending[index] = null;
+      setPendingInvites(updatedPending);
+  
+      message.open({
+        type: "info",
+        content: `Invite for slot ${index + 1} has been cancelled.`,
+      });
+    } catch {
+      message.open({
+        type: "error",
+        content: "Could not cancel invite.",
+      });
+    }
+  };
+  
+
   const handleStart = async () => {
     try {
       await apiService.post(`/matches/${gameId}/start`, {});
@@ -403,31 +432,80 @@ const StartPage: React.FC = () => {
       }
     };
 
-    // const handleRemoveAi = async (index: number) => {
-    //   if (!gameId) return;
+    const handleRemoveAi = async (index: number) => {
+      if (!gameId) return;
     
-    //   try {
-    //     await apiService.post(`/matches/${gameId}/ai/remove`, { slot: index +1 });
+      try {
+        await apiService.post(`/matches/${gameId}/ai/remove`, { slot: index });
     
-    //     const updatedPlayers = [...selectedPlayers];
-    //     updatedPlayers[index] = "";
-    //     setSelectedPlayers(updatedPlayers);
+        const updatedPlayers = [...selectedPlayers];
+        updatedPlayers[index] = "";
+        setSelectedPlayers(updatedPlayers);
     
-    //     const updatedDiffs = [...selectedDifficulties];
-    //     updatedDiffs[index] = 0;
-    //     setSelectedDifficulties(updatedDiffs);
+        const updatedDiffs = [...selectedDifficulties];
+        updatedDiffs[index] = 0;
+        setSelectedDifficulties(updatedDiffs);
     
-    //     message.open({
-    //       type: "success",
-    //       content: `AI player removed from slot ${index + 1}`,
-    //     });
-    //   } catch {
-    //     message.open({
-    //       type: "error",
-    //       content: "Could not remove AI player.",
-    //     });
-    //   }
-    // };
+        message.open({
+          type: "success",
+          content: `AI player removed from slot ${index + 1}`,
+        });
+      } catch {
+        message.open({
+          type: "error",
+          content: "Could not remove AI player.",
+        });
+      }
+    };
+
+    const handleRemovePlayer = async (index: number) => {
+      if (!gameId) return;
+    
+      try {
+        await apiService.delete(`/matches/${gameId}/player/${index}`);
+    
+        const updatedPlayers = [...selectedPlayers];
+        updatedPlayers[index] = "";
+        setSelectedPlayers(updatedPlayers);
+    
+        const updatedStatuses = [...inviteStatus];
+        updatedStatuses[index] = null;
+        setInviteStatus(updatedStatuses);
+    
+        const updatedPending = [...pendingInvites];
+        updatedPending[index] = null;
+        setPendingInvites(updatedPending);
+    
+        message.open({
+          type: "info",
+          content: `Player removed from slot ${index + 1}`,
+        });
+      } catch {
+        message.open({
+          type: "error",
+          content: "Could not remove player.",
+        });
+      }
+    };
+    
+    const handleLeaveMatch = async () => {
+      if (!gameId) return;
+    
+      try {
+        await apiService.delete(`/matches/${gameId}/leave`);
+        message.open({
+          type: "info",
+          content: "You left the match.",
+        });
+        router.push("/landingpageuser");
+      } catch {
+        message.open({
+          type: "error",
+          content: "Could not leave the match.",
+        });
+      }
+    };
+    
     
 
     const difficultyItems = [
@@ -479,11 +557,23 @@ const StartPage: React.FC = () => {
         >
           {inviteStatus[index] === "waiting"
             ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <p
                 style={{ fontWeight: "bold", fontSize: "16px", color: "gray" }}
               >
                 Waiting...
               </p>
+              {isHost && (
+                <Button
+                  danger
+                  size="small"
+                  type="link"
+                  onClick={() => handleCancelInvite(index)}
+                >
+                  Cancel
+                </Button>
+              )}
+              </div>
             )
             : isComputer
             ? (
@@ -491,7 +581,7 @@ const StartPage: React.FC = () => {
               <p style={{ fontWeight: "bold", fontSize: "16px", color: "black", marginBottom: 0 }}>
                 AI Player: {difficultyLabel[selectedDifficulties[index]]}
               </p>
-{/*               {isHost && (
+              {isHost && (
                 <Button
                   size="small"
                   danger
@@ -500,23 +590,46 @@ const StartPage: React.FC = () => {
                 >
                   Remove
                 </Button>
-              )} */}
+              )}
             </div>
 
             )
             : isFilled
             ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <p
                 style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
               >
                 {player}
               </p>
+              {isHost && (
+              <Button
+                size="small"
+                danger
+                type="link"
+                onClick={() => handleRemovePlayer(index)}
+              >
+                Remove
+              </Button>
+            )}
+            {player === currentUsername && !isHost && (
+              <Button
+                size="small"
+                danger
+                type="link"
+                onClick={handleLeaveMatch}
+              >
+                Leave
+              </Button>
+            )}
+             </div>
             )
             : !isHost
             ? (
               <p style={{ fontSize: "16px", color: "gray" }}>
                 Waiting for other players...
               </p>
+
             )
             : (
               <>
