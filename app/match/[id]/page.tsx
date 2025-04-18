@@ -71,7 +71,7 @@ const MatchPage: React.FC = () => {
           error,
         );
       }
-    }, 5000);
+    }, 2000);
 
     // When the component unmounts, this stops the function mapped to matchRefreshIntervalId from running every 5 seconds.
     return () => {
@@ -110,7 +110,7 @@ const MatchPage: React.FC = () => {
     }
   }, [playmat]);
 
-  const handlePlayCard = (card: cardProps) => {
+  const handlePlayCard = async (card: cardProps) => {
     console.log("Selected card in Match Page:", card.code);
 
     if (currentGamePhase === "passing") {
@@ -130,14 +130,39 @@ const MatchPage: React.FC = () => {
         if (!verifyTrick(card)) {
           // the linter abhors empty blocks
         } else {
-          const updatedCardsInHand = cardsInHand.filter((c) =>
-            c.code !== card.code
-          );
-          const updatedTrick0 = [card];
+          try{
+            const payload = {
+              gameId: matchId, 
+              playerId: 1, //Currently the frontend has no way of knowing the playerId, so we set it to 1 for now.
+              cardCode: card.code, // Since card in backend is only a string
+            };
+            console.log("Payload for playing card:", payload);           
 
-          setCardsInHand(updatedCardsInHand);
-          setTrickSlot0(updatedTrick0);
-          setCurrentPlayer(players[1] || "AI Player 1"); // Set the next player to play
+            const response = await apiService.post(`/matches/${matchId}/play`, {payload});
+
+            console.log("Response from server:", response);
+
+            if ((response as { status: number }).status === 200) {
+              console.log("Card played successfully:", card.code);
+
+              const updatedCardsInHand = cardsInHand.filter((c) => c.code !== card.code);
+              const updatedTrick0 = [card];
+    
+              setCardsInHand(updatedCardsInHand);
+              setTrickSlot0(updatedTrick0);
+              setCurrentPlayer(players[1] || "AI Player 1"); // Set the next player to play
+
+            } else {
+              if (typeof response === "object" && response !== null && "status" in response) {
+                console.error("Error playing card:", (response as { status: number }).status);
+              } else {
+                console.error("Error playing card: Invalid response format");
+              }
+            }
+
+          } catch (error) {
+            console.error("Error playing card:", error);
+          }
         }
       } else {
         console.log("You may not play cards while it is not your turn.");
@@ -201,28 +226,50 @@ const MatchPage: React.FC = () => {
     }
   };
 
-  const handlePassCards = () => {
+  const handlePassCards = async () => {
     if (cardsToPass.length < 3) {
       console.log("You must pass 3 cards.");
-    } else {
-      const updatedCardsInHand = cardsInHand.filter((c) =>
-        !cardsToPass.some((card) => card.code === c.code)
-      );
+      return
+    } 
+    try {
 
-      if (opponentToPassTo === "Opponent1") {
-        const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
-        setOpponent1Cards(updatedEnemyHand);
-      } else if (opponentToPassTo === "Opponent2") {
-        const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
-        setOpponent2Cards(updatedEnemyHand);
-      } else if (opponentToPassTo === "Opponent3") {
-        const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
-        setOpponent3Cards(updatedEnemyHand);
+      const payload = {
+        gameId: matchId,
+        playerId: 1, // Currently the frontend has no way of knowing the playerId, so we set it to 1 for now.
+        cards: cardsToPass.map((card) => card.code), // Send only the card codes
+      };
+
+      const response = await apiService.post(`/matches/${matchId}/passing`, {payload});
+      console.log("Response from server:", response);
+
+      if ((response as { status: number }).status === 200) {
+        const updatedCardsInHand = cardsInHand.filter((c) =>
+          !cardsToPass.some((card) => card.code === c.code)
+        );
+  
+        if (opponentToPassTo === "Opponent1") {
+          const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
+          setOpponent1Cards(updatedEnemyHand);
+        } else if (opponentToPassTo === "Opponent2") {
+          const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
+          setOpponent2Cards(updatedEnemyHand);
+        } else if (opponentToPassTo === "Opponent3") {
+          const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
+          setOpponent3Cards(updatedEnemyHand);
+        }
+  
+        setCardsInHand(updatedCardsInHand);
+        setCardsToPass([]);
+        setCurrentGamePhase("playing");
+      } else {
+        if (typeof response === "object" && response !== null && "status" in response) {
+          console.error("Error passing cards:", (response as { status: number }).status);
+        } else {
+          console.error("Error passing cards: Invalid response format");
+        }
       }
-
-      setCardsInHand(updatedCardsInHand);
-      setCardsToPass([]);
-      setCurrentGamePhase("playing");
+  } catch (error) {
+      console.error("Error passing cards:", error);
     }
   };
 
