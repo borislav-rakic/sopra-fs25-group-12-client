@@ -133,7 +133,7 @@ const MatchPage: React.FC = () => {
           try{
             const payload = {
               gameId: matchId, 
-              playerId: 1, //Currently the frontend has no way of knowing the playerId, so we set it to 1 for now.
+              playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
               cardCode: card.code, // Since card in backend is only a string
             };
             console.log("Payload for playing card:", payload);           
@@ -235,11 +235,12 @@ const MatchPage: React.FC = () => {
 
       const payload = {
         gameId: matchId,
-        playerId: 1, // Currently the frontend has no way of knowing the playerId, so we set it to 1 for now.
+        playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
         cards: cardsToPass.map((card) => card.code), // Send only the card codes
       };
+      console.log("Payload for passing cards:", payload);
 
-      const response = await apiService.post(`/matches/${matchId}/passing`, {payload});
+      const response = await apiService.post(`/matches/${matchId}/passing`, payload);
       console.log("Response from server:", response);
 
       if ((response as { status: number }).status === 200) {
