@@ -129,7 +129,7 @@ const LandingPageUser: React.FC = () => {
                   block className={styles.whiteButton}
                   onClick={() => router.push("/friends")}
                 >
-                  Manage Friendships
+                  Friends
                 </Button>
               </Col>
             )}

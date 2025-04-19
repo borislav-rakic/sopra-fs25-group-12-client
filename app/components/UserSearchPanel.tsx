@@ -56,22 +56,14 @@ const UserSearchPanel: React.FC = () => {
 
   return (
     <div style={{ width: "100%", maxWidth: 1200 }}>
-      <Input
-        placeholder="Search by username"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        allowClear
-        style={{
-          width: 250,
-          borderRadius: 20,
-          padding: "4px 12px",
-          border: "1px solid #ccc",
-          backgroundColor: "#f8f8f8",
-          boxShadow: "none",
-        }}
+     <Input
+      placeholder="Search username..."
+      size="large"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      allowClear
+      style={{ backgroundColor: "white", width: "260px" }}
       />{" "}
-      Start typing a user name to get some suggestions.
-
       {query.trim() && (
         <div>
           {loading

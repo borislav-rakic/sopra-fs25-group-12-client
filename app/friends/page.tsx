@@ -8,6 +8,8 @@ import "./friends.css";
 import FriendCard from "@/components/FriendCard";
 import UserSearchPanel from "@/components/UserSearchPanel";
 import { useRouter } from "next/navigation";
+import "@/styles/globals.css";
+import styles from "@/styles/page.module.css";
 
 type UserSummary = {
   id: number;
@@ -56,7 +58,7 @@ const FriendsPage: React.FC = () => {
     emptyMessage: string,
   ) => (
     <div className="friend-section">
-      <h3>{title}</h3>
+      <h3 style={{ color: "white", fontWeight: "bold" }}>{title}</h3>
       <div className="friend-scroll-wrapper">
         {users.length > 0
           ? (
@@ -74,18 +76,10 @@ const FriendsPage: React.FC = () => {
   );
 
   return (
+    <div className="contentContainer">
     <div className="friends-page">
-      <h2>My Friends</h2>
-      <Button
-        type="primary"
-        color="green"
-        onClick={() => router.push("/landingpageuser")}
-        style={{ marginBottom: "1em" }}
-      >
-        Back to Landing Page
-      </Button>
       {renderFriendSection(
-        "My Friend List",
+        "My Friends",
         acceptedRequests,
         "No accepted friends yet.",
       )}
@@ -95,12 +89,21 @@ const FriendsPage: React.FC = () => {
         "No incoming requests.",
       )}
       {renderFriendSection(
-        "Friend Requests You Declined",
+        "Declined Friend Requests",
         declinedRequests,
         "No declined requests.",
       )}
-      <h3>Search for New Friends</h3>
+      <h3 style={{ color: "white", fontWeight: "bold" }}>Search for new friends:</h3>
       <UserSearchPanel />
+
+      <Button
+        block className={styles.whiteButton}
+        style={{ width: 200, marginTop: "10px"}}
+        onClick={() => router.push("/landingpageuser")}
+      >
+        Back to Home Page
+      </Button>
+    </div>
     </div>
   );
 };
