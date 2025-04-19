@@ -9,6 +9,11 @@ import { useApi } from "@/hooks/useApi";
 import { useRouter } from "next/navigation";
 import Image from "next/image"; // Add this to your imports
 import { UserPrivateDTO } from "@/types/user";
+import "@/styles/globals.css";
+import styles from "@/styles/page.module.css";
+import { Input } from "antd";
+
+
 
 const MyProfile: React.FC = () => {
   const router = useRouter();
@@ -150,7 +155,7 @@ const MyProfile: React.FC = () => {
   const avatarUrl = `/avatars_118x118/a${form.avatar}.png`;
 
   return (
-    <div className="profile-container">
+    <div>
       <div className="profile-header-fixed">
         <Image
           src={avatarUrl}
@@ -167,11 +172,12 @@ const MyProfile: React.FC = () => {
           </div>
         </div>
       </div>
-      <h2>Edit Profile</h2>
+      <div className="contentContainer">
+      <h2 style={{ color: "white", marginBottom: "16px" }}>Your Profile</h2>
       <form onSubmit={handleSubmit}>
         <label>
-          Username:
-          <input
+          Change Username:
+          <Input
             name="username"
             value={form.username}
             onChange={handleChange}
@@ -179,9 +185,8 @@ const MyProfile: React.FC = () => {
           />
         </label>
         <label>
-          Password:
-          <input
-            type="password"
+          Change Password:
+          <Input.Password
             name="password"
             value={form.password}
             onChange={handleChange}
@@ -190,8 +195,7 @@ const MyProfile: React.FC = () => {
         </label>
         <label>
           Confirm Password:
-          <input
-            type="password"
+          <Input.Password
             name="passwordConfirmed"
             value={form.passwordConfirmed}
             onChange={handleChange}
@@ -199,8 +203,8 @@ const MyProfile: React.FC = () => {
           />
         </label>
         <label>
-          Birthday:
-          <input
+          Change Birthday:
+          <Input
             type="date"
             name="birthday"
             value={form.birthday}
@@ -210,19 +214,17 @@ const MyProfile: React.FC = () => {
 
         <AvatarSelector selected={form.avatar} onSelect={handleAvatarSelect} />
 
-        <Button type="primary" color="green" htmlType="submit">
+        <Button htmlType="submit" block className={styles.whiteButton}>
           Save Changes
         </Button>
         <Button
-          type="primary"
-          color="red"
-          variant="solid"
-          style={{ marginLeft: "1em" }}
+          block className={styles.whiteButton}
           onClick={() => router.push("/landingpageuser")}
         >
-          Cancel
+          Back to Homepage
         </Button>
       </form>
+    </div>
     </div>
   );
 };

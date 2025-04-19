@@ -18,6 +18,7 @@ import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
 import { Match } from "@/types/match";
 import { User } from "@/types/user";
+import "@/styles/globals.css";
 
 const StartPage: React.FC = () => {
   const params = useParams();
@@ -190,11 +191,6 @@ const StartPage: React.FC = () => {
           `/matches/${gameId}/joinRequests`,
         );
 
-        message.open({
-          type: "info",
-          content: `All join requests: ${JSON.stringify(joinRequestsObject)}`,
-        });
-
         const filteredRequests = joinRequestsObject
           .filter((request) => request.status === "pending")
           .map((request) => ({
@@ -202,12 +198,6 @@ const StartPage: React.FC = () => {
             status: request.status,
           }));
 
-        message.open({
-          type: "info",
-          content: `Filtered join requests: ${
-            JSON.stringify(filteredRequests)
-          }`,
-        });
         setJoinRequests(filteredRequests);
       } catch {
         message.open({
@@ -376,10 +366,10 @@ const StartPage: React.FC = () => {
   const renderHostCard = () => (
     <Card
       style={{
-        backgroundColor: "#f0f0f0",
+        backgroundColor: "white",
         padding: "10px",
         textAlign: "center",
-        width: 260,
+        width: 240,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -394,7 +384,6 @@ const StartPage: React.FC = () => {
   const renderPlayerCard = (index: number) => {
     const player = selectedPlayers[index];
     const isComputer = player === "computer";
-    const isInvited = player === "invite";
     const isFilled = player && player !== "computer" && player !== "invite";
     const difficultyLabel = ["Easy", "Medium", "Difficult"];
 
@@ -538,10 +527,10 @@ const StartPage: React.FC = () => {
       <Card
         key={index}
         style={{
-          backgroundColor: "#f0f0f0",
-          padding: "10px",
+          backgroundColor: "white",
+          padding: "6px",
           textAlign: "center",
-          width: 260,
+          width: 240,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -559,7 +548,7 @@ const StartPage: React.FC = () => {
             ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <p
-                style={{ fontWeight: "bold", fontSize: "16px", color: "gray" }}
+                style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
               >
                 Waiting...
               </p>
@@ -626,7 +615,7 @@ const StartPage: React.FC = () => {
             )
             : !isHost
             ? (
-              <p style={{ fontSize: "16px", color: "gray" }}>
+              <p style={{ fontSize: "16px", color: "black" }}>
                 Waiting for other players...
               </p>
 
@@ -634,11 +623,7 @@ const StartPage: React.FC = () => {
             : (
               <>
                 <Button
-                  style={{
-                    backgroundColor: isInvited ? "#b2f2bb" : "#d9d9d9",
-                    border: "none",
-                    width: "100%",
-                  }}
+                  block className={styles.whiteButton}
                   onClick={() => {
                     const updated = [...selectedPlayers];
                     const toggleInvite = [...showInvite];
@@ -679,17 +664,13 @@ const StartPage: React.FC = () => {
                   trigger={["click"]}
                 >
                   <Button
-                    style={{
-                      backgroundColor: isComputer ? "#b2f2bb" : "#d9d9d9",
-                      border: "none",
-                      width: "100%",
-                    }}
+                    block className={styles.whiteButton}
                   >
                     {isComputer
                       ? `Computer (${
                         difficultyLabel[selectedDifficulties[index]]
                       })`
-                      : "Computer opponent"}
+                      : "Computer Opponent"}
                   </Button>
                 </Dropdown>
 
@@ -791,41 +772,42 @@ const StartPage: React.FC = () => {
   };
 
   return (
-    <div
-      className={styles.page}
-      style={{ backgroundColor: "white", padding: "40px" }}
-    >
+    <div className="contentContainer" style={{ textAlign: "center" }}>
       <main className={styles.main}>
         {renderJoinRequestModal()}
         <p
           style={{
-            marginBottom: "20px",
+            marginBottom: "2px",
             fontWeight: "bold",
-            fontSize: "16px",
-            color: "black",
+            fontSize: "20px",
+            color: "white",
           }}
         >
-          Game ID:{" "}
-          <span style={{ fontFamily: "monospace", color: "black" }}>
+          MATCH ID:{" "}
+          <span style={{ color: "white" }}>
             {gameId}
           </span>
         </p>
 
-        <Row gutter={[12, 12]} justify="center">
-          <Col>{renderHostCard()}</Col>
-          {[1, 2, 3].map((i) => <Col key={i}>{renderPlayerCard(i)}</Col>)}
+        <Row gutter={[16, 16]} justify="center">
+          {[0, 1, 2, 3].map((i) => (
+            <Col xs={24} sm={12} md={12} lg={12} xl={12} key={i}>
+              {i === 0 ? renderHostCard() : renderPlayerCard(i)}
+            </Col>
+          ))}
         </Row>
 
         {isHost && (
           <>
-            <div style={{ marginTop: 40, textAlign: "center" }}>
-              <p style={{ color: "black", fontWeight: "bold" }}>
+            <div style={{ marginTop: "5",marginBottom: "10px", textAlign: "center" }}>
+              <p style={{ color: "white", fontWeight: "bold", marginBottom: "10px", fontSize: "20px",}}>
                 Amount of points to be reached until the end:
               </p>
               <Row gutter={[8, 8]} justify="center">
                 {[50, 75, 100, 150, 200].map((points) => (
                   <Col key={points}>
                     <Button
+                    type="default"
                       onClick={async () => {
                         setSelectedPoints(points);
                         try {
@@ -845,11 +827,10 @@ const StartPage: React.FC = () => {
                       }}
                       style={{
                         backgroundColor: selectedPoints === points
-                          ? "#b2f2bb"
-                          : "#d9d9d9",
-                        border: "none",
-                        color: "black",
+                          ? "green"
+                          : "white",
                         width: "60px",
+                        transition: "background-color 0.2s ease-in-out",
                       }}
                     >
                       {points}
@@ -861,17 +842,17 @@ const StartPage: React.FC = () => {
 
             <div
               style={{
-                marginTop: 40,
+                marginTop: 10,
                 display: "flex",
                 justifyContent: "center",
                 gap: "20px",
               }}
             >
-              <Button className="login-button" onClick={handleStart}>
-                Start
-              </Button>
-              <Button className="back-button" onClick={handleCancelMatch}>
+              <Button block className={styles.whiteButton} onClick={handleCancelMatch}>
                 Cancel Match
+              </Button>
+              <Button block className={styles.whiteButton} onClick={handleStart}>
+                Start
               </Button>
             </div>
           </>

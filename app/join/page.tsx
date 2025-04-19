@@ -191,15 +191,12 @@ const JoinPage: React.FC = () => {
   ];
 
   return (
-    <div
-      className="login-container"
-      style={{ paddingTop: "40px", maxWidth: 600, margin: "0 auto" }}
-    >
+    <div className="contentContainer">
       {contextHolder}
       <Form layout="vertical" size="large">
-        <Form.Item label="MatchID">
+        <Form.Item label="Enter Match ID:">
           <Input
-            placeholder="Search..."
+            placeholder=" Search Match ID..."
             value={searchValue}
             onChange={(e) => handleSearch(e.target.value)}
           />
@@ -209,7 +206,10 @@ const JoinPage: React.FC = () => {
           dataSource={filteredMatches}
           columns={columns}
           rowKey={(record) => record.matchId?.toString() ?? ""}
-          pagination={false}
+          pagination={{
+            pageSize: 5,
+            showSizeChanger: false,
+          }}
           bordered
         />
 

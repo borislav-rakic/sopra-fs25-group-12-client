@@ -75,26 +75,22 @@ const LandingPageUser: React.FC = () => {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
+      <div className='contentContainer'>
         <Image
           src="/LandingPageCards.png"
           alt="Hearts Attack Cards"
           width={200}
           height={150}
+          className={styles.cardImage}
         />
 
-        <h1>HEARTS ATTACK</h1>
-        <p>
-          A fast-paced card game of strategy and sabotage.<br />Can you survive
-          the Hearts Attack?
-        </p>
+        <h1 className="luckiestGuy">HEARTS ATTACK!</h1>
 
         <Space direction="vertical" size="middle" style={{ marginTop: 24 }}>
           <Row gutter={16} justify="center">
             <Col>
               <Button
-                type="primary"
-                color="green"
-                variant="solid"
+                block className={styles.whiteButton}
                 onClick={handleNewMatch}
               >
                 New Match
@@ -102,9 +98,7 @@ const LandingPageUser: React.FC = () => {
             </Col>
             <Col>
               <Button
-                type="primary"
-                color="green"
-                variant="solid"
+                block className={styles.whiteButton}
                 onClick={() => router.push("/join")}
               >
                 Join Match
@@ -112,9 +106,7 @@ const LandingPageUser: React.FC = () => {
             </Col>
             <Col>
               <Button
-                type="primary"
-                color="green"
-                variant="solid"
+                block className={styles.whiteButton}
                 onClick={() => router.push("/match")}
               >
                 Match Page Test
@@ -125,9 +117,7 @@ const LandingPageUser: React.FC = () => {
           <Row gutter={16} justify="center">
             <Col>
               <Button
-                type="primary"
-                color="yellow"
-                variant="solid"
+                block className={styles.whiteButton}
                 onClick={() => router.push("/leaderboard")}
               >
                 Leaderboard
@@ -136,9 +126,7 @@ const LandingPageUser: React.FC = () => {
             {user && !user.isGuest && (
               <Col>
                 <Button
-                  type="primary"
-                  color="yellow"
-                  variant="solid"
+                  block className={styles.whiteButton}
                   onClick={() => router.push("/friends")}
                 >
                   Manage Friendships
@@ -150,9 +138,7 @@ const LandingPageUser: React.FC = () => {
           <Row gutter={16} justify="center">
             <Col>
               <Button
-                type="primary"
-                color="yellow"
-                variant="solid"
+                block className={styles.whiteButton}
                 onClick={() => router.push("/rules")}
               >
                 Rules
@@ -161,9 +147,7 @@ const LandingPageUser: React.FC = () => {
             {user && !user.isGuest && (
               <Col>
                 <Button
-                  type="primary"
-                  color="yellow"
-                  variant="solid"
+                  block className={styles.whiteButton}
                   onClick={() => router.push("/profile")}
                 >
                   Profile
@@ -173,9 +157,7 @@ const LandingPageUser: React.FC = () => {
             {user && !user.isGuest && (
               <Col>
                 <Button
-                  type="primary"
-                  color="yellow"
-                  variant="solid"
+                  block className={styles.whiteButton}
                   onClick={() => setSettingsOpen(true)}
                 >
                   Settings
@@ -191,9 +173,7 @@ const LandingPageUser: React.FC = () => {
                     You are logged in as a guest only.
                   </span>
                   <Button
-                    type="primary"
-                    color="green"
-                    variant="solid"
+                    block className={styles.whiteButton}
                     onClick={() => router.push("/login")}
                     style={{ marginLeft: "1em" }}
                   >
@@ -203,9 +183,7 @@ const LandingPageUser: React.FC = () => {
 
                 <Col>
                   <Button
-                    type="primary"
-                    color="green"
-                    variant="solid"
+                    block className={styles.whiteButton}
                     onClick={() => router.push("/register")}
                     style={{ marginLeft: "1em" }}
                   >
@@ -218,9 +196,7 @@ const LandingPageUser: React.FC = () => {
             {user && !user.isGuest && (
               <Col>
                 <Button
-                  type="primary"
-                  color="red"
-                  variant="solid"
+                  block className={styles.whiteButton}
                   onClick={handleLogout}
                 >
                   Logout
@@ -238,6 +214,7 @@ const LandingPageUser: React.FC = () => {
           cardback={cardback}
           setCardback={setCardback}
         />
+         </div>
       </main>
     </div>
   );

@@ -6,7 +6,7 @@ import { User } from "@/types/user";
 import { Button, Form, Input, message } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 import "@/styles/globals.css";
-// import styles from "@/styles/page.module.css";
+import styles from "@/styles/page.module.css";
 
 interface FormFieldProps {
   label: string;
@@ -51,7 +51,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="login-container">
+      <div className="contentContainer">
       <Form
         form={form}
         name="login"
@@ -61,7 +61,7 @@ const Login: React.FC = () => {
         layout="vertical"
       >
         <Form.Item>
-          <p style={{ color: "black", fontSize: "14px", marginBottom: "16px" }}>
+          <p style={{ color: "white", fontSize: "16px", marginBottom: "10px" }}>
             For testing purposes we have users &quot;User1&quot;,
             &quot;User2&quot;, &hellip; , &quot;User9&quot;<br />with Passwords
             &quot;Secret1&quot;, &quot;Secret2&quot;, &hellip; ,
@@ -88,11 +88,12 @@ const Login: React.FC = () => {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            gap: "10px",
+            gap: "5px",
+            marginTop: "16px",
           }}
         >
           <Button
-            className="back-button"
+            block className={styles.whiteButton}
             onClick={() => router.push("/")}
           >
             Back
@@ -100,13 +101,13 @@ const Login: React.FC = () => {
 
           <Button
             htmlType="submit"
-            className="login-button"
+            block className={styles.whiteButton}
           >
             Login
           </Button>
         </div>
 
-        <div style={{ marginTop: "16px", textAlign: "center" }}>
+        <div style={{ marginTop: "16px",textAlign: "center", }}>
           <Button type="link" onClick={() => router.push("/register")}>
             Don&apos;t have an account? Register here.
           </Button>

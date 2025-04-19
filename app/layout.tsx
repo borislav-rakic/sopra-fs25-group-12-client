@@ -4,6 +4,7 @@ import { ConfigProvider, theme } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "@/styles/globals.css";
 import { InviteHandler } from "@/components/inviteHandler";
+import { Luckiest_Guy } from "next/font/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,6 +15,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const luckiestGuy = Luckiest_Guy({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-luckiest-guy",
+});
+
 
 export const metadata: Metadata = {
   title: "SoPra Group 12: Hearts Attack",
@@ -39,7 +47,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${luckiestGuy.variable}`}>
         <ConfigProvider
           theme={{
             algorithm: theme.defaultAlgorithm,

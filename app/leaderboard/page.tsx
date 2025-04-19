@@ -8,6 +8,8 @@ import { useApi } from "@/hooks/useApi";
 import { User } from "@/types/user";
 import Link from "next/link";
 import "@/styles/globals.css";
+import { Input } from "antd";
+import styles from "@/styles/page.module.css";
 
 type LeaderboardRow = {
   key: string;
@@ -108,7 +110,7 @@ const LeaderboardPage: React.FC = () => {
   };
 
   return (
-    <div className="login-container">
+    <div className="contentContainer">
       <div style={{ width: "100%", maxWidth: "800px" }}>
         <Space
           direction="vertical"
@@ -117,21 +119,13 @@ const LeaderboardPage: React.FC = () => {
         >
           {/* Top-right controls */}
           <Space style={{ justifyContent: "flex-end", width: "100%" }}>
-            <input
-              type="text"
-              placeholder="Search username..."
-              value={searchValue}
-              onChange={(e) => handleSearch(e.target.value)}
-              style={{
-                height: "36px", // Match AntD small button height
-                padding: "0 8px", // Tight horizontal space
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-                fontSize: "14px",
-                width: "200px",
-                lineHeight: "24px", // vertically centers text
-              }}
-            />
+          <Input
+            placeholder="Search username..."
+            size="large"
+            value={searchValue}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+
             <Dropdown
               menu={{
                 items: filterOptions,
@@ -139,7 +133,7 @@ const LeaderboardPage: React.FC = () => {
               }}
               trigger={["click"]}
             >
-              <Button className="login-button">
+              <Button block className={styles.whiteButton}>
                 Filter:{" "}
                 {filterOptions.find((item) => item.key === selectedFilter)
                   ?.label}
@@ -161,7 +155,6 @@ const LeaderboardPage: React.FC = () => {
             bordered
             loading={loading}
           />
-
           {/* Below-table buttons */}
           <div
             style={{
@@ -172,8 +165,7 @@ const LeaderboardPage: React.FC = () => {
           >
             {/* Back to Home */}
             <Button
-              className="back-button"
-              style={{ maxWidth: "fit-content" }}
+              block className={styles.whiteButton}
               onClick={() => router.push("/landingpageuser")}
             >
               Back To Home Page
