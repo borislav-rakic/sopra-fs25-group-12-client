@@ -127,7 +127,7 @@ const LandingPageUser: React.FC = () => {
           className={styles.cardImage}
         />
 
-        <h1 className="luckiestGuy">HEARTS ATTACK!</h1>
+        <h1 className="luckiestGuy" style={{ marginTop: 24 }}>HEARTS ATTACK!</h1>
 
         <Space direction="vertical" size="middle" style={{ marginTop: 24 }}>
           <Row gutter={16} justify="center">
