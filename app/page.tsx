@@ -75,10 +75,10 @@ export default function Home() {
           className={styles.cardImage} // Add styling as needed in CSS
         />
 
-        <h1 className="luckiestGuy">HEARTS ATTACK!</h1>
+        <h1 className="luckiestGuy"style={{ marginTop: 15 }}>HEARTS ATTACK!</h1>
 
         <p className='tagline'>
-          A fast-paced card game of strategy and sabotage.<br />
+          A fast-paced card game of strategy & sabotage.<br />
           Can you survive the Hearts Attack?!
         </p>
         <div className={styles.ctas}>
