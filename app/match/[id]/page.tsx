@@ -281,6 +281,46 @@ const MatchPage: React.FC = () => {
     setTrickSlot3([]);
   };
 
+  const calculateTrickWinner = () => {
+    console.log("Calculating trick winner...");
+    const allCards = [
+      ...trickSlot0,
+      ...trickSlot1,
+      ...trickSlot2,
+      ...trickSlot3,
+    ];
+
+    if (allCards.length < 4) {
+      console.log("Trick may only be calulated if all players have played a card.");
+      return;
+    }
+
+    const matchingCards = allCards.filter((card) => card.suit === currentTrick);
+
+    if (matchingCards.length === 0) {
+      console.log("No cards match the current trick's suit.");
+      return;
+    }
+  
+    // Initialize the highest card and its index
+    let highestCardIndex = 0;
+    let highestCard = matchingCards[0];
+  
+    // Iterate through matching cards to find the highest card
+    matchingCards.forEach((card) => {
+      const cardIndex = allCards.indexOf(card);
+      if (card.value > highestCard.value) {
+        highestCard = card;
+        highestCardIndex = cardIndex;
+      }
+    });
+  
+    console.log("Winning player index:", highestCardIndex);
+    console.log("Highest card in the trick:", highestCard.code);
+  
+    return highestCardIndex;
+  }
+
   const sortCards = (cards: cardProps[]) => {
     return cards.sort((a, b) => {
       console.log("Comparing cards:", a.code, " | ", b.code);
@@ -434,10 +474,10 @@ const MatchPage: React.FC = () => {
           onClick={() =>
             setTrickSlot2([
               {
-                code: "2H", // Example: Two of Hearts
+                code: "4H", // Example: Two of Hearts
                 suit: "Hearts",
-                value: BigInt(2),
-                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                value: BigInt(4),
+                image: "https://deckofcardsapi.com/static/img/4H.png", // Example image URL
                 flipped: false,
                 backimage: cardback,
                 onClick: (code: string) => {
@@ -453,10 +493,10 @@ const MatchPage: React.FC = () => {
           onClick={() =>
             setTrickSlot3([
               {
-                code: "2H", // Example: Two of Hearts
+                code: "3H", // Example: Two of Hearts
                 suit: "Hearts",
-                value: BigInt(2),
-                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                value: BigInt(3),
+                image: "https://deckofcardsapi.com/static/img/3H.png", // Example image URL
                 flipped: false,
                 backimage: cardback,
                 onClick: (code: string) => {
@@ -466,6 +506,25 @@ const MatchPage: React.FC = () => {
             ])}
         >
           testAddTrick3Card
+        </Button>
+
+        <Button
+          onClick={() =>
+            setTrickSlot0([
+              {
+                code: "5S", // Example: Two of Hearts
+                suit: "Spades",
+                value: BigInt(5),
+                image: "https://deckofcardsapi.com/static/img/5S.png", // Example image URL
+                flipped: false,
+                backimage: cardback,
+                onClick: (code: string) => {
+                  console.log(`Card clicked: ${code}`);
+                },
+              },
+            ])}
+        >
+          testAddTrick0Card
         </Button>
 
         <Button
@@ -712,6 +771,14 @@ const MatchPage: React.FC = () => {
           }}
         >
           ToggleIsFirstCard
+        </Button>
+          
+        <Button
+        onClick={() => {
+          calculateTrickWinner();
+        }}
+        >
+        CalculateTrickWinner
         </Button>
       </div>
 
