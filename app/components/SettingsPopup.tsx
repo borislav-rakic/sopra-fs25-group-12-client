@@ -83,6 +83,8 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
                 key={file}
                 src={`/card_back/${file}`}
                 alt={file}
+                width={100}
+                height={150}
                 className={`${styles.cardbackImage} ${
                   cardback === file ? styles.selected : ""
                 }`}

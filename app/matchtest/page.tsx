@@ -1,6 +1,6 @@
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 import "@ant-design/v5-patch-for-react-19";
-import { useParams /*, useRouter */ } from "next/navigation";
+// import { useParams /*, useRouter */ } from "next/navigation";
 import Image from "next/image";
 import { Button /* , Row, Col, Space */ } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
@@ -12,17 +12,18 @@ import { PlayerMatchInformation } from "@/types/playerMatchInformation";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
 
-const MatchPage: React.FC = () => {
+const MatchTestPage: React.FC = () => {
   //const router = useRouter();
-  const params = useParams();
+  // const params = useParams();
   const apiService = useApi();
-
-  const matchId = params?.id?.toString();
+  const [matchId, setMatchId] = useState<string | null>(null);
 
   const [cardsInHand, setCardsInHand] = useState<cardProps[]>([]);
   const [opponent1Cards, setOpponent1Cards] = useState<cardProps[]>([]);
   const [opponent2Cards, setOpponent2Cards] = useState<cardProps[]>([]);
   const [opponent3Cards, setOpponent3Cards] = useState<cardProps[]>([]);
+  const [matchCreated, setMatchCreated] = useState(false);
+  const [isFetchingLogic, setIsFetchingLogic] = useState(false); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [players, setPlayers] = useState<Array<string | null>>([
     null,
     null,
@@ -33,9 +34,6 @@ const MatchPage: React.FC = () => {
   const [trickSlot1, setTrickSlot1] = useState<cardProps[]>([]);
   const [trickSlot2, setTrickSlot2] = useState<cardProps[]>([]);
   const [trickSlot3, setTrickSlot3] = useState<cardProps[]>([]);
-
-  const [matchScore, setMatchScore] = useState([0, 0, 0, 0]); // eslint-disable-line @typescript-eslint/no-unused-vars
-  const [roundScore, setRoundScore] = useState([0, 0, 0, 0]); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   const [currentTrick, setCurrentTrick] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState("");
@@ -50,96 +48,117 @@ const MatchPage: React.FC = () => {
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
 
-  useEffect(() => {
-    // This function runs every 5 seconds to receive the current match information.
-    const matchRefreshIntervalId = setInterval(async () => {
-      console.log("Requesting match update...");
+  interface MatchResponse {
+    matchId: number;
+  }
+  
+  // let playerHand = document.getElementById("hand-0");
 
+  useEffect(() => {
+    const setupMatch = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("No token found in localStorage.");
+          return;
+        }
+  
+        // Step 1: Create the match
+        const matchResponse: MatchResponse = await apiService.post(`/matches`, {
+          playerToken: token,
+        });      
+  
+        if (!matchResponse || !matchResponse.matchId) {
+          throw new Error("Match creation failed");
+        }
+  
+        const newMatchId = matchResponse.matchId.toString();
+        console.log("Match created:", newMatchId);
+  
+        // Step 2: Add AI players
+        for (let i = 1; i <= 3; i++) {
+          await apiService.post(`/matches/${newMatchId}/ai`, {
+            slot: i,
+            difficulty: i,
+          });
+        }
+  
+        // Step 3: Start the match
+        await apiService.post(`/matches/${newMatchId}/start`, {});
+        console.log("Match started");
+  
+        // Step 4: Mark ready
+        setMatchId(newMatchId);
+        setMatchCreated(true);
+      } catch (error) {
+        console.error("Match setup failed:", error);
+      }
+    };
+  
+    if (!matchCreated) {
+      setupMatch();
+    }
+  }, [matchCreated, apiService]);
+  
+  
+
+  useEffect(() => {
+    if (true || !matchCreated || !matchId) return;
+  
+    const matchRefreshIntervalId = setInterval(async () => {
       try {
         const response = await apiService.post<PlayerMatchInformation>(
           `/matches/${matchId}/logic`,
           {},
         );
-
-        console.log(response);
-
+  
         if (response.matchPlayers) {
           setPlayers(response.matchPlayers);
         }
-        
-        if (response.playerCards) {
-          response.playerCards.forEach((item) => {
-            setCardsInHand((prevCardsInHand) => {
-              // Check if the card already exists in the player's hand
-              if (!prevCardsInHand.some((card) => card.code === item.card)) {
-                // Add the new card to the player's hand
-                return [...prevCardsInHand, generateCard(item.card)];
-              }
-              // If the card already exists, return the current state
-              return prevCardsInHand;
-            });
-          });
-        }
-
       } catch (error) {
-        console.error(
-          `Failed to fetch match data for matchId ${matchId}:`,
-          error,
-        );
+        console.error(`Failed to fetch match data for matchId ${matchId}:`, error);
       }
-    }, 2000);
-
-    // When the component unmounts, this stops the function mapped to matchRefreshIntervalId from running every 5 seconds.
+    }, 5000);
+  
     return () => {
       clearInterval(matchRefreshIntervalId);
       console.log("Interval cleared.");
     };
-  }, [apiService, matchId]);
-
-  const generateCard = (code : string)  => {
-
-    const rank = code.length === 3 ? code.slice(0, 2) : code[0]; // Since 10 would have a string of length 3
-    const suit = code[code.length - 1]; 
-
-    const rankToValue: { [key: string]: bigint } = {
-      "2": BigInt(2),
-      "3": BigInt(3),
-      "4": BigInt(4),
-      "5": BigInt(5),
-      "6": BigInt(6),
-      "7": BigInt(7),
-      "8": BigInt(8),
-      "9": BigInt(9),
-      "10": BigInt(10),
-      J: BigInt(11),
-      Q: BigInt(12),
-      K: BigInt(13),
-      A: BigInt(14),
-    };
-
-    const suitToName: { [key: string]: string } = {
-      H: "Hearts",
-      S: "Spades",
-      D: "Diamonds",
-      C: "Clubs",
-    };
-
-    const card: cardProps = {
-      code,
-      suit: suitToName[suit] || suit, // Use the full name if available
-      value: rankToValue[rank],
-      image: `https://deckofcardsapi.com/static/img/${code}.png`, // Example image URL
-      flipped: false,
-      backimage: cardback, // Use the current cardback
-      onClick: (code: string) => {
-        console.log(`Card clicked: ${code}`);
-      },
-    };
+  }, [apiService, matchId, matchCreated]);
   
-    console.log("Generated card:", card);
-    return card;
+  const fetchMatchLogic = async () => {
+  if (!matchId) return;
 
+  setIsFetchingLogic(true);
+  try {
+    const response = await apiService.post<PlayerMatchInformation>(
+      `/matches/${matchId}/logic`,
+      {}
+    );
+
+    console.log("Match logic response:", response);
+
+    if (response.matchPlayers) {
+      setPlayers(response.matchPlayers);
+    }
+
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  } catch (error: any) {
+    console.error("Logic fetch failed:", error.message);
+
+    if (error.message.includes("No games found for this match")) {
+      alert("The game hasn't been started yet. Ask the host to start the match.");
+    } else if (error.message.includes("Invalid token")) {
+      alert("You're not logged in or your session expired.");
+    } else {
+      alert("Something went wrong while fetching match data.");
+    }
+  } finally {
+    setIsFetchingLogic(false);
   }
+};
+
+  
 
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
@@ -171,7 +190,7 @@ const MatchPage: React.FC = () => {
     }
   }, [playmat]);
 
-  const handlePlayCard = async (card: cardProps) => {
+  const handlePlayCard = (card: cardProps) => {
     console.log("Selected card in Match Page:", card.code);
 
     if (currentGamePhase === "passing") {
@@ -191,39 +210,14 @@ const MatchPage: React.FC = () => {
         if (!verifyTrick(card)) {
           // the linter abhors empty blocks
         } else {
-          try{
-            const payload = {
-              gameId: matchId, 
-              playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
-              cardCode: card.code, // Since card in backend is only a string
-            };
-            console.log("Payload for playing card:", payload);           
+          const updatedCardsInHand = cardsInHand.filter((c) =>
+            c.code !== card.code
+          );
+          const updatedTrick0 = [card];
 
-            const response = await apiService.post(`/matches/${matchId}/play`, {payload});
-
-            console.log("Response from server:", response);
-
-            if ((response as { status: number }).status === 200) {
-              console.log("Card played successfully:", card.code);
-
-              const updatedCardsInHand = cardsInHand.filter((c) => c.code !== card.code);
-              const updatedTrick0 = [card];
-    
-              setCardsInHand(updatedCardsInHand);
-              setTrickSlot0(updatedTrick0);
-              setCurrentPlayer(players[1] || "AI Player 1"); // Set the next player to play
-
-            } else {
-              if (typeof response === "object" && response !== null && "status" in response) {
-                console.error("Error playing card:", (response as { status: number }).status);
-              } else {
-                console.error("Error playing card: Invalid response format");
-              }
-            }
-
-          } catch (error) {
-            console.error("Error playing card:", error);
-          }
+          setCardsInHand(updatedCardsInHand);
+          setTrickSlot0(updatedTrick0);
+          setCurrentPlayer(players[1] || "AI Player 1"); // Set the next player to play
         }
       } else {
         console.log("You may not play cards while it is not your turn.");
@@ -287,51 +281,28 @@ const MatchPage: React.FC = () => {
     }
   };
 
-  const handlePassCards = async () => {
+  const handlePassCards = () => {
     if (cardsToPass.length < 3) {
       console.log("You must pass 3 cards.");
-      return
-    } 
-    try {
+    } else {
+      const updatedCardsInHand = cardsInHand.filter((c) =>
+        !cardsToPass.some((card) => card.code === c.code)
+      );
 
-      const payload = {
-        gameId: matchId,
-        playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
-        cards: cardsToPass.map((card) => card.code), // Send only the card codes
-      };
-      console.log("Payload for passing cards:", payload);
-
-      const response = await apiService.post(`/matches/${matchId}/passing`, payload);
-      console.log("Response from server:", response);
-
-      if ((response as { status: number }).status === 200) {
-        const updatedCardsInHand = cardsInHand.filter((c) =>
-          !cardsToPass.some((card) => card.code === c.code)
-        );
-  
-        if (opponentToPassTo === "Opponent1") {
-          const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
-          setOpponent1Cards(updatedEnemyHand);
-        } else if (opponentToPassTo === "Opponent2") {
-          const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
-          setOpponent2Cards(updatedEnemyHand);
-        } else if (opponentToPassTo === "Opponent3") {
-          const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
-          setOpponent3Cards(updatedEnemyHand);
-        }
-  
-        setCardsInHand(updatedCardsInHand);
-        setCardsToPass([]);
-        setCurrentGamePhase("playing");
-      } else {
-        if (typeof response === "object" && response !== null && "status" in response) {
-          console.error("Error passing cards:", (response as { status: number }).status);
-        } else {
-          console.error("Error passing cards: Invalid response format");
-        }
+      if (opponentToPassTo === "Opponent1") {
+        const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
+        setOpponent1Cards(updatedEnemyHand);
+      } else if (opponentToPassTo === "Opponent2") {
+        const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
+        setOpponent2Cards(updatedEnemyHand);
+      } else if (opponentToPassTo === "Opponent3") {
+        const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
+        setOpponent3Cards(updatedEnemyHand);
       }
-  } catch (error) {
-      console.error("Error passing cards:", error);
+
+      setCardsInHand(updatedCardsInHand);
+      setCardsToPass([]);
+      setCurrentGamePhase("playing");
     }
   };
 
@@ -340,74 +311,7 @@ const MatchPage: React.FC = () => {
     setTrickSlot1([]);
     setTrickSlot2([]);
     setTrickSlot3([]);
-    setCurrentTrick("");
   };
-
-  const calculateTrickWinner = () => {
-    console.log("Calculating trick winner...");
-    const allCards = [
-      ...trickSlot0,
-      ...trickSlot1,
-      ...trickSlot2,
-      ...trickSlot3,
-    ];
-
-    if (allCards.length < 4) {
-      console.log("Trick may only be calulated if all players have played a card.");
-      return;
-    }
-
-    const matchingCards = allCards.filter((card) => card.suit === currentTrick);
-
-    if (matchingCards.length === 0) {
-      console.log("No cards match the current trick's suit.");
-      return;
-    }
-  
-    // Initialize the highest card and its index
-    let highestCardIndex = 0;
-    let highestCard = matchingCards[0];
-  
-    // Iterate through matching cards to find the highest card
-    matchingCards.forEach((card) => {
-      const cardIndex = allCards.indexOf(card);
-      if (card.value > highestCard.value) {
-        highestCard = card;
-        highestCardIndex = cardIndex;
-      }
-    });
-    return highestCardIndex;
-  }
-
-  useEffect(() => {
-    // Function to check if all trick slots contain a card
-    const checkAndHandleTrick = async () => {
-      if (
-        trickSlot0.length > 0 &&
-        trickSlot1.length > 0 &&
-        trickSlot2.length > 0 &&
-        trickSlot3.length > 0
-      ) {
-        console.log("All trick slots are filled. Calculating trick winner...");
-
-        const winningPlayer = calculateTrickWinner();
-        console.log("Winning player index:", winningPlayer);
-        
-        if (winningPlayer !== undefined) {
-          console.log("winning player: ", players[winningPlayer]);
-        } else {
-          console.log("No winning player could be determined.");
-        }
-
-        setTimeout(() => {
-          console.log("Clearing trick slots...");
-          handleClearTrick();
-        }, 2500);
-      }
-    };
-
-    checkAndHandleTrick();
-  }, [trickSlot0, trickSlot1, trickSlot2, trickSlot3]); 
 
   const sortCards = (cards: cardProps[]) => {
     return cards.sort((a, b) => {
@@ -427,26 +331,8 @@ const MatchPage: React.FC = () => {
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
 
-  const resetGame = () => { // eslint-disable-line @typescript-eslint/no-unused-vars
-    setCardsInHand([]);
-    setOpponent1Cards([]);
-    setOpponent2Cards([]);
-    setOpponent3Cards([]);
-    setTrickSlot0([]);
-    setTrickSlot1([]);
-    setTrickSlot2([]);
-    setTrickSlot3([]);
-    setCurrentTrick("");
-    setCurrentPlayer("");
-    setCurrentGamePhase("");
-    setCardsToPass([]);
-    setOpponentToPassTo("");
-    setHeartsBroken(false);
-    setFirstCardPlayed(false);
-    setIsFirstRound(true);
-  }
-
   return (
+    
     <div className={`${styles.page} matchPage`}>
       <div className="gear-icon">
         <Image
@@ -581,10 +467,10 @@ const MatchPage: React.FC = () => {
           onClick={() =>
             setTrickSlot2([
               {
-                code: "4H", // Example: Two of Hearts
+                code: "2H", // Example: Two of Hearts
                 suit: "Hearts",
-                value: BigInt(4),
-                image: "https://deckofcardsapi.com/static/img/4H.png", // Example image URL
+                value: BigInt(2),
+                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
                 flipped: false,
                 backimage: cardback,
                 onClick: (code: string) => {
@@ -600,10 +486,10 @@ const MatchPage: React.FC = () => {
           onClick={() =>
             setTrickSlot3([
               {
-                code: "3H", // Example: Two of Hearts
+                code: "2H", // Example: Two of Hearts
                 suit: "Hearts",
-                value: BigInt(3),
-                image: "https://deckofcardsapi.com/static/img/3H.png", // Example image URL
+                value: BigInt(2),
+                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
                 flipped: false,
                 backimage: cardback,
                 onClick: (code: string) => {
@@ -613,25 +499,6 @@ const MatchPage: React.FC = () => {
             ])}
         >
           testAddTrick3Card
-        </Button>
-
-        <Button
-          onClick={() =>
-            setTrickSlot0([
-              {
-                code: "5S", // Example: Two of Hearts
-                suit: "Spades",
-                value: BigInt(5),
-                image: "https://deckofcardsapi.com/static/img/5S.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-            ])}
-        >
-          testAddTrick0Card
         </Button>
 
         <Button
@@ -879,14 +746,6 @@ const MatchPage: React.FC = () => {
         >
           ToggleIsFirstCard
         </Button>
-          
-        <Button
-        onClick={() => {
-          calculateTrickWinner();
-        }}
-        >
-        CalculateTrickWinner
-        </Button>
       </div>
 
       <div className="gameboard">
@@ -901,19 +760,19 @@ const MatchPage: React.FC = () => {
             <tbody>
               <tr>
                 <td>{players[0] ? players[0] : "AI Player"}</td>
-                <td>{matchScore[0]}</td>
+                <td>10</td>
               </tr>
               <tr>
                 <td>{players[1] ? players[1] : "AI Player"}</td>
-                <td>{matchScore[1]}</td>
+                <td>15</td>
               </tr>
               <tr>
                 <td>{players[2] ? players[2] : "AI Player"}</td>
-                <td>{matchScore[2]}</td>
+                <td>20</td>
               </tr>
               <tr>
                 <td>{players[3] ? players[3] : "AI Player"}</td>
-                <td>{matchScore[3]}</td>
+                <td>25</td>
               </tr>
             </tbody>
           </table>
@@ -1053,7 +912,7 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {players[0] ? players[0] : "AI Player"}
           </div>
-          <div className="game-playerscore">Score: {roundScore[0]}</div>
+          <div className="game-playerscore">Score: 10</div>
         </div>
 
         <div className="game-playerscore1">
@@ -1069,7 +928,7 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {players[1] ? players[1] : "AI Player"}
           </div>
-          <div className="game-playerscore">Score: {roundScore[1]}</div>
+          <div className="game-playerscore">Score: 15</div>
         </div>
 
         <div className="game-playerscore2">
@@ -1085,7 +944,7 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {players[2] ? players[2] : "AI Player"}
           </div>
-          <div className="game-playerscore">Score: {roundScore[2]}</div>
+          <div className="game-playerscore">Score: 20</div>
         </div>
 
         <div className="game-playerscore3">
@@ -1101,11 +960,23 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {players[3] ? players[3] : "AI Player"}
           </div>
-          <div className="game-playerscore">Score: {roundScore[3]}</div>
+          <div className="game-playerscore">Score: 25</div>
         </div>
+<button
+  onClick={() => {
+    console.log("Button clicked!");
+    fetchMatchLogic();
+  }}
+  className="ant-btn ant-btn-primary"
+  style={{ zIndex: 9999, position: "relative" }}
+>
+  Fetch Match Logic
+</button>
+
+
       </div>
     </div>
   );
 };
 
-export default MatchPage;
+export default MatchTestPage;

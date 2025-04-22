@@ -5,7 +5,7 @@ import { useApi } from "@/hooks/useApi";
 import { User } from "@/types/user";
 import { Button, Form, Input } from "antd";
 import "@/styles/globals.css";
-// import styles from "@/styles/page.module.css";
+import styles from "@/styles/page.module.css";
 
 interface FormFieldProps {
   label: string;
@@ -37,7 +37,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="login-container">
+      <div className="contentContainer">
       <Form
         form={form}
         name="login"
@@ -80,7 +80,7 @@ const Register: React.FC = () => {
           }}
         >
           <Button
-            className="back-button"
+            block className={styles.whiteButton}
             onClick={() => router.push("/")}
           >
             Back
@@ -88,7 +88,7 @@ const Register: React.FC = () => {
 
           <Button
             htmlType="submit"
-            className="login-button"
+            block className={styles.whiteButton}
           >
             Register
           </Button>

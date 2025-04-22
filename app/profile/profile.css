@@ -7,8 +7,15 @@
 }
 
 form label {
+  color: white;
+  font-weight: bold;
   display: block;
-  margin-bottom: 1rem;
+  margin-bottom: 6px;
+}
+
+form label > .ant-input,
+form label > .ant-input-password {
+  margin-top: 4px;
 }
 
 input {

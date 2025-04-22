@@ -90,7 +90,7 @@ reason).
 | **Student**          | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | -------------------- | -------- | ------------------ | ------------------------------- | ----------------------------------- |
 | **@stevaniaeilyn**   | 17.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/3649bb847676fec9f26f3e417bc3406a271361b7<br/>https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/dcc59e673d074c104b549175af98cf56da5ae055 | added features, fixed bugs & defensive coding on start page  | users can no kick out players, leave, join another lobby while in a lobby|
-|                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+|                      | 19.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/256e9101b464b47f246b9b98bebcd437d57408b7 | styling for UI | The app has now better mapping, visually more pleasing for users and more fun |
 | **@diderot5038**     | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **@borislav-rakic**  | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |

@@ -165,3 +165,35 @@ a.secondary {
     filter: invert();
   }
 }
+
+
+.hand-0,
+.hand-1,
+.hand-2,
+.hand-3 {
+  position: absolute;
+}
+
+.hand-0 {
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.hand-1 {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+}
+
+.hand-2 {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+.hand-3 {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+}

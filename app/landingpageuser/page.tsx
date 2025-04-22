@@ -10,6 +10,9 @@ import { Match } from "@/types/match";
 import SettingsPopup from "@/components/SettingsPopup";
 import { useEffect, useState } from "react";
 import type { UserPrivateDTO } from "@/types/user";
+import { /*Avatar*/ Dropdown /*Menu*/ } from "antd";
+// import { UserOutlined } from "@ant-design/icons";
+
 
 const LandingPageUser: React.FC = () => {
   const router = useRouter();
@@ -75,26 +78,62 @@ const LandingPageUser: React.FC = () => {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
+      <div className='contentContainer'>
+        {user && !user.isGuest && (
+          <div style={{ position: "absolute", top: 20, right: 30, zIndex: 1000 }}>
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: "friends",
+                    label: "Friends",
+                    onClick: () => router.push("/friends"),
+                  },
+                  {
+                    key: "profile",
+                    label: "Profile",
+                    onClick: () => router.push("/profile"),
+                  },
+                  {
+                    key: "logout",
+                    label: "Logout",
+                    onClick: handleLogout,
+                  },
+                ],
+              }}
+              placement="bottomRight"
+              arrow
+            >
+              <Image
+                src={`/avatars_118x118/a${user.avatar || 101}.png`}
+                alt="User avatar"
+                width={50}
+                height={50}
+                style={{
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  border: "2px solid white",
+                }}
+              />
+            </Dropdown>
+          </div>
+        )}
+  
         <Image
           src="/LandingPageCards.png"
           alt="Hearts Attack Cards"
           width={200}
           height={150}
+          className={styles.cardImage}
         />
 
-        <h1>HEARTS ATTACK</h1>
-        <p>
-          A fast-paced card game of strategy and sabotage.<br />Can you survive
-          the Hearts Attack?
-        </p>
+        <h1 className="luckiestGuy" style={{ marginTop: 24 }}>HEARTS ATTACK!</h1>
 
         <Space direction="vertical" size="middle" style={{ marginTop: 24 }}>
           <Row gutter={16} justify="center">
             <Col>
               <Button
-                type="primary"
-                color="green"
-                variant="solid"
+                block className={styles.whiteButton}
                 onClick={handleNewMatch}
               >
                 New Match
@@ -102,9 +141,7 @@ const LandingPageUser: React.FC = () => {
             </Col>
             <Col>
               <Button
-                type="primary"
-                color="green"
-                variant="solid"
+                block className={styles.whiteButton}
                 onClick={() => router.push("/join")}
               >
                 Join Match
@@ -112,10 +149,8 @@ const LandingPageUser: React.FC = () => {
             </Col>
             <Col>
               <Button
-                type="primary"
-                color="green"
-                variant="solid"
-                onClick={() => router.push("/match")}
+                block className={styles.whiteButton}
+                onClick={() => router.push("/matchtest")}
               >
                 Match Page Test
               </Button>
@@ -125,63 +160,20 @@ const LandingPageUser: React.FC = () => {
           <Row gutter={16} justify="center">
             <Col>
               <Button
-                type="primary"
-                color="yellow"
-                variant="solid"
+                block className={styles.whiteButton}
                 onClick={() => router.push("/leaderboard")}
               >
                 Leaderboard
               </Button>
             </Col>
-            {user && !user.isGuest && (
-              <Col>
-                <Button
-                  type="primary"
-                  color="yellow"
-                  variant="solid"
-                  onClick={() => router.push("/friends")}
-                >
-                  Manage Friendships
-                </Button>
-              </Col>
-            )}
-          </Row>
-
-          <Row gutter={16} justify="center">
             <Col>
               <Button
-                type="primary"
-                color="yellow"
-                variant="solid"
+                block className={styles.whiteButton}
                 onClick={() => router.push("/rules")}
               >
                 Rules
               </Button>
             </Col>
-            {user && !user.isGuest && (
-              <Col>
-                <Button
-                  type="primary"
-                  color="yellow"
-                  variant="solid"
-                  onClick={() => router.push("/profile")}
-                >
-                  Profile
-                </Button>
-              </Col>
-            )}
-            {user && !user.isGuest && (
-              <Col>
-                <Button
-                  type="primary"
-                  color="yellow"
-                  variant="solid"
-                  onClick={() => setSettingsOpen(true)}
-                >
-                  Settings
-                </Button>
-              </Col>
-            )}
           </Row>
           <Row justify="center">
             {user && user.isGuest && (
@@ -191,9 +183,7 @@ const LandingPageUser: React.FC = () => {
                     You are logged in as a guest only.
                   </span>
                   <Button
-                    type="primary"
-                    color="green"
-                    variant="solid"
+                    block className={styles.whiteButton}
                     onClick={() => router.push("/login")}
                     style={{ marginLeft: "1em" }}
                   >
@@ -203,9 +193,7 @@ const LandingPageUser: React.FC = () => {
 
                 <Col>
                   <Button
-                    type="primary"
-                    color="green"
-                    variant="solid"
+                    block className={styles.whiteButton}
                     onClick={() => router.push("/register")}
                     style={{ marginLeft: "1em" }}
                   >
@@ -213,19 +201,6 @@ const LandingPageUser: React.FC = () => {
                   </Button>
                 </Col>
               </>
-            )}
-
-            {user && !user.isGuest && (
-              <Col>
-                <Button
-                  type="primary"
-                  color="red"
-                  variant="solid"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
-              </Col>
             )}
           </Row>
         </Space>
@@ -238,6 +213,7 @@ const LandingPageUser: React.FC = () => {
           cardback={cardback}
           setCardback={setCardback}
         />
+         </div>
       </main>
     </div>
   );

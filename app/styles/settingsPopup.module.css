@@ -86,19 +86,23 @@
   position: absolute;
   bottom: 10px;
   right: 10px;
-  background-color: #ffffff;
-  color: rgb(0, 0, 0);
-  border: 2px solid #000000; /* Blue border */
   padding: 10px 20px;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.3s ease;
+  font-weight: 500;
+  background-color: white;
+  color: black;
+  border: 2px solid black;
+  transition: all 0.3s ease;
 }
 
 .settingsApply:hover {
-  background-color: #b9ffaf; /* Slightly darker on hover */
+  background-color: white;
+  color: green;
+  border-color: green;
 }
+
 
 .colorSelector {
   display: flex;

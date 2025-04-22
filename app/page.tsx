@@ -66,60 +66,43 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
+      <div className='contentContainer'>
         <Image
           src="/LandingPageCards.png" // Replace with the actual path of your image
           alt="Hearts Attack Cards"
-          width={200} // Adjust width as needed
-          height={150} // Adjust height as needed
+          width={275} // Adjust width as needed
+          height={225} // Adjust height as needed
           className={styles.cardImage} // Add styling as needed in CSS
         />
 
-        <h1>HEARTS ATTACK</h1>
-        <p>
-          A fast-paced card game of strategy and sabotage.<br />Can you survive
-          the Hearts Attack?
+        <h1 className="luckiestGuy"style={{ marginTop: 15 }}>HEARTS ATTACK!</h1>
+
+        <p className='tagline'>
+          A fast-paced card game of strategy & sabotage.<br />
+          Can you survive the Hearts Attack?!
         </p>
         <div className={styles.ctas}>
-          <Button
-            type="primary" // as defined in the ConfigProvider in [layout.tsx](./layout.tsx), all primary antd elements are colored #22426b, with buttons #75bd9d as override
-            color="green" // if a single/specific antd component needs yet a different color, it can be explicitly overridden in the component as shown here
-            variant="solid" // read more about the antd button and its options here: https://ant.design/components/button
+          <Button block className={styles.whiteButton}            
             onClick={() => router.push("/login")}
-            target="_blank"
-            rel="noopener noreferrer"
           >
             Login
           </Button>
-          <Button
-            type="primary"
-            color="green"
-            variant="solid"
+          <Button block className={styles.whiteButton}
             onClick={() => router.push("/register")}
-            target="_blank"
-            rel="noopener noreferrer"
           >
             Register
           </Button>
-          <Button
-            type="primary"
-            color="blue"
-            variant="solid"
+          <Button block className={styles.whiteButton}
             onClick={() => handleGuestLogin()}
-            target="_blank"
-            rel="noopener noreferrer"
           >
             Play as Guest
           </Button>
-          <Button
-            type="primary"
-            color="yellow"
-            variant="solid"
+          <Button block className={styles.whiteButton}
             onClick={() => router.push("/rules")}
-            target="_blank"
-            rel="noopener noreferrer"
           >
             Rules
           </Button>
+        </div>
         </div>
       </main>
     </div>

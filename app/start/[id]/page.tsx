@@ -18,6 +18,7 @@ import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
 import { Match } from "@/types/match";
 import { User } from "@/types/user";
+import "@/styles/globals.css";
 
 const StartPage: React.FC = () => {
   const params = useParams();
@@ -42,7 +43,7 @@ const StartPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchValues, setSearchValues] = useState(["", "", "", ""]);
-  const [selectedPoints, setSelectedPoints] = useState<number | null>(null);
+  const [selectedPoints, setSelectedPoints] = useState<number | null>(100);
   const [inviteStatus, setInviteStatus] = useState<(null | "waiting")[]>([
     null,
     null,
@@ -122,16 +123,34 @@ const StartPage: React.FC = () => {
           updatedDifficulties[i] = 0;
         }
 
-        // Fill user players
-        playerIdList.forEach((playerId, index) => {
-          const user = usersRef.current.find((u) => Number(u.id) === playerId);
-          if (user) {
-            updatedSelectedPlayers[index] = user.username;
-          } else {
-            updatedSelectedPlayers[index] = "Waiting...";
+        const playerIdsArray = [
+          match.player1Id,
+          match.player2Id,
+          match.player3Id,
+          match.player4Id,
+        ];
+                
+        for (let i = 0; i < playerIdsArray.length; i++) {
+          const pid = playerIdsArray[i];
+        
+          if (pid === null || pid === undefined) {
+            updatedSelectedPlayers[i] = "";
+            continue;
           }
-        });
-
+        
+          if ([1, 2, 3].includes(pid)) {
+            // It's an AI player
+            const slot = i + 1;
+            const difficulty = match.aiPlayers?.[slot] ?? 1;
+            updatedSelectedPlayers[i] = "computer";
+            updatedDifficulties[i] = difficulty;
+          } else {
+            // It's a real user
+            const user = usersRef.current.find((u) => Number(u.id) === pid);
+            updatedSelectedPlayers[i] = user?.username ?? "Unknown User";
+          }
+        };
+        
         // Fill invites
         Object.entries(match.invites || {}).forEach(([slotStr, userId]) => {
           const slot = Number(slotStr);
@@ -139,22 +158,6 @@ const StartPage: React.FC = () => {
           updatedSelectedPlayers[slot] = user?.username ?? "Waiting...";
           updatedInviteStatus[slot] = "waiting";
           updatedPendingInvites[slot] = userId;
-        });
-
-        // Fill AI players in remaining slots
-        let slotIndex = 0;
-        match.aiPlayers?.forEach((difficulty) => {
-          // Skip over already-filled slots
-          while (
-            updatedSelectedPlayers[slotIndex] &&
-            slotIndex < updatedSelectedPlayers.length
-          ) {
-            slotIndex++;
-          }
-          if (slotIndex < 4) {
-            updatedSelectedPlayers[slotIndex] = "computer";
-            updatedDifficulties[slotIndex] = difficulty;
-          }
         });
 
         setSelectedPlayers(updatedSelectedPlayers);
@@ -188,11 +191,6 @@ const StartPage: React.FC = () => {
           `/matches/${gameId}/joinRequests`,
         );
 
-        message.open({
-          type: "info",
-          content: `All join requests: ${JSON.stringify(joinRequestsObject)}`,
-        });
-
         const filteredRequests = joinRequestsObject
           .filter((request) => request.status === "pending")
           .map((request) => ({
@@ -200,12 +198,6 @@ const StartPage: React.FC = () => {
             status: request.status,
           }));
 
-        message.open({
-          type: "info",
-          content: `Filtered join requests: ${
-            JSON.stringify(filteredRequests)
-          }`,
-        });
         setJoinRequests(filteredRequests);
       } catch {
         message.open({
@@ -302,6 +294,37 @@ const StartPage: React.FC = () => {
     }
   };
 
+  const handleCancelInvite = async (index: number) => {
+    if (!gameId) return;
+  
+    try {
+      await apiService.delete(`/matches/${gameId}/invite/${index}`);
+  
+      const updatedPlayers = [...selectedPlayers];
+      updatedPlayers[index] = "";
+      setSelectedPlayers(updatedPlayers);
+  
+      const updatedStatuses = [...inviteStatus];
+      updatedStatuses[index] = null;
+      setInviteStatus(updatedStatuses);
+  
+      const updatedPending = [...pendingInvites];
+      updatedPending[index] = null;
+      setPendingInvites(updatedPending);
+  
+      message.open({
+        type: "info",
+        content: `Invite for slot ${index + 1} has been cancelled.`,
+      });
+    } catch {
+      message.open({
+        type: "error",
+        content: "Could not cancel invite.",
+      });
+    }
+  };
+  
+
   const handleStart = async () => {
     try {
       await apiService.post(`/matches/${gameId}/start`, {});
@@ -343,10 +366,10 @@ const StartPage: React.FC = () => {
   const renderHostCard = () => (
     <Card
       style={{
-        backgroundColor: "#f0f0f0",
+        backgroundColor: "white",
         padding: "10px",
         textAlign: "center",
-        width: 260,
+        width: 240,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -361,9 +384,8 @@ const StartPage: React.FC = () => {
   const renderPlayerCard = (index: number) => {
     const player = selectedPlayers[index];
     const isComputer = player === "computer";
-    const isInvited = player === "invite";
     const isFilled = player && player !== "computer" && player !== "invite";
-    const difficultyLabel = ["Easy", "Medium", "Difficult"];
+    const difficultyLabel = ["","Easy", "Medium", "Difficult"];
 
     const handleDifficultySelect = async (difficulty: number) => {
       const updated = [...selectedPlayers];
@@ -385,6 +407,7 @@ const StartPage: React.FC = () => {
       try {
         await apiService.post(`/matches/${gameId}/ai`, {
           difficulty: difficulty,
+          slot: index,
         });
         message.open({
           type: "success",
@@ -398,10 +421,86 @@ const StartPage: React.FC = () => {
       }
     };
 
+    const handleRemoveAi = async (index: number) => {
+      if (!gameId) return;
+    
+      try {
+        await apiService.post(`/matches/${gameId}/ai/remove`, { slot: index });
+    
+        const updatedPlayers = [...selectedPlayers];
+        updatedPlayers[index] = "";
+        setSelectedPlayers(updatedPlayers);
+    
+        const updatedDiffs = [...selectedDifficulties];
+        updatedDiffs[index] = 0;
+        setSelectedDifficulties(updatedDiffs);
+    
+        message.open({
+          type: "success",
+          content: `AI player removed from slot ${index + 1}`,
+        });
+      } catch {
+        message.open({
+          type: "error",
+          content: "Could not remove AI player.",
+        });
+      }
+    };
+
+    const handleRemovePlayer = async (index: number) => {
+      if (!gameId) return;
+    
+      try {
+        await apiService.delete(`/matches/${gameId}/player/${index}`);
+    
+        const updatedPlayers = [...selectedPlayers];
+        updatedPlayers[index] = "";
+        setSelectedPlayers(updatedPlayers);
+    
+        const updatedStatuses = [...inviteStatus];
+        updatedStatuses[index] = null;
+        setInviteStatus(updatedStatuses);
+    
+        const updatedPending = [...pendingInvites];
+        updatedPending[index] = null;
+        setPendingInvites(updatedPending);
+    
+        message.open({
+          type: "info",
+          content: `Player removed from slot ${index + 1}`,
+        });
+      } catch {
+        message.open({
+          type: "error",
+          content: "Could not remove player.",
+        });
+      }
+    };
+    
+    const handleLeaveMatch = async () => {
+      if (!gameId) return;
+    
+      try {
+        await apiService.delete(`/matches/${gameId}/leave`);
+        message.open({
+          type: "info",
+          content: "You left the match.",
+        });
+        router.push("/landingpageuser");
+      } catch {
+        message.open({
+          type: "error",
+          content: "Could not leave the match.",
+        });
+      }
+    };
+    
+    
+
     const difficultyItems = [
-      { label: <span style={{ color: "black" }}>Easy</span>, key: "0" },
-      { label: <span style={{ color: "black" }}>Medium</span>, key: "1" },
-      { label: <span style={{ color: "black" }}>Difficult</span>, key: "2" },
+      { label: <span style={{ color: "black" }}>Easy</span>, key: "1" },
+      { label: <span style={{ color: "black" }}>Medium</span>, key: "2" },
+      { label: <span style={{ color: "black" }}>Difficult</span>, key: "3" },
     ];
 
     const columns = [
@@ -428,10 +527,10 @@ const StartPage: React.FC = () => {
       <Card
         key={index}
         style={{
-          backgroundColor: "#f0f0f0",
-          padding: "10px",
+          backgroundColor: "white",
+          padding: "6px",
           textAlign: "center",
-          width: 260,
+          width: 240,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -447,42 +546,84 @@ const StartPage: React.FC = () => {
         >
           {inviteStatus[index] === "waiting"
             ? (
-              <p
-                style={{ fontWeight: "bold", fontSize: "16px", color: "gray" }}
-              >
-                Waiting...
-              </p>
-            )
-            : isComputer
-            ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <p
                 style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
               >
+                Waiting...
+              </p>
+              {isHost && (
+                <Button
+                  danger
+                  size="small"
+                  type="link"
+                  onClick={() => handleCancelInvite(index)}
+                >
+                  Cancel
+                </Button>
+              )}
+              </div>
+            )
+            : isComputer
+            ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <p style={{ fontWeight: "bold", fontSize: "16px", color: "black", marginBottom: 0 }}>
                 AI Player: {difficultyLabel[selectedDifficulties[index]]}
               </p>
+              {isHost && (
+                <Button
+                  size="small"
+                  danger
+                  type="link"
+                  onClick={() => handleRemoveAi(index)}
+                >
+                  Remove
+                </Button>
+              )}
+            </div>
+
             )
             : isFilled
             ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <p
                 style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
               >
                 {player}
               </p>
+              {isHost && (
+              <Button
+                size="small"
+                danger
+                type="link"
+                onClick={() => handleRemovePlayer(index)}
+              >
+                Remove
+              </Button>
+            )}
+            {player === currentUsername && !isHost && (
+              <Button
+                size="small"
+                danger
+                type="link"
+                onClick={handleLeaveMatch}
+              >
+                Leave
+              </Button>
+            )}
+             </div>
             )
             : !isHost
             ? (
-              <p style={{ fontSize: "16px", color: "gray" }}>
+              <p style={{ fontSize: "16px", color: "black" }}>
                 Waiting for other players...
               </p>
+
             )
             : (
               <>
                 <Button
-                  style={{
-                    backgroundColor: isInvited ? "#b2f2bb" : "#d9d9d9",
-                    border: "none",
-                    width: "100%",
-                  }}
+                  block className={styles.whiteButton}
                   onClick={() => {
                     const updated = [...selectedPlayers];
                     const toggleInvite = [...showInvite];
@@ -523,17 +664,13 @@ const StartPage: React.FC = () => {
                   trigger={["click"]}
                 >
                   <Button
-                    style={{
-                      backgroundColor: isComputer ? "#b2f2bb" : "#d9d9d9",
-                      border: "none",
-                      width: "100%",
-                    }}
+                    block className={styles.whiteButton}
                   >
                     {isComputer
                       ? `Computer (${
                         difficultyLabel[selectedDifficulties[index]]
                       })`
-                      : "Computer opponent"}
+                      : "Computer Opponent"}
                   </Button>
                 </Dropdown>
 
@@ -635,41 +772,42 @@ const StartPage: React.FC = () => {
   };
 
   return (
-    <div
-      className={styles.page}
-      style={{ backgroundColor: "white", padding: "40px" }}
-    >
+    <div className="contentContainer" style={{ textAlign: "center" }}>
       <main className={styles.main}>
         {renderJoinRequestModal()}
         <p
           style={{
-            marginBottom: "20px",
+            marginBottom: "2px",
             fontWeight: "bold",
-            fontSize: "16px",
-            color: "black",
+            fontSize: "20px",
+            color: "white",
           }}
         >
-          Game ID:{" "}
-          <span style={{ fontFamily: "monospace", color: "black" }}>
+          MATCH ID:{" "}
+          <span style={{ color: "white" }}>
             {gameId}
           </span>
         </p>
 
-        <Row gutter={[12, 12]} justify="center">
-          <Col>{renderHostCard()}</Col>
-          {[1, 2, 3].map((i) => <Col key={i}>{renderPlayerCard(i)}</Col>)}
+        <Row gutter={[16, 16]} justify="center">
+          {[0, 1, 2, 3].map((i) => (
+            <Col xs={24} sm={12} md={12} lg={12} xl={12} key={i}>
+              {i === 0 ? renderHostCard() : renderPlayerCard(i)}
+            </Col>
+          ))}
         </Row>
 
         {isHost && (
           <>
-            <div style={{ marginTop: 40, textAlign: "center" }}>
-              <p style={{ color: "black", fontWeight: "bold" }}>
+            <div style={{ marginTop: "5",marginBottom: "10px", textAlign: "center" }}>
+              <p style={{ color: "white", fontWeight: "bold", marginBottom: "10px", fontSize: "20px",}}>
                 Amount of points to be reached until the end:
               </p>
               <Row gutter={[8, 8]} justify="center">
                 {[50, 75, 100, 150, 200].map((points) => (
                   <Col key={points}>
                     <Button
+                    type="default"
                       onClick={async () => {
                         setSelectedPoints(points);
                         try {
@@ -689,11 +827,10 @@ const StartPage: React.FC = () => {
                       }}
                       style={{
                         backgroundColor: selectedPoints === points
-                          ? "#b2f2bb"
-                          : "#d9d9d9",
-                        border: "none",
-                        color: "black",
+                          ? "green"
+                          : "white",
                         width: "60px",
+                        transition: "background-color 0.2s ease-in-out",
                       }}
                     >
                       {points}
@@ -705,17 +842,17 @@ const StartPage: React.FC = () => {
 
             <div
               style={{
-                marginTop: 40,
+                marginTop: 10,
                 display: "flex",
                 justifyContent: "center",
                 gap: "20px",
               }}
             >
-              <Button className="login-button" onClick={handleStart}>
-                Start
-              </Button>
-              <Button className="back-button" onClick={handleCancelMatch}>
+              <Button block className={styles.whiteButton} onClick={handleCancelMatch}>
                 Cancel Match
+              </Button>
+              <Button block className={styles.whiteButton} onClick={handleStart}>
+                Start
               </Button>
             </div>
           </>

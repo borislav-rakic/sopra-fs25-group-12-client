@@ -1,6 +1,4 @@
-// interface Dictionary {
-//     [Key: number]: String;
-// }
+import { PlayerCard } from "../types/playerCard";
 
 export interface PlayerMatchInformation {
   aiPlayers: Array<number> | null;
@@ -9,4 +7,8 @@ export interface PlayerMatchInformation {
   matchId: bigint | null;
   matchPlayers: Array<string | null> | null;
   started: boolean | null;
+  playerCards: Array<PlayerCard> | null;
+  isGameFinished: boolean | null;
+  isMatchFinished: boolean | null;
+  isMyTurn: boolean | null;
 }
