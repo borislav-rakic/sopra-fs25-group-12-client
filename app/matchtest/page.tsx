@@ -1,6 +1,6 @@
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 import "@ant-design/v5-patch-for-react-19";
-import { useParams /*, useRouter */ } from "next/navigation";
+// import { useParams /*, useRouter */ } from "next/navigation";
 import Image from "next/image";
 import { Button /* , Row, Col, Space */ } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
@@ -14,7 +14,7 @@ import Card, { cardProps } from "@/components/card";
 
 const MatchTestPage: React.FC = () => {
   //const router = useRouter();
-  const params = useParams();
+  // const params = useParams();
   const apiService = useApi();
   const [matchId, setMatchId] = useState<string | null>(null);
 
@@ -23,7 +23,7 @@ const MatchTestPage: React.FC = () => {
   const [opponent2Cards, setOpponent2Cards] = useState<cardProps[]>([]);
   const [opponent3Cards, setOpponent3Cards] = useState<cardProps[]>([]);
   const [matchCreated, setMatchCreated] = useState(false);
-  const [isFetchingLogic, setIsFetchingLogic] = useState(false);
+  const [isFetchingLogic, setIsFetchingLogic] = useState(false); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [players, setPlayers] = useState<Array<string | null>>([
     null,
     null,
@@ -142,6 +142,7 @@ const MatchTestPage: React.FC = () => {
       setPlayers(response.matchPlayers);
     }
 
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   } catch (error: any) {
     console.error("Logic fetch failed:", error.message);
 

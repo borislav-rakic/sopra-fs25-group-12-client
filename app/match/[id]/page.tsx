@@ -34,8 +34,8 @@ const MatchPage: React.FC = () => {
   const [trickSlot2, setTrickSlot2] = useState<cardProps[]>([]);
   const [trickSlot3, setTrickSlot3] = useState<cardProps[]>([]);
 
-  const [matchScore, setMatchScore] = useState([0, 0, 0, 0]);
-  const [roundScore, setRoundScore] = useState([0, 0, 0, 0]);
+  const [matchScore, setMatchScore] = useState([0, 0, 0, 0]); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [roundScore, setRoundScore] = useState([0, 0, 0, 0]); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   const [currentTrick, setCurrentTrick] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState("");
@@ -427,7 +427,7 @@ const MatchPage: React.FC = () => {
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
 
-  const resetGame = () => {
+  const resetGame = () => { // eslint-disable-line @typescript-eslint/no-unused-vars
     setCardsInHand([]);
     setOpponent1Cards([]);
     setOpponent2Cards([]);

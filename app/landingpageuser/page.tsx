@@ -10,8 +10,8 @@ import { Match } from "@/types/match";
 import SettingsPopup from "@/components/SettingsPopup";
 import { useEffect, useState } from "react";
 import type { UserPrivateDTO } from "@/types/user";
-import { Avatar, Dropdown, Menu } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { /*Avatar*/ Dropdown /*Menu*/ } from "antd";
+// import { UserOutlined } from "@ant-design/icons";
 
 
 const LandingPageUser: React.FC = () => {
