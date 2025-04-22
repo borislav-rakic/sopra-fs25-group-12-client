@@ -1,4 +1,4 @@
-import { PlayerCard } from "@/types/PlayerCard";
+import { PlayerCard } from "../types/playerCard";
 
 export interface PlayerMatchInformation {
   aiPlayers: Array<number> | null;
