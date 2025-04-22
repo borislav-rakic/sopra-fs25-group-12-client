@@ -279,6 +279,7 @@ const MatchPage: React.FC = () => {
     setTrickSlot1([]);
     setTrickSlot2([]);
     setTrickSlot3([]);
+    setCurrentTrick("");
   };
 
   const calculateTrickWinner = () => {
@@ -315,11 +316,40 @@ const MatchPage: React.FC = () => {
       }
     });
   
-    console.log("Winning player index:", highestCardIndex);
-    console.log("Highest card in the trick:", highestCard.code);
+
   
     return highestCardIndex;
   }
+
+  useEffect(() => {
+    // Function to check if all trick slots contain a card
+    const checkAndHandleTrick = async () => {
+      if (
+        trickSlot0.length > 0 &&
+        trickSlot1.length > 0 &&
+        trickSlot2.length > 0 &&
+        trickSlot3.length > 0
+      ) {
+        console.log("All trick slots are filled. Calculating trick winner...");
+
+        const winningPlayer = calculateTrickWinner();
+        console.log("Winning player index:", winningPlayer);
+        
+        if (winningPlayer !== undefined) {
+          console.log("winning player: ", players[winningPlayer]);
+        } else {
+          console.log("No winning player could be determined.");
+        }
+
+        setTimeout(() => {
+          console.log("Clearing trick slots...");
+          handleClearTrick();
+        }, 2500);
+      }
+    };
+
+    checkAndHandleTrick();
+  }, [trickSlot0, trickSlot1, trickSlot2, trickSlot3]); 
 
   const sortCards = (cards: cardProps[]) => {
     return cards.sort((a, b) => {
