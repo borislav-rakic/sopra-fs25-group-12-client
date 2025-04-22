@@ -385,7 +385,7 @@ const StartPage: React.FC = () => {
     const player = selectedPlayers[index];
     const isComputer = player === "computer";
     const isFilled = player && player !== "computer" && player !== "invite";
-    const difficultyLabel = ["Easy", "Medium", "Difficult"];
+    const difficultyLabel = ["","Easy", "Medium", "Difficult"];
 
     const handleDifficultySelect = async (difficulty: number) => {
       const updated = [...selectedPlayers];
@@ -498,9 +498,9 @@ const StartPage: React.FC = () => {
     
 
     const difficultyItems = [
-      { label: <span style={{ color: "black" }}>Easy</span>, key: "0" },
-      { label: <span style={{ color: "black" }}>Medium</span>, key: "1" },
-      { label: <span style={{ color: "black" }}>Difficult</span>, key: "2" },
+      { label: <span style={{ color: "black" }}>Easy</span>, key: "1" },
+      { label: <span style={{ color: "black" }}>Medium</span>, key: "2" },
+      { label: <span style={{ color: "black" }}>Difficult</span>, key: "3" },
     ];
 
     const columns = [
