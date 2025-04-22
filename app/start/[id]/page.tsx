@@ -43,7 +43,7 @@ const StartPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchValues, setSearchValues] = useState(["", "", "", ""]);
-  const [selectedPoints, setSelectedPoints] = useState<number | null>(null);
+  const [selectedPoints, setSelectedPoints] = useState<number | null>(100);
   const [inviteStatus, setInviteStatus] = useState<(null | "waiting")[]>([
     null,
     null,
