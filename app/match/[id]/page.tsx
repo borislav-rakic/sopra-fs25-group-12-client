@@ -34,6 +34,9 @@ const MatchPage: React.FC = () => {
   const [trickSlot2, setTrickSlot2] = useState<cardProps[]>([]);
   const [trickSlot3, setTrickSlot3] = useState<cardProps[]>([]);
 
+  const [matchScore, setMatchScore] = useState([0, 0, 0, 0]);
+  const [roundScore, setRoundScore] = useState([0, 0, 0, 0]);
+
   const [currentTrick, setCurrentTrick] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState("");
   const [currentGamePhase, setCurrentGamePhase] = useState("");
@@ -46,8 +49,6 @@ const MatchPage: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
-
-  // let playerHand = document.getElementById("hand-0");
 
   useEffect(() => {
     // This function runs every 5 seconds to receive the current match information.
@@ -315,9 +316,6 @@ const MatchPage: React.FC = () => {
         highestCardIndex = cardIndex;
       }
     });
-  
-
-  
     return highestCardIndex;
   }
 
@@ -368,6 +366,25 @@ const MatchPage: React.FC = () => {
     const sortedCards = sortCards(cardsInHand);
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
+
+  const resetGame = () => {
+    setCardsInHand([]);
+    setOpponent1Cards([]);
+    setOpponent2Cards([]);
+    setOpponent3Cards([]);
+    setTrickSlot0([]);
+    setTrickSlot1([]);
+    setTrickSlot2([]);
+    setTrickSlot3([]);
+    setCurrentTrick("");
+    setCurrentPlayer("");
+    setCurrentGamePhase("");
+    setCardsToPass([]);
+    setOpponentToPassTo("");
+    setHeartsBroken(false);
+    setFirstCardPlayed(false);
+    setIsFirstRound(true);
+  }
 
   return (
     <div className={`${styles.page} matchPage`}>
@@ -824,19 +841,19 @@ const MatchPage: React.FC = () => {
             <tbody>
               <tr>
                 <td>{players[0] ? players[0] : "AI Player"}</td>
-                <td>10</td>
+                <td>{matchScore[0]}</td>
               </tr>
               <tr>
                 <td>{players[1] ? players[1] : "AI Player"}</td>
-                <td>15</td>
+                <td>{matchScore[1]}</td>
               </tr>
               <tr>
                 <td>{players[2] ? players[2] : "AI Player"}</td>
-                <td>20</td>
+                <td>{matchScore[2]}</td>
               </tr>
               <tr>
                 <td>{players[3] ? players[3] : "AI Player"}</td>
-                <td>25</td>
+                <td>{matchScore[3]}</td>
               </tr>
             </tbody>
           </table>
@@ -976,7 +993,7 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {players[0] ? players[0] : "AI Player"}
           </div>
-          <div className="game-playerscore">Score: 10</div>
+          <div className="game-playerscore">Score: {roundScore[0]}</div>
         </div>
 
         <div className="game-playerscore1">
@@ -992,7 +1009,7 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {players[1] ? players[1] : "AI Player"}
           </div>
-          <div className="game-playerscore">Score: 15</div>
+          <div className="game-playerscore">Score: {roundScore[1]}</div>
         </div>
 
         <div className="game-playerscore2">
@@ -1008,7 +1025,7 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {players[2] ? players[2] : "AI Player"}
           </div>
-          <div className="game-playerscore">Score: 20</div>
+          <div className="game-playerscore">Score: {roundScore[2]}</div>
         </div>
 
         <div className="game-playerscore3">
@@ -1024,7 +1041,7 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {players[3] ? players[3] : "AI Player"}
           </div>
-          <div className="game-playerscore">Score: 25</div>
+          <div className="game-playerscore">Score: {roundScore[3]}</div>
         </div>
       </div>
     </div>
