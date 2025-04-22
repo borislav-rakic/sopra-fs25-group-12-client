@@ -107,7 +107,7 @@ const LandingPageUser: React.FC = () => {
             <Col>
               <Button
                 block className={styles.whiteButton}
-                onClick={() => router.push("/match")}
+                onClick={() => router.push("/matchtest")}
               >
                 Match Page Test
               </Button>
