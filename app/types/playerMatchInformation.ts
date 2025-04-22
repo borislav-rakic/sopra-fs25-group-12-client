@@ -1,12 +1,4 @@
-// interface Dictionary {
-//     [Key: number]: String;
-// }
-
-export interface PlayerCard {
-  gameId: number; // Game ID as an integer
-  playerId: number; // Player ID as an integer
-  card: string; // Card as a string
-}
+import { PlayerCard } from './playerCard';
 
 export interface PlayerMatchInformation {
   aiPlayers: Array<number> | null;
