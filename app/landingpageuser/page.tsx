@@ -10,6 +10,9 @@ import { Match } from "@/types/match";
 import SettingsPopup from "@/components/SettingsPopup";
 import { useEffect, useState } from "react";
 import type { UserPrivateDTO } from "@/types/user";
+import { Avatar, Dropdown, Menu } from "antd";
+import { UserOutlined } from "@ant-design/icons";
+
 
 const LandingPageUser: React.FC = () => {
   const router = useRouter();
@@ -76,6 +79,46 @@ const LandingPageUser: React.FC = () => {
     <div className={styles.page}>
       <main className={styles.main}>
       <div className='contentContainer'>
+        {user && !user.isGuest && (
+          <div style={{ position: "absolute", top: 20, right: 30, zIndex: 1000 }}>
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: "friends",
+                    label: "Friends",
+                    onClick: () => router.push("/friends"),
+                  },
+                  {
+                    key: "profile",
+                    label: "Profile",
+                    onClick: () => router.push("/profile"),
+                  },
+                  {
+                    key: "logout",
+                    label: "Logout",
+                    onClick: handleLogout,
+                  },
+                ],
+              }}
+              placement="bottomRight"
+              arrow
+            >
+              <Image
+                src={`/avatars_118x118/a${user.avatar || 101}.png`}
+                alt="User avatar"
+                width={50}
+                height={50}
+                style={{
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  border: "2px solid white",
+                }}
+              />
+            </Dropdown>
+          </div>
+        )}
+  
         <Image
           src="/LandingPageCards.png"
           alt="Hearts Attack Cards"
@@ -84,7 +127,7 @@ const LandingPageUser: React.FC = () => {
           className={styles.cardImage}
         />
 
-        <h1 className="luckiestGuy">HEARTS ATTACK!</h1>
+        <h1 className="luckiestGuy" style={{ marginTop: 24 }}>HEARTS ATTACK!</h1>
 
         <Space direction="vertical" size="middle" style={{ marginTop: 24 }}>
           <Row gutter={16} justify="center">
@@ -123,19 +166,6 @@ const LandingPageUser: React.FC = () => {
                 Leaderboard
               </Button>
             </Col>
-            {user && !user.isGuest && (
-              <Col>
-                <Button
-                  block className={styles.whiteButton}
-                  onClick={() => router.push("/friends")}
-                >
-                  Friends
-                </Button>
-              </Col>
-            )}
-          </Row>
-
-          <Row gutter={16} justify="center">
             <Col>
               <Button
                 block className={styles.whiteButton}
@@ -144,26 +174,6 @@ const LandingPageUser: React.FC = () => {
                 Rules
               </Button>
             </Col>
-            {user && !user.isGuest && (
-              <Col>
-                <Button
-                  block className={styles.whiteButton}
-                  onClick={() => router.push("/profile")}
-                >
-                  Profile
-                </Button>
-              </Col>
-            )}
-            {user && !user.isGuest && (
-              <Col>
-                <Button
-                  block className={styles.whiteButton}
-                  onClick={() => setSettingsOpen(true)}
-                >
-                  Settings
-                </Button>
-              </Col>
-            )}
           </Row>
           <Row justify="center">
             {user && user.isGuest && (
@@ -191,17 +201,6 @@ const LandingPageUser: React.FC = () => {
                   </Button>
                 </Col>
               </>
-            )}
-
-            {user && !user.isGuest && (
-              <Col>
-                <Button
-                  block className={styles.whiteButton}
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
-              </Col>
             )}
           </Row>
         </Space>
