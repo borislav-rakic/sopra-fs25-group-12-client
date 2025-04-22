@@ -53,7 +53,7 @@ const MatchPage: React.FC = () => {
   useEffect(() => {
     // This function runs every 5 seconds to receive the current match information.
     const matchRefreshIntervalId = setInterval(async () => {
-      //console.log("Requesting match update...");
+      console.log("Requesting match update...");
 
       try {
         const response = await apiService.post<PlayerMatchInformation>(
@@ -61,11 +61,26 @@ const MatchPage: React.FC = () => {
           {},
         );
 
-        //console.log(response);
+        console.log(response);
 
         if (response.matchPlayers) {
           setPlayers(response.matchPlayers);
         }
+        
+        if (response.playerCards) {
+          response.playerCards.forEach((item) => {
+            setCardsInHand((prevCardsInHand) => {
+              // Check if the card already exists in the player's hand
+              if (!prevCardsInHand.some((card) => card.code === item.card)) {
+                // Add the new card to the player's hand
+                return [...prevCardsInHand, generateCard(item.card)];
+              }
+              // If the card already exists, return the current state
+              return prevCardsInHand;
+            });
+          });
+        }
+
       } catch (error) {
         console.error(
           `Failed to fetch match data for matchId ${matchId}:`,
@@ -80,6 +95,51 @@ const MatchPage: React.FC = () => {
       console.log("Interval cleared.");
     };
   }, [apiService, matchId]);
+
+  const generateCard = (code : string)  => {
+
+    const rank = code.length === 3 ? code.slice(0, 2) : code[0]; // Since 10 would have a string of length 3
+    const suit = code[code.length - 1]; 
+
+    const rankToValue: { [key: string]: bigint } = {
+      "2": BigInt(2),
+      "3": BigInt(3),
+      "4": BigInt(4),
+      "5": BigInt(5),
+      "6": BigInt(6),
+      "7": BigInt(7),
+      "8": BigInt(8),
+      "9": BigInt(9),
+      "10": BigInt(10),
+      J: BigInt(11),
+      Q: BigInt(12),
+      K: BigInt(13),
+      A: BigInt(14),
+    };
+
+    const suitToName: { [key: string]: string } = {
+      H: "Hearts",
+      S: "Spades",
+      D: "Diamonds",
+      C: "Clubs",
+    };
+
+    const card: cardProps = {
+      code,
+      suit: suitToName[suit] || suit, // Use the full name if available
+      value: rankToValue[rank],
+      image: `https://deckofcardsapi.com/static/img/${code}.png`, // Example image URL
+      flipped: false,
+      backimage: cardback, // Use the current cardback
+      onClick: (code: string) => {
+        console.log(`Card clicked: ${code}`);
+      },
+    };
+  
+    console.log("Generated card:", card);
+    return card;
+
+  }
 
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
