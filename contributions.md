@@ -91,8 +91,8 @@ reason).
 | -------------------- | -------- | ------------------ | ------------------------------- | ----------------------------------- |
 | **@stevaniaeilyn**   | 17.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/3649bb847676fec9f26f3e417bc3406a271361b7<br/>https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/dcc59e673d074c104b549175af98cf56da5ae055 | added features, fixed bugs & defensive coding on start page (client: #19, server: #8, #17, #18, #19, #20)  | users can no kick out players, leave, join another lobby while in a lobby|
 |                      | 19.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/256e9101b464b47f246b9b98bebcd437d57408b7 | styling for UI (client: #16)| The app has now better mapping, visually more pleasing for users and more fun |
-| **@diderot5038**     | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@diderot5038**     | 23.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/e4c43e2133be14fbdef1812d254a3410cb827be4 | Implemented a naive AI player emulation. | Users who do not find enough co-players need to be able to fill the seats with AI players. |
+|                      | 23.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/b5eafe5afbca86861ce25c5c2f7f25a14086ffd9 | Completed Polling Reply. | The frontend client regularly pulls information concerning the state of the game. |
 | **@borislav-rakic**  | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **@dominiqueheller** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
