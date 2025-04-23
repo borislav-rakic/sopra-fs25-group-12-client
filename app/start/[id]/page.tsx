@@ -811,8 +811,8 @@ const StartPage: React.FC = () => {
                       onClick={async () => {
                         setSelectedPoints(points);
                         try {
-                          await apiService.post(`/matches/${gameId}/length`, {
-                            length: points,
+                          await apiService.post(`/matches/${gameId}/matchGoal`, {
+                            matchGoal: points,
                           });
                           message.open({
                             type: "success",
