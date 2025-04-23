@@ -155,10 +155,11 @@ const StartPage: React.FC = () => {
           }
         };
         
-        // Fill invites
         Object.entries(match.invites || {}).forEach(([slotStr, userId]) => {
           const slot = Number(slotStr);
           const index = slotToFrontendIndex(slot);
+        
+          const user = usersRef.current.find((u) => Number(u.id) === userId);
           updatedSelectedPlayers[index] = user?.username ?? "Waiting...";
           updatedInviteStatus[index] = "waiting";
           updatedPendingInvites[index] = userId;
