@@ -25,6 +25,10 @@ const StartPage: React.FC = () => {
   const gameId = params?.id?.toString();
   const router = useRouter();
   const apiService = useApi();
+  const frontendIndexToSlot = (index: number): number => index + 1;
+  const slotToFrontendIndex = (slot: number): number => slot - 1;
+  const frontendPlayerIndices = [0, 1, 2, 3];
+  const TOTAL_SLOTS = 4;
 
   const [selectedPlayers, setSelectedPlayers] = useState(["", "", "", ""]);
   const [showDifficulty, setShowDifficulty] = useState([
@@ -116,7 +120,7 @@ const StartPage: React.FC = () => {
         const updatedPendingInvites = [...pendingInvites];
         const updatedDifficulties = [...selectedDifficulties];
 
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < TOTAL_SLOTS; i++) {
           updatedSelectedPlayers[i] = "";
           updatedInviteStatus[i] = null;
           updatedPendingInvites[i] = null;
@@ -140,7 +144,7 @@ const StartPage: React.FC = () => {
         
           if ([1, 2, 3].includes(pid)) {
             // It's an AI player
-            const slot = i + 1;
+            const slot = frontendIndexToSlot(i);
             const difficulty = match.aiPlayers?.[slot] ?? 1;
             updatedSelectedPlayers[i] = "computer";
             updatedDifficulties[i] = difficulty;
@@ -154,10 +158,10 @@ const StartPage: React.FC = () => {
         // Fill invites
         Object.entries(match.invites || {}).forEach(([slotStr, userId]) => {
           const slot = Number(slotStr);
-          const user = usersRef.current.find((u) => Number(u.id) === userId);
-          updatedSelectedPlayers[slot] = user?.username ?? "Waiting...";
-          updatedInviteStatus[slot] = "waiting";
-          updatedPendingInvites[slot] = userId;
+          const index = slotToFrontendIndex(slot);
+          updatedSelectedPlayers[index] = user?.username ?? "Waiting...";
+          updatedInviteStatus[index] = "waiting";
+          updatedPendingInvites[index] = userId;
         });
 
         setSelectedPlayers(updatedSelectedPlayers);
@@ -257,7 +261,7 @@ const StartPage: React.FC = () => {
       }
       await apiService.post(`/matches/${gameId}/invite`, {
         userId: user.id,
-        playerSlot: index,
+        playerSlot: frontendIndexToSlot(index),
       });
 
       const updated = [...selectedPlayers];
@@ -298,7 +302,7 @@ const StartPage: React.FC = () => {
     if (!gameId) return;
   
     try {
-      await apiService.delete(`/matches/${gameId}/invite/${index}`);
+      await apiService.delete(`/matches/${gameId}/invite/${frontendIndexToSlot(index)}`);
   
       const updatedPlayers = [...selectedPlayers];
       updatedPlayers[index] = "";
@@ -314,7 +318,7 @@ const StartPage: React.FC = () => {
   
       message.open({
         type: "info",
-        content: `Invite for slot ${index + 1} has been cancelled.`,
+        content: `Invite for slot ${frontendIndexToSlot(index)} has been cancelled.`,
       });
     } catch {
       message.open({
@@ -407,11 +411,11 @@ const StartPage: React.FC = () => {
       try {
         await apiService.post(`/matches/${gameId}/ai`, {
           difficulty: difficulty,
-          slot: index,
+          slot: frontendIndexToSlot(index),
         });
         message.open({
           type: "success",
-          content: `Computer added at position ${index + 1}`,
+          content: `Computer added at position ${frontendIndexToSlot(index)}`,
         });
       } catch {
         message.open({
@@ -425,7 +429,7 @@ const StartPage: React.FC = () => {
       if (!gameId) return;
     
       try {
-        await apiService.post(`/matches/${gameId}/ai/remove`, { slot: index });
+        await apiService.post(`/matches/${gameId}/ai/remove`, { slot: frontendIndexToSlot(index) });
     
         const updatedPlayers = [...selectedPlayers];
         updatedPlayers[index] = "";
@@ -437,7 +441,7 @@ const StartPage: React.FC = () => {
     
         message.open({
           type: "success",
-          content: `AI player removed from slot ${index + 1}`,
+          content: `AI player removed from slot ${frontendIndexToSlot(index)}`,
         });
       } catch {
         message.open({
@@ -451,7 +455,7 @@ const StartPage: React.FC = () => {
       if (!gameId) return;
     
       try {
-        await apiService.delete(`/matches/${gameId}/player/${index}`);
+        await apiService.delete(`/matches/${gameId}/player/${frontendIndexToSlot(index)}`);
     
         const updatedPlayers = [...selectedPlayers];
         updatedPlayers[index] = "";
@@ -467,7 +471,7 @@ const StartPage: React.FC = () => {
     
         message.open({
           type: "info",
-          content: `Player removed from slot ${index + 1}`,
+          content: `Player removed from slot ${frontendIndexToSlot(index)}`,
         });
       } catch {
         message.open({
@@ -790,7 +794,7 @@ const StartPage: React.FC = () => {
         </p>
 
         <Row gutter={[16, 16]} justify="center">
-          {[0, 1, 2, 3].map((i) => (
+          {frontendPlayerIndices.map((i) => (
             <Col xs={24} sm={12} md={12} lg={12} xl={12} key={i}>
               {i === 0 ? renderHostCard() : renderPlayerCard(i)}
             </Col>
