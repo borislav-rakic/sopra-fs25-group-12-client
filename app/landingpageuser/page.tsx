@@ -147,14 +147,6 @@ const LandingPageUser: React.FC = () => {
                 Join Match
               </Button>
             </Col>
-            <Col>
-              <Button
-                block className={styles.whiteButton}
-                onClick={() => router.push("/matchtest")}
-              >
-                Match Page Test
-              </Button>
-            </Col>
           </Row>
 
           <Row gutter={16} justify="center">
