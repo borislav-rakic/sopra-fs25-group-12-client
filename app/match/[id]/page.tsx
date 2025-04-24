@@ -122,11 +122,11 @@ const MatchPage: React.FC = () => {
               // Add cards to opponent1Cards
               const newCards = Array.from({ length: difference }, () => generateEnemyCard());
               setOpponent1Cards(newCards);
-              console.log(`Added ${difference} cards to opponent1Cards.`);
+              //console.log(`Added ${difference} cards to opponent1Cards.`);
             } else if (difference < 0) {
               // Remove cards from opponent1Cards
               setOpponent1Cards((prevCards) => prevCards.slice(0, expectedOpponent1Cards));
-              console.log(`Removed ${Math.abs(difference)} cards from opponent1Cards.`);
+              //console.log(`Removed ${Math.abs(difference)} cards from opponent1Cards.`);
             }
           }
           if (opponent2Cards.length !== expectedOpponent2Cards) {
@@ -135,11 +135,11 @@ const MatchPage: React.FC = () => {
               // Add cards to opponent2Cards
               const newCards = Array.from({ length: difference }, () => generateEnemyCard());
               setOpponent2Cards(newCards);
-              console.log(`Added ${difference} cards to opponent2Cards.`);
+              //console.log(`Added ${difference} cards to opponent2Cards.`);
             } else if (difference < 0) {
               // Remove cards from opponent2Cards
               setOpponent2Cards((prevCards) => prevCards.slice(0, expectedOpponent2Cards));
-              console.log(`Removed ${Math.abs(difference)} cards from opponent2Cards.`);
+              //console.log(`Removed ${Math.abs(difference)} cards from opponent2Cards.`);
             }
           }
           if (opponent3Cards.length !== expectedOpponent3Cards) {
@@ -148,11 +148,11 @@ const MatchPage: React.FC = () => {
               // Add cards to opponent3Cards
               const newCards = Array.from({ length: difference }, () => generateEnemyCard());
               setOpponent3Cards(newCards);
-              console.log(`Added ${difference} cards to opponent3Cards.`);
+              //console.log(`Added ${difference} cards to opponent3Cards.`);
             } else if (difference < 0) {
               // Remove cards from opponent3Cards
               setOpponent3Cards((prevCards) => prevCards.slice(0, expectedOpponent3Cards));
-              console.log(`Removed ${Math.abs(difference)} cards from opponent3Cards.`);
+              //console.log(`Removed ${Math.abs(difference)} cards from opponent3Cards.`);
             }
           }
         }
@@ -174,8 +174,8 @@ const MatchPage: React.FC = () => {
 
   const generateCard = (code : string)  => {
 
-    const rank = code.length === 3 ? code.slice(0, 2) : code[0]; // Since 10 would have a string of length 3
-    const suit = code[code.length - 1]; 
+    const rank = code[0];
+    const suit = code[1]; 
 
     const rankToValue: { [key: string]: bigint } = {
       "2": BigInt(2),
@@ -186,7 +186,7 @@ const MatchPage: React.FC = () => {
       "7": BigInt(7),
       "8": BigInt(8),
       "9": BigInt(9),
-      "10": BigInt(10),
+      "0": BigInt(10),
       J: BigInt(11),
       Q: BigInt(12),
       K: BigInt(13),
@@ -223,26 +223,14 @@ const MatchPage: React.FC = () => {
       suit: "XX",
       value: BigInt(0),
       image: "",
-      backimage: resolveCardBackImage(cardback), 
+      backimage: cardback, 
       flipped: false,
       onClick: () => {}
     }
     return card;
   };
 
-  const resolveCardBackImage = (name: string) => {
-    switch (name) {
-      case "Default":
-        return "/cards/back/default.png";
-      case "Red":
-        return "/cards/back/red.png";
-      case "Blue":
-        return "/cards/back/blue.png";
-      // add other themes here
-      default:
-        return "/cards/back/default.png";
-    }
-  };
+
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
   };
@@ -258,8 +246,8 @@ const MatchPage: React.FC = () => {
     if (localStorage.getItem("cardback")) {
       setCardback(localStorage.getItem("cardback") || "");
     } else {
-      setCardback("Default"); // Default cardback
-      localStorage.setItem("cardback", "Default");
+      setCardback("/card_back/b101.png"); // Default cardback
+      localStorage.setItem("cardback", "/card_back/b101.png");
     }
   }, []);
 
@@ -312,7 +300,7 @@ const MatchPage: React.FC = () => {
         console.log("Response from server:", response);
   
         // Check if the response is valid
-        if (!response || typeof response !== "object" || Object.keys(response).length === 0) {
+        if (!response || typeof response !== "object") {
           console.error("Error playing card: Invalid or empty response from server.");
           return;
         }
@@ -410,7 +398,7 @@ const MatchPage: React.FC = () => {
     const response = await apiService.post(`/matches/${matchId}/passing`, payload);
 
     // Check if the response indicates an error
-    if (!response || typeof response !== "object" || Object.keys(response).length === 0) {
+    if (!response || typeof response !== "object") {
       console.error("Error passing cards: Invalid or empty response from server.");
       return;
     }
