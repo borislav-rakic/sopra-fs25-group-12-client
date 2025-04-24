@@ -10,5 +10,11 @@ export interface PlayerMatchInformation {
   playerCards: Array<PlayerCard> | null;
   isGameFinished: boolean | null;
   isMatchFinished: boolean | null;
-  isMyTurn: boolean | null;
+  myTurn: boolean | null;
+  cardsInHandPerPlayer: Array<number> | null;
+  currentTrick: string | null;
+  gamePhase: string | null;
+  heartsBroken: boolean | null;
+  avatarUrls: Array<string | null> | null;
+  playerPoints: Array<number> | null;
 }
