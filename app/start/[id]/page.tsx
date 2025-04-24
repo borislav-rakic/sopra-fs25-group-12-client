@@ -113,7 +113,7 @@ const StartPage: React.FC = () => {
         ].filter((id): id is number => id !== null);
 
         setPlayerIds(playerIdList);
-        setHostUsername(match.host);
+        setHostUsername(match.hostUsername);
 
         const updatedSelectedPlayers = [...selectedPlayers];
         const updatedInviteStatus = [...inviteStatus];

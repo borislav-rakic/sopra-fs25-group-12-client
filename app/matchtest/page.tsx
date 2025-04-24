@@ -7,7 +7,7 @@ import { useApi } from "@/hooks/useApi";
 // import { Match } from "@/types/match";
 import { useEffect, useState } from "react";
 import SettingsPopup from "@/components/SettingsPopup";
-import Card, { cardProps } from "@/components/Card";
+import Card, { cardProps } from "@/components/card";
 
 const MatchTestPage: React.FC = () => {
   //const router = useRouter();
@@ -109,7 +109,7 @@ const MatchTestPage: React.FC = () => {
         console.log("Match created:", newMatchId);
 
         // Step 2: Add AI players
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 2; i <= 4; i++) {
           await apiService.post(`/matches/${newMatchId}/ai`, {
             slot: i,
             difficulty: i,

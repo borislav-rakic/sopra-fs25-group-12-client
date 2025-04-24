@@ -1,7 +1,8 @@
 export interface Match {
   matchId: bigint;
   playerIds: bigint[] | null;
-  host: string;
+  hostUsername: string
+  hostId: string;
   started: boolean | null;
   invites?: Record<number, number>;
   aiPlayers: number[];
