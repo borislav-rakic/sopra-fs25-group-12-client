@@ -93,8 +93,8 @@ reason).
 |                      | 19.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/256e9101b464b47f246b9b98bebcd437d57408b7 | styling for UI (client: #16)| The app has now better mapping, visually more pleasing for users and more fun |
 | **@diderot5038**     | 23.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/e4c43e2133be14fbdef1812d254a3410cb827be4 | Implemented a naive AI player emulation. | Users who do not find enough co-players need to be able to fill the seats with AI players. |
 |                      | 23.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/b5eafe5afbca86861ce25c5c2f7f25a14086ffd9 | Completed Polling Reply. | The frontend client regularly pulls information concerning the state of the game. |
-| **@borislav-rakic**  | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@borislav-rakic**  | 21.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/dff908479da81d929eaf311c0afc7232e647eb1f | Added additional information to be sent to each player requesting information during a match. | The information is used to represent the match state in the frontend. |
+|                      | 23.04.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/cb49640a230fbae3b258160fb212f872b7d5382b | Added test cases for GameService functions. | This is important to reach the 50% test coverage on SonarQube. |
 | **@dominiqueheller** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 
