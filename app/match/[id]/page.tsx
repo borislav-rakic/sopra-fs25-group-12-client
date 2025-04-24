@@ -29,6 +29,12 @@ const MatchPage: React.FC = () => {
     null,
     null,
   ]);
+  const [playerAvatars, setPlayerAvatars] = useState<Array<string | null>>([
+    null,
+    null,
+    null,
+    null,
+  ]);
   const [trickSlot0, setTrickSlot0] = useState<cardProps[]>([]);
   const [trickSlot1, setTrickSlot1] = useState<cardProps[]>([]);
   const [trickSlot2, setTrickSlot2] = useState<cardProps[]>([]);
@@ -38,13 +44,14 @@ const MatchPage: React.FC = () => {
   const [roundScore, setRoundScore] = useState([0, 0, 0, 0]); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   const [currentTrick, setCurrentTrick] = useState("");
-  const [currentPlayer, setCurrentPlayer] = useState("");
+  const [currentPlayer, setCurrentPlayer] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [currentGamePhase, setCurrentGamePhase] = useState("");
   const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
   const [opponentToPassTo, setOpponentToPassTo] = useState("");
   const [heartsBroken, setHeartsBroken] = useState(false);
   const [firstCardPlayed, setFirstCardPlayed] = useState(false);
   const [isFirstRound, setIsFirstRound] = useState(true);
+  const [myTurn, setMyTurn] = useState(false); 
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
@@ -66,19 +73,88 @@ const MatchPage: React.FC = () => {
         if (response.matchPlayers) {
           setPlayers(response.matchPlayers);
         }
+
+        if (response.avatarUrls) {
+          setPlayerAvatars(response.avatarUrls);
+        }
+
+        if (response.playerPoints) {
+          const updatedMatchScore = [
+            response.playerPoints["1"] || 0,
+            response.playerPoints["2"] || 0,
+            response.playerPoints["3"] || 0,
+            response.playerPoints["4"] || 0,
+          ];
+          setMatchScore(updatedMatchScore);
+        }
         
         if (response.playerCards) {
           response.playerCards.forEach((item) => {
             setCardsInHand((prevCardsInHand) => {
               // Check if the card already exists in the player's hand
-              if (!prevCardsInHand.some((card) => card.code === item.card)) {
+              if (!prevCardsInHand.some((card) => card.code === item.card?.code)) {
                 // Add the new card to the player's hand
-                return [...prevCardsInHand, generateCard(item.card)];
+                return [...prevCardsInHand, generateCard(item.card?.code)];
               }
               // If the card already exists, return the current state
               return prevCardsInHand;
             });
           });
+        }
+
+
+        setHeartsBroken(response.heartsBroken || false);
+        setCurrentGamePhase(response.gamePhase || "");
+        setMyTurn(response.myTurn || false);
+       
+        //checks number of cards in enemy hands
+        if (response.cardsInHandPerPlayer) {
+          const expectedOpponent1Cards = response.cardsInHandPerPlayer[1];
+          const expectedOpponent2Cards = response.cardsInHandPerPlayer[2];
+          const expectedOpponent3Cards = response.cardsInHandPerPlayer[3];
+
+          //console.log("Expected opponent cards:", expectedOpponent1Cards, expectedOpponent2Cards, expectedOpponent3Cards);
+          //console.log("Current opponent cards:", opponent1Cards.length, opponent2Cards.length, opponent3Cards.length);
+
+          if (opponent1Cards.length !== expectedOpponent1Cards) {
+            const difference = expectedOpponent1Cards - opponent1Cards.length;
+            if (difference > 0) {
+              // Add cards to opponent1Cards
+              const newCards = Array.from({ length: difference }, () => generateEnemyCard());
+              setOpponent1Cards(newCards);
+              //console.log(`Added ${difference} cards to opponent1Cards.`);
+            } else if (difference < 0) {
+              // Remove cards from opponent1Cards
+              setOpponent1Cards((prevCards) => prevCards.slice(0, expectedOpponent1Cards));
+              //console.log(`Removed ${Math.abs(difference)} cards from opponent1Cards.`);
+            }
+          }
+          if (opponent2Cards.length !== expectedOpponent2Cards) {
+            const difference = expectedOpponent2Cards - opponent2Cards.length;
+            if (difference > 0) {
+              // Add cards to opponent2Cards
+              const newCards = Array.from({ length: difference }, () => generateEnemyCard());
+              setOpponent2Cards(newCards);
+              //console.log(`Added ${difference} cards to opponent2Cards.`);
+            } else if (difference < 0) {
+              // Remove cards from opponent2Cards
+              setOpponent2Cards((prevCards) => prevCards.slice(0, expectedOpponent2Cards));
+              //console.log(`Removed ${Math.abs(difference)} cards from opponent2Cards.`);
+            }
+          }
+          if (opponent3Cards.length !== expectedOpponent3Cards) {
+            const difference = expectedOpponent3Cards - opponent3Cards.length;
+            if (difference > 0) {
+              // Add cards to opponent3Cards
+              const newCards = Array.from({ length: difference }, () => generateEnemyCard());
+              setOpponent3Cards(newCards);
+              //console.log(`Added ${difference} cards to opponent3Cards.`);
+            } else if (difference < 0) {
+              // Remove cards from opponent3Cards
+              setOpponent3Cards((prevCards) => prevCards.slice(0, expectedOpponent3Cards));
+              //console.log(`Removed ${Math.abs(difference)} cards from opponent3Cards.`);
+            }
+          }
         }
 
       } catch (error) {
@@ -98,8 +174,8 @@ const MatchPage: React.FC = () => {
 
   const generateCard = (code : string)  => {
 
-    const rank = code.length === 3 ? code.slice(0, 2) : code[0]; // Since 10 would have a string of length 3
-    const suit = code[code.length - 1]; 
+    const rank = code[0];
+    const suit = code[1]; 
 
     const rankToValue: { [key: string]: bigint } = {
       "2": BigInt(2),
@@ -110,7 +186,7 @@ const MatchPage: React.FC = () => {
       "7": BigInt(7),
       "8": BigInt(8),
       "9": BigInt(9),
-      "10": BigInt(10),
+      "0": BigInt(10),
       J: BigInt(11),
       Q: BigInt(12),
       K: BigInt(13),
@@ -141,6 +217,20 @@ const MatchPage: React.FC = () => {
 
   }
 
+  const generateEnemyCard = () => {
+    const card: cardProps = {
+      code: "XX",
+      suit: "XX",
+      value: BigInt(0),
+      image: "",
+      backimage: cardback, 
+      flipped: false,
+      onClick: () => {}
+    }
+    return card;
+  };
+
+
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
   };
@@ -156,8 +246,8 @@ const MatchPage: React.FC = () => {
     if (localStorage.getItem("cardback")) {
       setCardback(localStorage.getItem("cardback") || "");
     } else {
-      setCardback("Default"); // Default cardback
-      localStorage.setItem("cardback", "Default");
+      setCardback("/card_back/b101.png"); // Default cardback
+      localStorage.setItem("cardback", "/card_back/b101.png");
     }
   }, []);
 
@@ -174,7 +264,7 @@ const MatchPage: React.FC = () => {
   const handlePlayCard = async (card: cardProps) => {
     console.log("Selected card in Match Page:", card.code);
 
-    if (currentGamePhase === "passing") {
+    if (currentGamePhase === "PASSING") {
       if (cardsToPass.find((c) => c.code === card.code)) {
         setCardsToPass(cardsToPass.filter((c) => c.code !== card.code));
         console.log("removed card from cardsToPass: ", card.code);
@@ -186,50 +276,57 @@ const MatchPage: React.FC = () => {
       } else {
         console.log("You may not pass more than 3 cards.");
       }
-    } else if (currentGamePhase === "playing") {
-      if (currentPlayer === players[0]) {
-        if (!verifyTrick(card)) {
-          // the linter abhors empty blocks
-        } else {
-          try{
-            const payload = {
-              gameId: matchId, 
-              playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
-              cardCode: card.code, // Since card in backend is only a string
-            };
-            console.log("Payload for playing card:", payload);           
-
-            const response = await apiService.post(`/matches/${matchId}/play`, {payload});
-
-            console.log("Response from server:", response);
-
-            if ((response as { status: number }).status === 200) {
-              console.log("Card played successfully:", card.code);
-
-              const updatedCardsInHand = cardsInHand.filter((c) => c.code !== card.code);
-              const updatedTrick0 = [card];
-    
-              setCardsInHand(updatedCardsInHand);
-              setTrickSlot0(updatedTrick0);
-              setCurrentPlayer(players[1] || "AI Player 1"); // Set the next player to play
-
-            } else {
-              if (typeof response === "object" && response !== null && "status" in response) {
-                console.error("Error playing card:", (response as { status: number }).status);
-              } else {
-                console.error("Error playing card: Invalid response format");
-              }
-            }
-
-          } catch (error) {
-            console.error("Error playing card:", error);
-          }
-        }
-      } else {
+    } else if (currentGamePhase === "PLAYING" || currentGamePhase === "FIRSTROUND") {
+      if (!myTurn) {
         console.log("You may not play cards while it is not your turn.");
+        return;
+      }
+  
+      if (!verifyTrick(card)) {
+        console.log("Invalid card play. Trick verification failed.");
+        return;
+      }
+
+      try {
+        const payload = {
+          gameId: matchId,
+          playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
+          cardCode: card.code, // Since card in backend is only a string
+        };
+        console.log("Payload for playing card:", payload);
+  
+        const response = await apiService.post(`/matches/${matchId}/play`, { payload });
+  
+        console.log("Response from server:", response);
+  
+        // Check if the response is valid
+        if (!response || typeof response !== "object") {
+          console.error("Error playing card: Invalid or empty response from server.");
+          return;
+        }
+
+        if (!firstCardPlayed) {
+          setFirstCardPlayed(true);
+        }
+
+        if (currentTrick === "") {
+          setCurrentTrick(card.suit);
+        }
+  
+        // If the response is valid, proceed with the success logic
+        console.log("Card played successfully:", card.code);
+  
+        const updatedCardsInHand = cardsInHand.filter((c) => c.code !== card.code);
+        const updatedTrick0 = [card];
+  
+        setCardsInHand(updatedCardsInHand);
+        setTrickSlot0(updatedTrick0);
+        setCurrentPlayer(players[1] || ""); // Set the next player to play
+      } catch (error) {
+        console.error("Error playing card:", error);
       }
     } else {
-      console.log("currently unused game phase option");
+      console.log("Currently unused game phase option.");
     }
   };
 
@@ -240,15 +337,13 @@ const MatchPage: React.FC = () => {
     console.log("Verifying trick for card: ", card.code);
     if (!firstCardPlayed) {
       if (card.code === "2C") {
-        setFirstCardPlayed(false);
-        setCurrentTrick(card.suit);
         console.log("First card played in the game is 2 of clubs.");
         return true; // 2 of clubs is played first
       }
       console.log("First card played in the game must be 2 of clubs.");
       return false;
     }
-    if (isFirstRound) {
+    if (currentGamePhase === "FIRSTROUND") {
       if (card.code === "QS" || card.suit === "Hearts") {
         console.log(
           "Queen of Spades or Hearts cannot be played in the first round.",
@@ -260,14 +355,12 @@ const MatchPage: React.FC = () => {
       console.log("First card played in the trick.");
       if (heartsBroken) {
         console.log("Hearts are broken, any card can be played.");
-        setCurrentTrick(card.suit);
         return true; // Any card can be played if hearts are broken
       } else if (card.suit === "Hearts") {
         console.log("Hearts cannot be played until they are broken.");
         return false; // Hearts cannot be played if they haven't been broken
       } else {
         console.log("No constraints on the first card played.");
-        setCurrentTrick(card.suit);
         return true; // Any non-heart card can be played
       }
     } else {
@@ -301,35 +394,38 @@ const MatchPage: React.FC = () => {
       };
       console.log("Payload for passing cards:", payload);
 
-      const response = await apiService.post(`/matches/${matchId}/passing`, payload);
-      console.log("Response from server:", response);
+    // Make the API request
+    const response = await apiService.post(`/matches/${matchId}/passing`, payload);
 
-      if ((response as { status: number }).status === 200) {
-        const updatedCardsInHand = cardsInHand.filter((c) =>
-          !cardsToPass.some((card) => card.code === c.code)
-        );
-  
-        if (opponentToPassTo === "Opponent1") {
-          const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
-          setOpponent1Cards(updatedEnemyHand);
-        } else if (opponentToPassTo === "Opponent2") {
-          const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
-          setOpponent2Cards(updatedEnemyHand);
-        } else if (opponentToPassTo === "Opponent3") {
-          const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
-          setOpponent3Cards(updatedEnemyHand);
-        }
-  
-        setCardsInHand(updatedCardsInHand);
-        setCardsToPass([]);
-        setCurrentGamePhase("playing");
-      } else {
-        if (typeof response === "object" && response !== null && "status" in response) {
-          console.error("Error passing cards:", (response as { status: number }).status);
-        } else {
-          console.error("Error passing cards: Invalid response format");
-        }
-      }
+    // Check if the response indicates an error
+    if (!response || typeof response !== "object") {
+      console.error("Error passing cards: Invalid or empty response from server.");
+      return;
+    }
+
+    // If the response is valid, proceed with the success logic
+    console.log("Response from server:", response);
+
+    const updatedCardsInHand = cardsInHand.filter(
+      (c) => !cardsToPass.some((card) => card.code === c.code)
+    );
+
+    // Update the opponent's hand based on the selected opponent
+    if (opponentToPassTo === "Opponent1") {
+      const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
+      setOpponent1Cards(updatedEnemyHand);
+    } else if (opponentToPassTo === "Opponent2") {
+      const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
+      setOpponent2Cards(updatedEnemyHand);
+    } else if (opponentToPassTo === "Opponent3") {
+      const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
+      setOpponent3Cards(updatedEnemyHand);
+    }
+
+    // Update the state
+    setCardsInHand(updatedCardsInHand);
+    setCardsToPass([]);
+    setCurrentGamePhase("playing");
   } catch (error) {
       console.error("Error passing cards:", error);
     }
@@ -887,6 +983,7 @@ const MatchPage: React.FC = () => {
         >
         CalculateTrickWinner
         </Button>
+
       </div>
 
       <div className="gameboard">
@@ -1044,7 +1141,7 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src="/avatars_118x118/a101.png"
+              src={playerAvatars[0] ? playerAvatars[0] : "/avatars_118x118/a104.png"}
               alt="avatar"
               width={72}
               height={72}
@@ -1060,7 +1157,7 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src="/avatars_118x118/a102.png"
+              src={playerAvatars[1] ? playerAvatars[1] : "/avatars_118x118/a104.png"}
               alt="avatar"
               width={72}
               height={72}
@@ -1076,7 +1173,7 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src="/avatars_118x118/a103.png"
+              src={playerAvatars[2] ? playerAvatars[2] : "/avatars_118x118/a104.png"}
               alt="avatar"
               width={72}
               height={72}
@@ -1092,7 +1189,7 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src="/avatars_118x118/a104.png"
+              src={playerAvatars[3] ? playerAvatars[3] : "/avatars_118x118/a104.png"}
               alt="avatar"
               width={72}
               height={72}
