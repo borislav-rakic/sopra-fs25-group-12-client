@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { PlayerMatchInformation } from "@/types/playerMatchInformation";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
-import { PlayerCard } from "@/types/playerCard";
+import { innerCard} from "@/types/playerCard";
 
 const MatchPage: React.FC = () => {
   //const router = useRouter();
@@ -53,10 +53,14 @@ const MatchPage: React.FC = () => {
   const [firstCardPlayed, setFirstCardPlayed] = useState(false);
   const [isFirstRound, setIsFirstRound] = useState(true);
   const [myTurn, setMyTurn] = useState(false); 
+  //const [currentMatchPhase, setCurrentMatchPhase] = useState("");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
+
+  //const [slot, setSlot] = useState(1);
+  //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
 
   const [isMatchTesterVisible, setIsMatchTesterVisible] = useState(true);
 
@@ -73,31 +77,78 @@ const MatchPage: React.FC = () => {
 
         console.log(response);
 
-        if (response.matchPlayers) {
-          setPlayers(response.matchPlayers);
+       /*  if (response.slot) {
+          setSlot(response.slot);
+        } */
+       const slot = response.slot || 1; // Default to 1 if slot is not available
+       console.log("Slot:", slot);
+
+      /*   if (response.currentTrickLeaderSlot) {
+          setTrickLeaderSlot(response.currentTrickLeaderSlot);
+        } */
+
+        const trickLeaderSlot = response.currentTrickLeaderSlot || 1; // Default to 1 if trickLeaderSlot is not available
+        console.log("Trick Leader Slot:", trickLeaderSlot);
+
+        if (response.matchPlayers && response.slot) {
+          setPlayers((/* prevPlayers */) => {
+            const updatedPlayers = [
+              response.matchPlayers ? response.matchPlayers[(0 + slot - 1) % 4] : null,
+              response.matchPlayers ? response.matchPlayers[(1 + slot - 1) % 4] : null,
+              response.matchPlayers ? response.matchPlayers[(2 + slot - 1) % 4] : null,
+              response.matchPlayers ? response.matchPlayers[(3 + slot - 1) % 4] : null,
+            ];
+            //console.log("Previous players:", prevPlayers);
+            //console.log("Updated players:", updatedPlayers);
+            return updatedPlayers;
+          });
         }
 
         if (response.avatarUrls) {
-          setPlayerAvatars(response.avatarUrls);
+          setPlayerAvatars((/* prevAvatars */) => {
+            const updatedAvatars = [
+              response.avatarUrls ? response.avatarUrls[(0 + slot - 1) % 4] : null,
+              response.avatarUrls ? response.avatarUrls[(1 + slot - 1) % 4] : null,
+              response.avatarUrls ? response.avatarUrls[(2 + slot - 1) % 4] : null,
+              response.avatarUrls ? response.avatarUrls[(3 + slot - 1) % 4] : null,
+            ];
+            //console.log("Previous avatars:", prevAvatars);
+            //console.log("Updated avatars:", updatedAvatars);
+            return updatedAvatars;
+          });
         }
 
         if (response.playerPoints) {
-          const updatedMatchScore = [
+          const pointsArray = [
             response.playerPoints["1"] || 0,
             response.playerPoints["2"] || 0,
             response.playerPoints["3"] || 0,
             response.playerPoints["4"] || 0,
           ];
-          setMatchScore(updatedMatchScore);
-        }
-        if (response.playerPoints) {
-          const updatedRoundScore = [
-            response.playerPoints["1"] || 0,
-            response.playerPoints["2"] || 0,
-            response.playerPoints["3"] || 0,
-            response.playerPoints["4"] || 0,
-          ];
-          setRoundScore(updatedRoundScore);
+        
+          setMatchScore((/* prevMatchScore */) => {
+            const updatedMatchScore = [
+              pointsArray[(0 + slot - 1) % 4],
+              pointsArray[(1 + slot - 1) % 4],
+              pointsArray[(2 + slot - 1) % 4],
+              pointsArray[(3 + slot - 1) % 4],
+            ];
+            //console.log("Previous match score:", prevMatchScore);
+            //console.log("Updated match score:", updatedMatchScore);
+            return updatedMatchScore;
+          });
+
+          setRoundScore((/* prevRoundScore */) => {
+            const updatedRoundScore = [
+              pointsArray[(0 + slot - 1) % 4],
+              pointsArray[(1 + slot - 1) % 4],
+              pointsArray[(2 + slot - 1) % 4],
+              pointsArray[(3 + slot - 1) % 4],
+            ];
+            //console.log("Previous round score:", prevRoundScore);
+            //console.log("Updated round score:", updatedRoundScore);
+            return updatedRoundScore;
+          });
         }
         
         if (response.playerCards) {
@@ -118,14 +169,37 @@ const MatchPage: React.FC = () => {
         setHeartsBroken(response.heartsBroken || false);
         setCurrentGamePhase(response.gamePhase || "");
         setMyTurn(response.myTurn || false);
+
+        if(!firstCardPlayed) {
+          if(response.currentTrick?.length !== 0) {
+            setFirstCardPlayed(true);
+          }
+        }
+        console.log("First card is played:", firstCardPlayed);
         
-        handleTrickFromLogic(response.currentTrick || []);
+        handleTrickFromLogic(response.currentTrick || [], slot, trickLeaderSlot); // Pass the current trick to the function
        
         //checks number of cards in enemy hands
         if (response.cardsInHandPerPlayer) {
-          const expectedOpponent1Cards = response.cardsInHandPerPlayer[1];
-          const expectedOpponent2Cards = response.cardsInHandPerPlayer[2];
-          const expectedOpponent3Cards = response.cardsInHandPerPlayer[3];
+
+          const cardsInHandArray = [
+            response.cardsInHandPerPlayer["1"] || 0,
+            response.cardsInHandPerPlayer["2"] || 0,
+            response.cardsInHandPerPlayer["3"] || 0,
+            response.cardsInHandPerPlayer["4"] || 0,
+          ];
+        
+          // Shift indices based on the player's slot
+          const shiftedCardsInHand = [
+            cardsInHandArray[(0 + slot - 1 + 4) % 4],
+            cardsInHandArray[(1 + slot - 1 + 4) % 4],
+            cardsInHandArray[(2 + slot - 1 + 4) % 4],
+            cardsInHandArray[(3 + slot - 1 + 4) % 4],
+          ];
+
+          const expectedOpponent1Cards = shiftedCardsInHand[1];
+          const expectedOpponent2Cards = shiftedCardsInHand[2];
+          const expectedOpponent3Cards = shiftedCardsInHand[3];
 
           //console.log("Expected opponent cards:", expectedOpponent1Cards, expectedOpponent2Cards, expectedOpponent3Cards);
           //console.log("Current opponent cards:", opponent1Cards.length, opponent2Cards.length, opponent3Cards.length);
@@ -171,6 +245,10 @@ const MatchPage: React.FC = () => {
           }
         }
 
+/*         if (response.matchPhase) {
+          setCurrentMatchPhase(response.matchPhase);
+        } */
+
       } catch (error) {
         console.error(
           `Failed to fetch match data for matchId ${matchId}:`,
@@ -185,6 +263,7 @@ const MatchPage: React.FC = () => {
       console.log("Interval cleared.");
     };
   }, [apiService, matchId]);
+
 
   const generateCard = (code : string)  => {
 
@@ -290,7 +369,7 @@ const MatchPage: React.FC = () => {
       } else {
         console.log("You may not pass more than 3 cards.");
       }
-    } else if (currentGamePhase === "PLAYING" || currentGamePhase === "FIRSTROUND") {
+    } else if (currentGamePhase === "NORMALROUND" || currentGamePhase === "FIRSTROUND" || currentGamePhase === "FINALROUND") {
       if (!myTurn) {
         console.log("You may not play cards while it is not your turn.");
         return;
@@ -304,7 +383,6 @@ const MatchPage: React.FC = () => {
       try {
         const payload = {
           gameId: matchId,
-          playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
           card: card.code, // Since card in backend is only a string
         };
         console.log("Payload for playing card:", payload);
@@ -404,7 +482,6 @@ const MatchPage: React.FC = () => {
 
       const payload = {
         gameId: matchId,
-        playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
         cards: cardsToPass.map((card) => card.code), // Send only the card codes
       };
       console.log("Payload for passing cards:", payload);
@@ -513,6 +590,7 @@ const MatchPage: React.FC = () => {
         setTimeout(() => {
           console.log("Clearing trick slots...");
           handleClearTrick();
+
         }, 2500);
       }
     };
@@ -538,30 +616,50 @@ const MatchPage: React.FC = () => {
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
 
-  const handleTrickFromLogic = (trick: PlayerCard[]) => {
+  const handleTrickFromLogic = (trick: innerCard[], slot: number, trickLeaderSlot: number) => {
     console.log("Received trick from logic:", trick);
+    const tempTrick: string[] = ["", "", "", ""];
+    const indexShift = (trickLeaderSlot - slot + 4) % 4;
+
+    trick.forEach((card, index) => {
+      if (card) {
+        const shiftedIndex = (index + indexShift) % 4; 
+        tempTrick[shiftedIndex] = card.code; 
+      }
+    });
+
+    console.log("Shifted trick array:", tempTrick);
+
     // if trick is empty and shouldnt be or if trick is not what it should be, set it to the new trick for trick 0
-    if(trick[0] !== undefined && ((trickSlot0.length === 0 && trick[0] !== null) || trickSlot0[0].code !== trick[0].card.code)) {
-      setTrickSlot0([
-        generateCard(trick[0].card.code),
-      ]);
+    if ((tempTrick[0] || tempTrick[0] === "") && (trickSlot0.length === 0 || trickSlot0[0].code !== tempTrick[0])) {
+      if(tempTrick[0]===""){
+        setTrickSlot0([]);
+      } else {
+        setTrickSlot0([generateCard(tempTrick[0])]);
+      }
     }
-    if(trick[1] !== undefined && ((trickSlot1.length === 0 && trick[1] !== null) || trickSlot0[1].code !== trick[1].card.code)) {
-      setTrickSlot1([
-        generateCard(trick[1].card.code),
-      ]);
+    if ((tempTrick[1] || tempTrick[1] === "") && (trickSlot1.length === 0 || trickSlot1[0].code !== tempTrick[1])) {
+      if(tempTrick[1]===""){
+        setTrickSlot1([]);
+      } else {
+        setTrickSlot1([generateCard(tempTrick[1])]);
+      }
     }
-    if(trick[2] !== undefined && ((trickSlot2.length === 0 && trick[2] !== null) || trickSlot0[2].code !== trick[2].card.code)) {
-      setTrickSlot2([
-        generateCard(trick[2].card.code),
-      ]);
+    if ((tempTrick[2] || tempTrick[2] === "") && (trickSlot2.length === 0 || trickSlot2[0].code !== tempTrick[2])) {
+      if(tempTrick[2]===""){
+        setTrickSlot2([]);
+      } else {
+        setTrickSlot2([generateCard(tempTrick[2])]);
+      }
     }
-    if(trick[3] !== undefined && ((trickSlot3.length === 0 && trick[3] !== null) || trickSlot0[3].code !== trick[3].card.code)) {
-      setTrickSlot3([
-        generateCard(trick[3].card.code),
-      ]);
+    if ((tempTrick[3] || tempTrick[3] === "") && (trickSlot3.length === 0 || trickSlot3[0].code !== tempTrick[3])) {
+      if(tempTrick[3]===""){
+        setTrickSlot3([]);
+      } else {
+        setTrickSlot3([generateCard(tempTrick[3])]);
+      }
     }
-  }
+  };
 /* 
   const resetGame = () => {
     setCardsInHand([]);
