@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { PlayerMatchInformation } from "@/types/playerMatchInformation";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
+import { PlayerCard } from "@/types/playerCard";
 
 const MatchPage: React.FC = () => {
   //const router = useRouter();
@@ -106,6 +107,8 @@ const MatchPage: React.FC = () => {
         setHeartsBroken(response.heartsBroken || false);
         setCurrentGamePhase(response.gamePhase || "");
         setMyTurn(response.myTurn || false);
+        
+        handleTrickFromLogic(response.currentTrick || []);
        
         //checks number of cards in enemy hands
         if (response.cardsInHandPerPlayer) {
@@ -240,8 +243,8 @@ const MatchPage: React.FC = () => {
     if (localStorage.getItem("playmat")) {
       setPlaymat(localStorage.getItem("playmat") || "");
     } else {
-      setPlaymat("Green"); // Default playmat
-      localStorage.setItem("playmat", "Green");
+      setPlaymat("#008000"); // Default playmat
+      localStorage.setItem("playmat", "#008000");
     }
     if (localStorage.getItem("cardback")) {
       setCardback(localStorage.getItem("cardback") || "");
@@ -522,6 +525,31 @@ const MatchPage: React.FC = () => {
     const sortedCards = sortCards(cardsInHand);
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
+
+  const handleTrickFromLogic = (trick: PlayerCard[]) => {
+    console.log("Received trick from logic:", trick);
+    // if trick is empty and shouldnt be or if trick is not what it should be, set it to the new trick for trick 0
+    if(trick[0] !== undefined && ((trickSlot0.length === 0 && trick[0] !== null) || trickSlot0[0].code !== trick[0].card.code)) {
+      setTrickSlot0([
+        generateCard(trick[0].card.code),
+      ]);
+    }
+    if(trick[1] !== undefined && ((trickSlot1.length === 0 && trick[1] !== null) || trickSlot0[1].code !== trick[1].card.code)) {
+      setTrickSlot1([
+        generateCard(trick[1].card.code),
+      ]);
+    }
+    if(trick[2] !== undefined && ((trickSlot2.length === 0 && trick[2] !== null) || trickSlot0[2].code !== trick[2].card.code)) {
+      setTrickSlot2([
+        generateCard(trick[2].card.code),
+      ]);
+    }
+    if(trick[3] !== undefined && ((trickSlot3.length === 0 && trick[3] !== null) || trickSlot0[3].code !== trick[3].card.code)) {
+      setTrickSlot3([
+        generateCard(trick[3].card.code),
+      ]);
+    }
+  }
 
   const resetGame = () => { // eslint-disable-line @typescript-eslint/no-unused-vars
     setCardsInHand([]);

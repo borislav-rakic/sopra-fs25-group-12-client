@@ -34,6 +34,10 @@ const MatchTestPage: React.FC = () => {
   const [currentPlayer, setCurrentPlayer] = useState("");
   const [currentGamePhase, setCurrentGamePhase] = useState("");
   const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
+  const [heartsBroken, setHeartsBroken] = useState(false);
+  const [firstCardPlayed, setFirstCardPlayed] = useState(false);
+  const [isFirstRound, setIsFirstRound] = useState(true);
+  const [myTurn, setMyTurn] = useState(false); 
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
@@ -173,7 +177,7 @@ const MatchTestPage: React.FC = () => {
       value: BigInt(card.value),
       flipped: true,
       backimage: resolveCardBackImage(cardback),
-      onClick: () => handlePlayCard(card),
+      onClick: () => {},
     }));
     setCardsInHand(sortCards(updatedHand));
 

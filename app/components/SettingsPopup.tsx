@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "@/styles/settingsPopup.module.css";
 import Image from "next/image";
 
@@ -14,6 +14,7 @@ interface SettingsPopupProps {
 }
 
 const playMatColors = [
+  "#008000",
   "#ec4d40",
   "#57d2e4",
   "#42db83",
@@ -34,6 +35,13 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
 }) => {
   const [oldPlaymat, setOldPlaymat] = useState(playmat);
   const [oldCardback, setOldCardback] = useState(cardback);
+
+  useEffect(() => {
+    if (isOpen) {
+      setOldPlaymat(playmat);
+      setOldCardback(cardback);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -88,7 +96,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
                 className={`${styles.cardbackImage} ${
                   cardback === file ? styles.selected : ""
                 }`}
-                onClick={() => setCardback(file)}
+                onClick={() => setCardback(`/card_back/${file}`)}
               />
             ))}
           </div>
