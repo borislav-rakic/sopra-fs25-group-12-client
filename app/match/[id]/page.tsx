@@ -1238,6 +1238,34 @@ const MatchPage: React.FC = () => {
           </div>
           <div className="game-playerscore">Score: {roundScore[3]}</div>
         </div>
+
+        {cardsToPass.length === 3 && (
+          <button
+            type="button"
+            onClick={handlePassCards}
+            className="pass-cards-button"
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 1000,
+              padding: "20px 40px", // Increased padding for a bigger button
+              fontSize: "1.5rem", // Larger font size
+              backgroundColor: "#d3d3d3", // Light grey background
+              color: "#000", // Black text color
+              border: "none",
+              borderRadius: "10px", // Slightly rounded corners
+              cursor: "pointer",
+              transition: "background-color 0.3s ease", // Smooth transition for hover effect
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1890ff")} // Blue on hover
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#d3d3d3")} // Back to grey
+          >
+            Pass Cards
+          </button>
+        )}
+
       </div>
     </div>
   );
