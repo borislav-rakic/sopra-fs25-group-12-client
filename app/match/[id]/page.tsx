@@ -53,6 +53,7 @@ const MatchPage: React.FC = () => {
   const [firstCardPlayed, setFirstCardPlayed] = useState(false);
   const [isFirstRound, setIsFirstRound] = useState(true);
   const [myTurn, setMyTurn] = useState(false); 
+  const [currentMatchPhase, setCurrentMatchPhase] = useState(""); //eslint-disable-line @typescript-eslint/no-unused-vars
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
@@ -80,12 +81,14 @@ const MatchPage: React.FC = () => {
           setSlot(response.slot);
         } */
        const slot = response.slot || 1; // Default to 1 if slot is not available
+       console.log("Slot:", slot);
 
       /*   if (response.currentTrickLeaderSlot) {
           setTrickLeaderSlot(response.currentTrickLeaderSlot);
         } */
 
         const trickLeaderSlot = response.currentTrickLeaderSlot || 1; // Default to 1 if trickLeaderSlot is not available
+        console.log("Trick Leader Slot:", trickLeaderSlot);
 
         if (response.matchPlayers && response.slot) {
           setPlayers((/* prevPlayers */) => {
@@ -240,6 +243,10 @@ const MatchPage: React.FC = () => {
               //console.log(`Removed ${Math.abs(difference)} cards from opponent3Cards.`);
             }
           }
+        }
+
+        if (response.matchPhase) {
+          setCurrentMatchPhase(response.matchPhase);
         }
 
       } catch (error) {
@@ -583,6 +590,7 @@ const MatchPage: React.FC = () => {
         setTimeout(() => {
           console.log("Clearing trick slots...");
           handleClearTrick();
+
         }, 2500);
       }
     };
@@ -622,19 +630,34 @@ const MatchPage: React.FC = () => {
 
     console.log("Shifted trick array:", tempTrick);
 
-
     // if trick is empty and shouldnt be or if trick is not what it should be, set it to the new trick for trick 0
-    if (tempTrick[0] && (trickSlot0.length === 0 || trickSlot0[0].code !== tempTrick[0])) {
-      setTrickSlot0([generateCard(tempTrick[0])]);
+    if ((tempTrick[0] || tempTrick[0] === "") && (trickSlot0.length === 0 || trickSlot0[0].code !== tempTrick[0])) {
+      if(tempTrick[0]===""){
+        setTrickSlot0([]);
+      } else {
+        setTrickSlot0([generateCard(tempTrick[0])]);
+      }
     }
-    if (tempTrick[1] && (trickSlot1.length === 0 || trickSlot1[0].code !== tempTrick[1])) {
-      setTrickSlot1([generateCard(tempTrick[1])]);
+    if ((tempTrick[1] || tempTrick[1] === "") && (trickSlot1.length === 0 || trickSlot1[0].code !== tempTrick[1])) {
+      if(tempTrick[1]===""){
+        setTrickSlot1([]);
+      } else {
+        setTrickSlot1([generateCard(tempTrick[1])]);
+      }
     }
-    if (tempTrick[2] && (trickSlot2.length === 0 || trickSlot2[0].code !== tempTrick[2])) {
-      setTrickSlot2([generateCard(tempTrick[2])]);
+    if ((tempTrick[2] || tempTrick[2] === "") && (trickSlot2.length === 0 || trickSlot2[0].code !== tempTrick[2])) {
+      if(tempTrick[2]===""){
+        setTrickSlot2([]);
+      } else {
+        setTrickSlot2([generateCard(tempTrick[2])]);
+      }
     }
-    if (tempTrick[3] && (trickSlot3.length === 0 || trickSlot3[0].code !== tempTrick[3])) {
-      setTrickSlot3([generateCard(tempTrick[3])]);
+    if ((tempTrick[3] || tempTrick[3] === "") && (trickSlot3.length === 0 || trickSlot3[0].code !== tempTrick[3])) {
+      if(tempTrick[3]===""){
+        setTrickSlot3([]);
+      } else {
+        setTrickSlot3([generateCard(tempTrick[3])]);
+      }
     }
   };
 /* 

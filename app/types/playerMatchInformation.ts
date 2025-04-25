@@ -19,4 +19,5 @@ export interface PlayerMatchInformation {
   playerPoints: Array<number> | null;
   slot: number | null;
   currentTrickLeaderSlot: number | null;
+  matchPhase: string | null;
 }
