@@ -309,7 +309,7 @@ const MatchPage: React.FC = () => {
         };
         console.log("Payload for playing card:", payload);
   
-        const response = await apiService.post(`/matches/${matchId}/play`, { payload });
+        const response = await apiService.post(`/matches/${matchId}/play`, payload);
   
         console.log("Response from server:", response);
   
