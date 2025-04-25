@@ -18,4 +18,5 @@ export interface PlayerMatchInformation {
   avatarUrls: Array<string | null> | null;
   playerPoints: Array<number> | null;
   slot: number | null;
+  currentTrickLeaderSlot: number | null;
 }

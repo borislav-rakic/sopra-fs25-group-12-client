@@ -58,7 +58,8 @@ const MatchPage: React.FC = () => {
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
 
-  const [slot, setSlot] = useState(0); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [slot, setSlot] = useState(0);
+  const [trickLeaderSlot, setTrickLeaderSlot] = useState(0);
 
   const [isMatchTesterVisible, setIsMatchTesterVisible] = useState(true);
 
@@ -78,6 +79,11 @@ const MatchPage: React.FC = () => {
         if (response.slot) {
           setSlot(response.slot);
         }
+
+        if (response.currentTrickLeaderSlot) {
+          setTrickLeaderSlot(response.currentTrickLeaderSlot);
+        }
+
 
         if (response.matchPlayers) {
           setPlayers((/* prevPlayers */) => {
@@ -158,14 +164,37 @@ const MatchPage: React.FC = () => {
         setHeartsBroken(response.heartsBroken || false);
         setCurrentGamePhase(response.gamePhase || "");
         setMyTurn(response.myTurn || false);
+
+        if(!firstCardPlayed) {
+          if(response.currentTrick?.length !== 0) {
+            setFirstCardPlayed(true);
+          }
+        }
+        console.log("First card is played:", firstCardPlayed);
         
         handleTrickFromLogic(response.currentTrick || []);
        
         //checks number of cards in enemy hands
         if (response.cardsInHandPerPlayer) {
-          const expectedOpponent1Cards = response.cardsInHandPerPlayer[1];
-          const expectedOpponent2Cards = response.cardsInHandPerPlayer[2];
-          const expectedOpponent3Cards = response.cardsInHandPerPlayer[3];
+
+          const cardsInHandArray = [
+            response.cardsInHandPerPlayer["1"] || 0,
+            response.cardsInHandPerPlayer["2"] || 0,
+            response.cardsInHandPerPlayer["3"] || 0,
+            response.cardsInHandPerPlayer["4"] || 0,
+          ];
+        
+          // Shift indices based on the player's slot
+          const shiftedCardsInHand = [
+            cardsInHandArray[(0 + slot - 1 + 4) % 4],
+            cardsInHandArray[(1 + slot - 1 + 4) % 4],
+            cardsInHandArray[(2 + slot - 1 + 4) % 4],
+            cardsInHandArray[(3 + slot - 1 + 4) % 4],
+          ];
+
+          const expectedOpponent1Cards = shiftedCardsInHand[1];
+          const expectedOpponent2Cards = shiftedCardsInHand[2];
+          const expectedOpponent3Cards = shiftedCardsInHand[3];
 
           //console.log("Expected opponent cards:", expectedOpponent1Cards, expectedOpponent2Cards, expectedOpponent3Cards);
           //console.log("Current opponent cards:", opponent1Cards.length, opponent2Cards.length, opponent3Cards.length);
@@ -580,28 +609,33 @@ const MatchPage: React.FC = () => {
 
   const handleTrickFromLogic = (trick: innerCard[]) => {
     console.log("Received trick from logic:", trick);
+    const tempTrick: string[] = ["", "", "", ""];
+    const indexShift = (trickLeaderSlot - slot + 4) % 4;
+
+    trick.forEach((card, index) => {
+      if (card) {
+        const shiftedIndex = (index + indexShift) % 4; 
+        tempTrick[shiftedIndex] = card.code; 
+      }
+    });
+
+    console.log("Shifted trick array:", tempTrick);
+
+
     // if trick is empty and shouldnt be or if trick is not what it should be, set it to the new trick for trick 0
-    if(trick[0] !== undefined && ((trickSlot0.length === 0 && trick[0] !== null) || trickSlot0[0].code !== trick[0].code)) {
-      setTrickSlot0([
-        generateCard(trick[0].code),
-      ]);
+    if (tempTrick[0] && (trickSlot0.length === 0 || trickSlot0[0].code !== tempTrick[0])) {
+      setTrickSlot0([generateCard(tempTrick[0])]);
     }
-    if(trick[1] !== undefined && ((trickSlot1.length === 0 && trick[1] !== null) || trickSlot0[1].code !== trick[1].code)) {
-      setTrickSlot1([
-        generateCard(trick[1].code),
-      ]);
+    if (tempTrick[1] && (trickSlot1.length === 0 || trickSlot1[0].code !== tempTrick[1])) {
+      setTrickSlot1([generateCard(tempTrick[1])]);
     }
-    if(trick[2] !== undefined && ((trickSlot2.length === 0 && trick[2] !== null) || trickSlot0[2].code !== trick[2].code)) {
-      setTrickSlot2([
-        generateCard(trick[2].code),
-      ]);
+    if (tempTrick[2] && (trickSlot2.length === 0 || trickSlot2[0].code !== tempTrick[2])) {
+      setTrickSlot2([generateCard(tempTrick[2])]);
     }
-    if(trick[3] !== undefined && ((trickSlot3.length === 0 && trick[3] !== null) || trickSlot0[3].code !== trick[3].code)) {
-      setTrickSlot3([
-        generateCard(trick[3].code),
-      ]);
+    if (tempTrick[3] && (trickSlot3.length === 0 || trickSlot3[0].code !== tempTrick[3])) {
+      setTrickSlot3([generateCard(tempTrick[3])]);
     }
-  }
+  };
 /* 
   const resetGame = () => {
     setCardsInHand([]);
