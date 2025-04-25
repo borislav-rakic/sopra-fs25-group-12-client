@@ -305,7 +305,7 @@ const MatchPage: React.FC = () => {
         const payload = {
           gameId: matchId,
           playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
-          cardCode: card.code, // Since card in backend is only a string
+          card: card.code, // Since card in backend is only a string
         };
         console.log("Payload for playing card:", payload);
   
