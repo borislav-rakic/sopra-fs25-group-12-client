@@ -58,6 +58,8 @@ const MatchPage: React.FC = () => {
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
 
+  const [slot, setSlot] = useState(0); // eslint-disable-line @typescript-eslint/no-unused-vars
+
   const [isMatchTesterVisible, setIsMatchTesterVisible] = useState(true);
 
   useEffect(() => {
@@ -73,31 +75,69 @@ const MatchPage: React.FC = () => {
 
         console.log(response);
 
+        if (response.slot) {
+          setSlot(response.slot);
+        }
+
         if (response.matchPlayers) {
-          setPlayers(response.matchPlayers);
+          setPlayers((prevPlayers) => {
+            const updatedPlayers = [
+              response.matchPlayers ? response.matchPlayers[(0 + slot - 1) % 4] : null,
+              response.matchPlayers ? response.matchPlayers[(1 + slot - 1) % 4] : null,
+              response.matchPlayers ? response.matchPlayers[(2 + slot - 1) % 4] : null,
+              response.matchPlayers ? response.matchPlayers[(3 + slot - 1) % 4] : null,
+            ];
+            console.log("Previous players:", prevPlayers);
+            console.log("Updated players:", updatedPlayers);
+            return updatedPlayers;
+          });
         }
 
         if (response.avatarUrls) {
-          setPlayerAvatars(response.avatarUrls);
+          setPlayerAvatars((prevAvatars) => {
+            const updatedAvatars = [
+              response.avatarUrls ? response.avatarUrls[(0 + slot - 1) % 4] : null,
+              response.avatarUrls ? response.avatarUrls[(1 + slot - 1) % 4] : null,
+              response.avatarUrls ? response.avatarUrls[(2 + slot - 1) % 4] : null,
+              response.avatarUrls ? response.avatarUrls[(3 + slot - 1) % 4] : null,
+            ];
+            console.log("Previous avatars:", prevAvatars);
+            console.log("Updated avatars:", updatedAvatars);
+            return updatedAvatars;
+          });
         }
 
         if (response.playerPoints) {
-          const updatedMatchScore = [
+          const pointsArray = [
             response.playerPoints["1"] || 0,
             response.playerPoints["2"] || 0,
             response.playerPoints["3"] || 0,
             response.playerPoints["4"] || 0,
           ];
-          setMatchScore(updatedMatchScore);
-        }
-        if (response.playerPoints) {
-          const updatedRoundScore = [
-            response.playerPoints["1"] || 0,
-            response.playerPoints["2"] || 0,
-            response.playerPoints["3"] || 0,
-            response.playerPoints["4"] || 0,
-          ];
-          setRoundScore(updatedRoundScore);
+        
+          setMatchScore((prevMatchScore) => {
+            const updatedMatchScore = [
+              pointsArray[(0 + slot - 1) % 4],
+              pointsArray[(1 + slot - 1) % 4],
+              pointsArray[(2 + slot - 1) % 4],
+              pointsArray[(3 + slot - 1) % 4],
+            ];
+            console.log("Previous match score:", prevMatchScore);
+            console.log("Updated match score:", updatedMatchScore);
+            return updatedMatchScore;
+          });
+
+          setRoundScore((prevRoundScore) => {
+            const updatedRoundScore = [
+              pointsArray[(0 + slot - 1) % 4],
+              pointsArray[(1 + slot - 1) % 4],
+              pointsArray[(2 + slot - 1) % 4],
+              pointsArray[(3 + slot - 1) % 4],
+            ];
+            console.log("Previous round score:", prevRoundScore);
+            console.log("Updated round score:", updatedRoundScore);
+            return updatedRoundScore;
+          });
         }
         
         if (response.playerCards) {
@@ -305,11 +345,11 @@ const MatchPage: React.FC = () => {
         const payload = {
           gameId: matchId,
           playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
-          cardCode: card.code, // Since card in backend is only a string
+          card: card.code, // Since card in backend is only a string
         };
         console.log("Payload for playing card:", payload);
   
-        const response = await apiService.post(`/matches/${matchId}/play`, { payload });
+        const response = await apiService.post(`/matches/${matchId}/play`, payload);
   
         console.log("Response from server:", response);
   

@@ -17,4 +17,5 @@ export interface PlayerMatchInformation {
   heartsBroken: boolean | null;
   avatarUrls: Array<string | null> | null;
   playerPoints: Array<number> | null;
+  slot: number | null;
 }
