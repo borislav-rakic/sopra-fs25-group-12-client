@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { PlayerMatchInformation } from "@/types/playerMatchInformation";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
-import { innerCard, PlayerCard } from "@/types/playerCard";
+import { innerCard} from "@/types/playerCard";
 
 const MatchPage: React.FC = () => {
   //const router = useRouter();
