@@ -58,6 +58,8 @@ const MatchPage: React.FC = () => {
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
 
+  const [isMatchTesterVisible, setIsMatchTesterVisible] = useState(true);
+
   useEffect(() => {
     // This function runs every 5 seconds to receive the current match information.
     const matchRefreshIntervalId = setInterval(async () => {
@@ -603,427 +605,438 @@ const MatchPage: React.FC = () => {
         setCardback={setCardback}
       />
 
-      <div
-        className="matchtester"
-        draggable
-        style={{
-          width: "100px",
-          height: "100px",
-          position: "absolute",
-          top: "100px",
-          left: "10px",
-        }}
-      >
-        <Button
-          onClick={() =>
-            setCardsInHand([
-              ...cardsInHand, // Keep the existing cards
-              {
-                code: "2H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(2),
-                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
-                flipped: true,
-                backimage: cardback,
-                onClick: () => {},
-              },
-            ])}
-        >
-          test
-        </Button>
-
-        <Button
-          onClick={() =>
-            setOpponent1Cards([
-              ...opponent1Cards, // Keep the existing cards
-              {
-                code: "2H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(2),
-                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-            ])}
-        >
-          testAddOpponent1Card
-        </Button>
-
-        <Button
-          onClick={() =>
-            setOpponent2Cards([
-              ...opponent2Cards, // Keep the existing cards
-              {
-                code: "2H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(2),
-                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-            ])}
-        >
-          testAddOpponent2Card
-        </Button>
-
-        <Button
-          onClick={() =>
-            setOpponent3Cards([
-              ...opponent3Cards, // Keep the existing cards
-              {
-                code: "2H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(2),
-                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-            ])}
-        >
-          testAddOpponent3Card
-        </Button>
-
-        <Button
-          onClick={() =>
-            setTrickSlot1([
-              {
-                code: "2H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(2),
-                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-            ])}
-        >
-          testAddTrick1Card
-        </Button>
-
-        <Button
-          onClick={() =>
-            setTrickSlot2([
-              {
-                code: "4H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(4),
-                image: "https://deckofcardsapi.com/static/img/4H.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-            ])}
-        >
-          testAddTrick2Card
-        </Button>
-
-        <Button
-          onClick={() =>
-            setTrickSlot3([
-              {
-                code: "3H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(3),
-                image: "https://deckofcardsapi.com/static/img/3H.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-            ])}
-        >
-          testAddTrick3Card
-        </Button>
-
-        <Button
-          onClick={() =>
-            setTrickSlot0([
-              {
-                code: "5S", // Example: Two of Hearts
-                suit: "Spades",
-                value: BigInt(5),
-                image: "https://deckofcardsapi.com/static/img/5S.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-            ])}
-        >
-          testAddTrick0Card
-        </Button>
-
-        <Button
-          onClick={() => handleClearTrick()}
-        >
-          EmptyTrick
-        </Button>
-
-        <Button
-          onClick={() =>
-            setCardsInHand([
-              {
-                code: "2H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(2),
-                image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-              {
-                code: "5H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(5),
-                image: "https://deckofcardsapi.com/static/img/5H.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-              {
-                code: "2C", // Example: Two of Hearts
-                suit: "Clubs",
-                value: BigInt(2),
-                image: "https://deckofcardsapi.com/static/img/2C.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-              {
-                code: "QS", // Example: Two of Hearts
-                suit: "Spades",
-                value: BigInt(12),
-                image: "https://deckofcardsapi.com/static/img/QS.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-              {
-                code: "3H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(3),
-                image: "https://deckofcardsapi.com/static/img/3H.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-              {
-                code: "4H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(4),
-                image: "https://deckofcardsapi.com/static/img/4H.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-              {
-                code: "7S", // Example: Two of Hearts
-                suit: "Spades",
-                value: BigInt(7),
-                image: "https://deckofcardsapi.com/static/img/7S.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-              {
-                code: "6H", // Example: Two of Hearts
-                suit: "Hearts",
-                value: BigInt(6),
-                image: "https://deckofcardsapi.com/static/img/6H.png", // Example image URL
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-              {
-                code: "7C",
-                suit: "Clubs",
-                value: BigInt(7),
-                image: "https://deckofcardsapi.com/static/img/7C.png",
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-              {
-                code: "3C",
-                suit: "Clubs",
-                value: BigInt(3),
-                image: "https://deckofcardsapi.com/static/img/3C.png",
-                flipped: false,
-                backimage: cardback,
-                onClick: (code: string) => {
-                  console.log(`Card clicked: ${code}`);
-                },
-              },
-            ])}
-        >
-          testAddVariousCards
-        </Button>
-
-        <Button
-          onClick={() => {
-            setCurrentGamePhase("passing");
-            console.log("Game phase set to passing");
+      {isMatchTesterVisible && (
+        <div
+          className="matchtester"
+          draggable
+          style={{
+            width: "100px",
+            height: "100px",
+            position: "absolute",
+            top: "100px",
+            left: "10px",
           }}
         >
-          setGamePhasePassing
-        </Button>
+          <Button
+            onClick={() =>
+              setCardsInHand([
+                ...cardsInHand, // Keep the existing cards
+                {
+                  code: "2H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(2),
+                  image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                  flipped: true,
+                  backimage: cardback,
+                  onClick: () => {},
+                },
+              ])}
+          >
+            test
+          </Button>
 
-        <Button
+          <Button
+            onClick={() =>
+              setOpponent1Cards([
+                ...opponent1Cards, // Keep the existing cards
+                {
+                  code: "2H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(2),
+                  image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+              ])}
+          >
+            testAddOpponent1Card
+          </Button>
+
+          <Button
+            onClick={() =>
+              setOpponent2Cards([
+                ...opponent2Cards, // Keep the existing cards
+                {
+                  code: "2H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(2),
+                  image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+              ])}
+          >
+            testAddOpponent2Card
+          </Button>
+
+          <Button
+            onClick={() =>
+              setOpponent3Cards([
+                ...opponent3Cards, // Keep the existing cards
+                {
+                  code: "2H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(2),
+                  image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+              ])}
+          >
+            testAddOpponent3Card
+          </Button>
+
+          <Button
+            onClick={() =>
+              setTrickSlot1([
+                {
+                  code: "2H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(2),
+                  image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+              ])}
+          >
+            testAddTrick1Card
+          </Button>
+
+          <Button
+            onClick={() =>
+              setTrickSlot2([
+                {
+                  code: "4H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(4),
+                  image: "https://deckofcardsapi.com/static/img/4H.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+              ])}
+          >
+            testAddTrick2Card
+          </Button>
+
+          <Button
+            onClick={() =>
+              setTrickSlot3([
+                {
+                  code: "3H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(3),
+                  image: "https://deckofcardsapi.com/static/img/3H.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+              ])}
+          >
+            testAddTrick3Card
+          </Button>
+
+          <Button
+            onClick={() =>
+              setTrickSlot0([
+                {
+                  code: "5S", // Example: Two of Hearts
+                  suit: "Spades",
+                  value: BigInt(5),
+                  image: "https://deckofcardsapi.com/static/img/5S.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+              ])}
+          >
+            testAddTrick0Card
+          </Button>
+
+          <Button
+            onClick={() => handleClearTrick()}
+          >
+            EmptyTrick
+          </Button>
+
+          <Button
+            onClick={() =>
+              setCardsInHand([
+                {
+                  code: "2H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(2),
+                  image: "https://deckofcardsapi.com/static/img/2H.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+                {
+                  code: "5H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(5),
+                  image: "https://deckofcardsapi.com/static/img/5H.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+                {
+                  code: "2C", // Example: Two of Hearts
+                  suit: "Clubs",
+                  value: BigInt(2),
+                  image: "https://deckofcardsapi.com/static/img/2C.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+                {
+                  code: "QS", // Example: Two of Hearts
+                  suit: "Spades",
+                  value: BigInt(12),
+                  image: "https://deckofcardsapi.com/static/img/QS.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+                {
+                  code: "3H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(3),
+                  image: "https://deckofcardsapi.com/static/img/3H.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+                {
+                  code: "4H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(4),
+                  image: "https://deckofcardsapi.com/static/img/4H.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+                {
+                  code: "7S", // Example: Two of Hearts
+                  suit: "Spades",
+                  value: BigInt(7),
+                  image: "https://deckofcardsapi.com/static/img/7S.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+                {
+                  code: "6H", // Example: Two of Hearts
+                  suit: "Hearts",
+                  value: BigInt(6),
+                  image: "https://deckofcardsapi.com/static/img/6H.png", // Example image URL
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+                {
+                  code: "7C",
+                  suit: "Clubs",
+                  value: BigInt(7),
+                  image: "https://deckofcardsapi.com/static/img/7C.png",
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+                {
+                  code: "3C",
+                  suit: "Clubs",
+                  value: BigInt(3),
+                  image: "https://deckofcardsapi.com/static/img/3C.png",
+                  flipped: false,
+                  backimage: cardback,
+                  onClick: (code: string) => {
+                    console.log(`Card clicked: ${code}`);
+                  },
+                },
+              ])}
+          >
+            testAddVariousCards
+          </Button>
+
+          <Button
+            onClick={() => {
+              setCurrentGamePhase("passing");
+              console.log("Game phase set to passing");
+            }}
+          >
+            setGamePhasePassing
+          </Button>
+
+          <Button
+            onClick={() => {
+              setCurrentGamePhase("playing");
+              console.log("Game phase set to playing");
+            }}
+          >
+            setGamePhasePlaying
+          </Button>
+
+          <Button
+            onClick={() => {
+              setCurrentPlayer("User1");
+              console.log("Player set to User1");
+            }}
+          >
+            setPlayerUser1
+          </Button>
+
+          <Button
+            onClick={() => console.log("current cardsToPass: ", cardsToPass)}
+          >
+            logCardsToPass
+          </Button>
+
+          <Button
+            onClick={() => {
+              handlePassCards();
+            }}
+          >
+            PassCardsToOpponent
+          </Button>
+
+          <Button
+            onClick={() => {
+              setOpponentToPassTo("Opponent1");
+              console.log("Opponent to pass to set to Opponent1");
+            }}
+          >
+            SetOpponentToPassTo1
+          </Button>
+
+          <Button
+            onClick={() => {
+              setOpponentToPassTo("Opponent2");
+              console.log("Opponent to pass to set to Opponent2");
+            }}
+          >
+            SetOpponentToPassTo2
+          </Button>
+
+          <Button
+            onClick={() => {
+              setOpponentToPassTo("Opponent3");
+              console.log("Opponent to pass to set to Opponent3");
+            }}
+          >
+            SetOpponentToPassTo3
+          </Button>
+
+          <Button
+            onClick={() => {
+              setCurrentTrick("");
+              console.log("Current trick set to empty");
+            }}
+          >
+            SetTrickEmpty
+          </Button>
+
+          <Button
+            onClick={() => {
+              setCurrentTrick("Hearts");
+              console.log("Current trick set to Hearts");
+            }}
+          >
+            SetTrickHearts
+          </Button>
+
+          <Button
+            onClick={() => {
+              setCurrentTrick("Spades");
+              console.log("Current trick set to Spades");
+            }}
+          >
+            SetTrickSpades
+          </Button>
+
+          <Button
+            onClick={() => {
+              setHeartsBroken(!heartsBroken);
+              console.log("Hearts broken set to: ", heartsBroken);
+            }}
+          >
+            ToggleHeartsBroken
+          </Button>
+
+          <Button
+            onClick={() => {
+              setIsFirstRound(!isFirstRound);
+              console.log("Set isFirstRound: ", isFirstRound);
+            }}
+          >
+            ToggleIsFirstRound
+          </Button>
+
+          <Button
+            onClick={() => {
+              setFirstCardPlayed(!firstCardPlayed);
+              console.log("Set FirstCardPlayed: ", firstCardPlayed);
+            }}
+          >
+            ToggleIsFirstCard
+          </Button>
+            
+          <Button
           onClick={() => {
-            setCurrentGamePhase("playing");
-            console.log("Game phase set to playing");
+            calculateTrickWinner();
           }}
-        >
-          setGamePhasePlaying
-        </Button>
+          >
+          CalculateTrickWinner
+          </Button>
 
-        <Button
-          onClick={() => {
-            setCurrentPlayer("User1");
-            console.log("Player set to User1");
-          }}
-        >
-          setPlayerUser1
-        </Button>
-
-        <Button
-          onClick={() => console.log("current cardsToPass: ", cardsToPass)}
-        >
-          logCardsToPass
-        </Button>
-
-        <Button
-          onClick={() => {
-            handlePassCards();
-          }}
-        >
-          PassCardsToOpponent
-        </Button>
-
-        <Button
-          onClick={() => {
-            setOpponentToPassTo("Opponent1");
-            console.log("Opponent to pass to set to Opponent1");
-          }}
-        >
-          SetOpponentToPassTo1
-        </Button>
-
-        <Button
-          onClick={() => {
-            setOpponentToPassTo("Opponent2");
-            console.log("Opponent to pass to set to Opponent2");
-          }}
-        >
-          SetOpponentToPassTo2
-        </Button>
-
-        <Button
-          onClick={() => {
-            setOpponentToPassTo("Opponent3");
-            console.log("Opponent to pass to set to Opponent3");
-          }}
-        >
-          SetOpponentToPassTo3
-        </Button>
-
-        <Button
-          onClick={() => {
-            setCurrentTrick("");
-            console.log("Current trick set to empty");
-          }}
-        >
-          SetTrickEmpty
-        </Button>
-
-        <Button
-          onClick={() => {
-            setCurrentTrick("Hearts");
-            console.log("Current trick set to Hearts");
-          }}
-        >
-          SetTrickHearts
-        </Button>
-
-        <Button
-          onClick={() => {
-            setCurrentTrick("Spades");
-            console.log("Current trick set to Spades");
-          }}
-        >
-          SetTrickSpades
-        </Button>
-
-        <Button
-          onClick={() => {
-            setHeartsBroken(!heartsBroken);
-            console.log("Hearts broken set to: ", heartsBroken);
-          }}
-        >
-          ToggleHeartsBroken
-        </Button>
-
-        <Button
-          onClick={() => {
-            setIsFirstRound(!isFirstRound);
-            console.log("Set isFirstRound: ", isFirstRound);
-          }}
-        >
-          ToggleIsFirstRound
-        </Button>
-
-        <Button
-          onClick={() => {
-            setFirstCardPlayed(!firstCardPlayed);
-            console.log("Set FirstCardPlayed: ", firstCardPlayed);
-          }}
-        >
-          ToggleIsFirstCard
-        </Button>
-          
-        <Button
-        onClick={() => {
-          calculateTrickWinner();
-        }}
-        >
-        CalculateTrickWinner
-        </Button>
-
-      </div>
-
+          <Button
+      onClick={() => {
+        setIsMatchTesterVisible(false); // Hide the matchtester
+        setTimeout(() => {
+          setIsMatchTesterVisible(true); // Show it again after 10 seconds
+        }, 10000); // 10 seconds
+      }}
+    >
+      Hide MatchTester
+    </Button>
+        </div>
+      )}  
       <div className="gameboard">
         <div className="score-table">
           <table>
