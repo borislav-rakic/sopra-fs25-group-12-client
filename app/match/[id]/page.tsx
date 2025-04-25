@@ -58,8 +58,8 @@ const MatchPage: React.FC = () => {
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
 
-  const [slot, setSlot] = useState(0);
-  const [trickLeaderSlot, setTrickLeaderSlot] = useState(0);
+  //const [slot, setSlot] = useState(1);
+  //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
 
   const [isMatchTesterVisible, setIsMatchTesterVisible] = useState(true);
 
@@ -76,16 +76,18 @@ const MatchPage: React.FC = () => {
 
         console.log(response);
 
-        if (response.slot) {
+       /*  if (response.slot) {
           setSlot(response.slot);
-        }
+        } */
+       const slot = response.slot || 1; // Default to 1 if slot is not available
 
-        if (response.currentTrickLeaderSlot) {
+      /*   if (response.currentTrickLeaderSlot) {
           setTrickLeaderSlot(response.currentTrickLeaderSlot);
-        }
+        } */
 
+        const trickLeaderSlot = response.currentTrickLeaderSlot || 1; // Default to 1 if trickLeaderSlot is not available
 
-        if (response.matchPlayers) {
+        if (response.matchPlayers && response.slot) {
           setPlayers((/* prevPlayers */) => {
             const updatedPlayers = [
               response.matchPlayers ? response.matchPlayers[(0 + slot - 1) % 4] : null,
@@ -172,7 +174,7 @@ const MatchPage: React.FC = () => {
         }
         console.log("First card is played:", firstCardPlayed);
         
-        handleTrickFromLogic(response.currentTrick || []);
+        handleTrickFromLogic(response.currentTrick || [], slot, trickLeaderSlot); // Pass the current trick to the function
        
         //checks number of cards in enemy hands
         if (response.cardsInHandPerPlayer) {
@@ -254,6 +256,7 @@ const MatchPage: React.FC = () => {
       console.log("Interval cleared.");
     };
   }, [apiService, matchId]);
+
 
   const generateCard = (code : string)  => {
 
@@ -373,7 +376,6 @@ const MatchPage: React.FC = () => {
       try {
         const payload = {
           gameId: matchId,
-          playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
           card: card.code, // Since card in backend is only a string
         };
         console.log("Payload for playing card:", payload);
@@ -473,7 +475,6 @@ const MatchPage: React.FC = () => {
 
       const payload = {
         gameId: matchId,
-        playerId: 4, // Currently the frontend has no way of knowing the playerId, so we set it to 4 for now and test with User1.
         cards: cardsToPass.map((card) => card.code), // Send only the card codes
       };
       console.log("Payload for passing cards:", payload);
@@ -607,7 +608,7 @@ const MatchPage: React.FC = () => {
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
 
-  const handleTrickFromLogic = (trick: innerCard[]) => {
+  const handleTrickFromLogic = (trick: innerCard[], slot: number, trickLeaderSlot: number) => {
     console.log("Received trick from logic:", trick);
     const tempTrick: string[] = ["", "", "", ""];
     const indexShift = (trickLeaderSlot - slot + 4) % 4;
