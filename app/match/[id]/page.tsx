@@ -88,6 +88,15 @@ const MatchPage: React.FC = () => {
           ];
           setMatchScore(updatedMatchScore);
         }
+        if (response.playerPoints) {
+          const updatedRoundScore = [
+            response.playerPoints["1"] || 0,
+            response.playerPoints["2"] || 0,
+            response.playerPoints["3"] || 0,
+            response.playerPoints["4"] || 0,
+          ];
+          setRoundScore(updatedRoundScore);
+        }
         
         if (response.playerCards) {
           response.playerCards.forEach((item) => {
@@ -325,6 +334,7 @@ const MatchPage: React.FC = () => {
         setCardsInHand(updatedCardsInHand);
         setTrickSlot0(updatedTrick0);
         setCurrentPlayer(players[1] || ""); // Set the next player to play
+        console.log("Current player:", currentPlayer);
       } catch (error) {
         console.error("Error playing card:", error);
       }
@@ -480,7 +490,7 @@ const MatchPage: React.FC = () => {
 
   useEffect(() => {
     // Function to check if all trick slots contain a card
-    const checkAndHandleTrick = async () => {
+    const checkAndHandleTrick = () => {
       if (
         trickSlot0.length > 0 &&
         trickSlot1.length > 0 &&
@@ -550,8 +560,8 @@ const MatchPage: React.FC = () => {
       ]);
     }
   }
-
-  const resetGame = () => { // eslint-disable-line @typescript-eslint/no-unused-vars
+/* 
+  const resetGame = () => {
     setCardsInHand([]);
     setOpponent1Cards([]);
     setOpponent2Cards([]);
@@ -569,7 +579,7 @@ const MatchPage: React.FC = () => {
     setFirstCardPlayed(false);
     setIsFirstRound(true);
   }
-
+ */
   return (
     <div className={`${styles.page} matchPage`}>
       <div className="gear-icon">
@@ -595,7 +605,7 @@ const MatchPage: React.FC = () => {
 
       <div
         className="matchtester"
-        draggable={true}
+        draggable
         style={{
           width: "100px",
           height: "100px",
@@ -1053,7 +1063,7 @@ const MatchPage: React.FC = () => {
               value={card.value}
               image={card.image}
               backimage={cardback}
-              flipped={true}
+              flipped
               onClick={() => handlePlayCard(card)}
               isSelected={cardsToPass.some((c) => c.code === card.code)}
             />
@@ -1115,7 +1125,7 @@ const MatchPage: React.FC = () => {
                 value={card.value}
                 image={card.image}
                 backimage={cardback}
-                flipped={true}
+                flipped
                 onClick={card.onClick}
               />
             ))}
@@ -1130,7 +1140,7 @@ const MatchPage: React.FC = () => {
                 value={card.value}
                 image={card.image}
                 backimage={cardback}
-                flipped={true}
+                flipped
                 onClick={card.onClick}
               />
             ))}
@@ -1144,7 +1154,7 @@ const MatchPage: React.FC = () => {
                 value={card.value}
                 image={card.image}
                 backimage={cardback}
-                flipped={true}
+                flipped
                 onClick={card.onClick}
               />
             ))}
@@ -1158,7 +1168,7 @@ const MatchPage: React.FC = () => {
                 value={card.value}
                 image={card.image}
                 backimage={cardback}
-                flipped={true}
+                flipped
                 onClick={card.onClick}
               />
             ))}

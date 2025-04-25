@@ -62,7 +62,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
   return (
     <div className={styles.settingsPopupOverlay}>
       <div className={styles.settingsPopup}>
-        <button className={styles.closeButton} onClick={handleCancel}>
+        <button type="button" className={styles.closeButton} onClick={handleCancel}>
           ✖
         </button>
         <h2>Settings</h2>
@@ -101,7 +101,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
             ))}
           </div>
         </div>
-        <button className={styles.settingsApply} onClick={handleApply}>
+        <button type="button" className={styles.settingsApply} onClick={handleApply}>
           Apply
         </button>
       </div>

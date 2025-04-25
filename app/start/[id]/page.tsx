@@ -760,7 +760,7 @@ const StartPage: React.FC = () => {
       <Modal
         key={request.userId}
         title={`Join Request`}
-        open={true}
+        open
         onOk={() => handleAcceptJoin(Number(request.userId), Number(gameId))}
         onCancel={() =>
           handleDeclineJoin(Number(request.userId), Number(gameId))}

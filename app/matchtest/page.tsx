@@ -393,7 +393,7 @@ const MatchTestPage: React.FC = () => {
 
       <div
         className="matchtester"
-        draggable={true}
+        draggable
         style={{
           width: "100px",
           height: "100px",
@@ -443,7 +443,7 @@ const MatchTestPage: React.FC = () => {
               value={card.value}
               image={card.image}
               backimage={cardback}
-              flipped={true}
+              flipped
               onClick={() => handlePlayCard(card)}
               isSelected={cardsToPass.some((c) => c.code === card.code)}
             />
@@ -505,7 +505,7 @@ const MatchTestPage: React.FC = () => {
                 value={card.value}
                 image={card.image}
                 backimage={cardback}
-                flipped={true}
+                flipped
                 onClick={card.onClick}
               />
             ))}
@@ -520,7 +520,7 @@ const MatchTestPage: React.FC = () => {
                 value={card.value}
                 image={card.image}
                 backimage={cardback}
-                flipped={true}
+                flipped
                 onClick={card.onClick}
               />
             ))}
@@ -534,7 +534,7 @@ const MatchTestPage: React.FC = () => {
                 value={card.value}
                 image={card.image}
                 backimage={cardback}
-                flipped={true}
+                flipped
                 onClick={card.onClick}
               />
             ))}
@@ -548,7 +548,7 @@ const MatchTestPage: React.FC = () => {
                 value={card.value}
                 image={card.image}
                 backimage={cardback}
-                flipped={true}
+                flipped
                 onClick={card.onClick}
               />
             ))}
@@ -618,7 +618,7 @@ const MatchTestPage: React.FC = () => {
           </div>
           <div className="game-playerscore">Score: 25</div>
         </div>
-        <button
+        <button type="button"
           onClick={() => {
             console.log("Button clicked!");
             fetchMatchLogic();
