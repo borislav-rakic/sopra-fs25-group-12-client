@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { PlayerMatchInformation } from "@/types/playerMatchInformation";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
-import { PlayerCard } from "@/types/playerCard";
+import { innerCard, PlayerCard } from "@/types/playerCard";
 
 const MatchPage: React.FC = () => {
   //const router = useRouter();
@@ -80,29 +80,29 @@ const MatchPage: React.FC = () => {
         }
 
         if (response.matchPlayers) {
-          setPlayers((prevPlayers) => {
+          setPlayers((/* prevPlayers */) => {
             const updatedPlayers = [
               response.matchPlayers ? response.matchPlayers[(0 + slot - 1) % 4] : null,
               response.matchPlayers ? response.matchPlayers[(1 + slot - 1) % 4] : null,
               response.matchPlayers ? response.matchPlayers[(2 + slot - 1) % 4] : null,
               response.matchPlayers ? response.matchPlayers[(3 + slot - 1) % 4] : null,
             ];
-            console.log("Previous players:", prevPlayers);
-            console.log("Updated players:", updatedPlayers);
+            //console.log("Previous players:", prevPlayers);
+            //console.log("Updated players:", updatedPlayers);
             return updatedPlayers;
           });
         }
 
         if (response.avatarUrls) {
-          setPlayerAvatars((prevAvatars) => {
+          setPlayerAvatars((/* prevAvatars */) => {
             const updatedAvatars = [
               response.avatarUrls ? response.avatarUrls[(0 + slot - 1) % 4] : null,
               response.avatarUrls ? response.avatarUrls[(1 + slot - 1) % 4] : null,
               response.avatarUrls ? response.avatarUrls[(2 + slot - 1) % 4] : null,
               response.avatarUrls ? response.avatarUrls[(3 + slot - 1) % 4] : null,
             ];
-            console.log("Previous avatars:", prevAvatars);
-            console.log("Updated avatars:", updatedAvatars);
+            //console.log("Previous avatars:", prevAvatars);
+            //console.log("Updated avatars:", updatedAvatars);
             return updatedAvatars;
           });
         }
@@ -115,27 +115,27 @@ const MatchPage: React.FC = () => {
             response.playerPoints["4"] || 0,
           ];
         
-          setMatchScore((prevMatchScore) => {
+          setMatchScore((/* prevMatchScore */) => {
             const updatedMatchScore = [
               pointsArray[(0 + slot - 1) % 4],
               pointsArray[(1 + slot - 1) % 4],
               pointsArray[(2 + slot - 1) % 4],
               pointsArray[(3 + slot - 1) % 4],
             ];
-            console.log("Previous match score:", prevMatchScore);
-            console.log("Updated match score:", updatedMatchScore);
+            //console.log("Previous match score:", prevMatchScore);
+            //console.log("Updated match score:", updatedMatchScore);
             return updatedMatchScore;
           });
 
-          setRoundScore((prevRoundScore) => {
+          setRoundScore((/* prevRoundScore */) => {
             const updatedRoundScore = [
               pointsArray[(0 + slot - 1) % 4],
               pointsArray[(1 + slot - 1) % 4],
               pointsArray[(2 + slot - 1) % 4],
               pointsArray[(3 + slot - 1) % 4],
             ];
-            console.log("Previous round score:", prevRoundScore);
-            console.log("Updated round score:", updatedRoundScore);
+            //console.log("Previous round score:", prevRoundScore);
+            //console.log("Updated round score:", updatedRoundScore);
             return updatedRoundScore;
           });
         }
@@ -330,7 +330,7 @@ const MatchPage: React.FC = () => {
       } else {
         console.log("You may not pass more than 3 cards.");
       }
-    } else if (currentGamePhase === "PLAYING" || currentGamePhase === "FIRSTROUND") {
+    } else if (currentGamePhase === "NORMALROUND" || currentGamePhase === "FIRSTROUND" || currentGamePhase === "FINALROUND") {
       if (!myTurn) {
         console.log("You may not play cards while it is not your turn.");
         return;
@@ -578,27 +578,27 @@ const MatchPage: React.FC = () => {
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
 
-  const handleTrickFromLogic = (trick: PlayerCard[]) => {
+  const handleTrickFromLogic = (trick: innerCard[]) => {
     console.log("Received trick from logic:", trick);
     // if trick is empty and shouldnt be or if trick is not what it should be, set it to the new trick for trick 0
-    if(trick[0] !== undefined && ((trickSlot0.length === 0 && trick[0] !== null) || trickSlot0[0].code !== trick[0].card.code)) {
+    if(trick[0] !== undefined && ((trickSlot0.length === 0 && trick[0] !== null) || trickSlot0[0].code !== trick[0].code)) {
       setTrickSlot0([
-        generateCard(trick[0].card.code),
+        generateCard(trick[0].code),
       ]);
     }
-    if(trick[1] !== undefined && ((trickSlot1.length === 0 && trick[1] !== null) || trickSlot0[1].code !== trick[1].card.code)) {
+    if(trick[1] !== undefined && ((trickSlot1.length === 0 && trick[1] !== null) || trickSlot0[1].code !== trick[1].code)) {
       setTrickSlot1([
-        generateCard(trick[1].card.code),
+        generateCard(trick[1].code),
       ]);
     }
-    if(trick[2] !== undefined && ((trickSlot2.length === 0 && trick[2] !== null) || trickSlot0[2].code !== trick[2].card.code)) {
+    if(trick[2] !== undefined && ((trickSlot2.length === 0 && trick[2] !== null) || trickSlot0[2].code !== trick[2].code)) {
       setTrickSlot2([
-        generateCard(trick[2].card.code),
+        generateCard(trick[2].code),
       ]);
     }
-    if(trick[3] !== undefined && ((trickSlot3.length === 0 && trick[3] !== null) || trickSlot0[3].code !== trick[3].card.code)) {
+    if(trick[3] !== undefined && ((trickSlot3.length === 0 && trick[3] !== null) || trickSlot0[3].code !== trick[3].code)) {
       setTrickSlot3([
-        generateCard(trick[3].card.code),
+        generateCard(trick[3].code),
       ]);
     }
   }

@@ -1,4 +1,4 @@
-import { PlayerCard } from "../types/playerCard";
+import { innerCard, PlayerCard } from "../types/playerCard";
 
 export interface PlayerMatchInformation {
   aiPlayers: Array<number> | null;
@@ -12,7 +12,7 @@ export interface PlayerMatchInformation {
   isMatchFinished: boolean | null;
   myTurn: boolean | null;
   cardsInHandPerPlayer: Array<number> | null;
-  currentTrick: Array<PlayerCard> | null;
+  currentTrick: Array<innerCard> | null;
   gamePhase: string | null;
   heartsBroken: boolean | null;
   avatarUrls: Array<string | null> | null;
