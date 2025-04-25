@@ -1115,6 +1115,11 @@ const MatchPage: React.FC = () => {
           ))}
         </div>
 
+        <div className="hand-0-extension"></div>
+        <div className="hand-1-extension"></div>
+        <div className="hand-2-extension"></div>
+        <div className="hand-3-extension"></div>
+
         <div className="pile">
           <div className="playingcard-pile-0">
             {trickSlot0.map((card, index) => (

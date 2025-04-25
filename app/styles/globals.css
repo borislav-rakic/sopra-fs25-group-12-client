@@ -284,9 +284,9 @@ a {
   border: 0px solid white;
   position: absolute;
   z-index: 10;
-  width: 50%;
+  width: 43%;
   height: 20%;
-  background-color: rgba(122, 122, 122, 0.742);
+  background-color: rgb(122, 122, 122);
   border-radius: 6px;
   top: 75%;
   left: 25%;
@@ -297,13 +297,25 @@ a {
   justify-content: center;
 }
 
+.hand-0-extension {
+  border: 0px solid white;
+  position: absolute;
+  z-index: 0;
+  width: 50%;
+  height: 20%;
+  background-color: rgb(122, 122, 122);
+  border-radius: 6px;
+  top: 75%;
+  left: 25%;
+}
+
 .hand-1 {
   border: 0px solid white;
   position: absolute;
   z-index: 10;
-  width: 50%;
+  width: 43%;
   height: 20%;
-  background-color: rgba(122, 122, 122, 0.742);
+  background-color: rgb(122, 122, 122);
   border-radius: 6px;
   left: 25%;
   top: 25%;
@@ -317,15 +329,29 @@ a {
   justify-content: center;
 }
 
+.hand-1-extension {
+  border: 0px solid white;
+  position: absolute;
+  z-index: 0;
+  width: 50%;
+  height: 20%;
+  background-color: rgb(122, 122, 122);
+  border-radius: 6px;
+  left: 25%;
+  top: 25%;
+  transform: rotate(90deg);
+  transform-origin: top left;
+}
+
 .hand-2 {
   border: 0px solid white;
   position: absolute;
   z-index: 10;
-  width: 50%;
+  width: 43%;
   height: 20%;
-  background-color: rgba(122, 122, 122, 0.742);
+  background-color: rgb(122, 122, 122);
   border-radius: 6px;
-  left: 25%;
+  right: 25%;
   top: 5%;
   transform: rotate(180deg);
   text-align: left;
@@ -336,13 +362,26 @@ a {
   justify-content: center;
 }
 
+.hand-2-extension {
+  border: 0px solid white;
+  position: absolute;
+  z-index: 0;
+  width: 50%;
+  height: 20%;
+  background-color: rgb(122, 122, 122);
+  border-radius: 6px;
+  right: 25%;
+  top: 5%;
+  transform: rotate(180deg);
+}
+
 .hand-3 {
   border: 0px solid white;
   position: absolute;
   z-index: 10;
-  width: 50%;
+  width: 43%;
   height: 20%;
-  background-color: rgba(122, 122, 122, 0.742);
+  background-color: rgb(122, 122, 122);
   border-radius: 6px;
   left: 75%;
   top: 75%;
@@ -354,6 +393,20 @@ a {
   grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
   align-items: center; /* Center child elements vertically */
   justify-content: center;
+}
+
+.hand-3-extension {
+  border: 0px solid white;
+  position: absolute;
+  z-index: 0;
+  width: 50%;
+  height: 20%;
+  background-color: rgb(122, 122, 122);
+  border-radius: 6px;
+  left: 75%;
+  top: 75%;
+  transform: rotate(270deg);
+  transform-origin: top left;
 }
 
 .playingcard {
