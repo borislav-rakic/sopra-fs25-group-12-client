@@ -53,7 +53,7 @@ const MatchPage: React.FC = () => {
   const [firstCardPlayed, setFirstCardPlayed] = useState(false);
   const [isFirstRound, setIsFirstRound] = useState(true);
   const [myTurn, setMyTurn] = useState(false); 
-  const [currentMatchPhase, setCurrentMatchPhase] = useState(""); //eslint-disable-line @typescript-eslint/no-unused-vars
+  //const [currentMatchPhase, setCurrentMatchPhase] = useState("");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
@@ -245,9 +245,9 @@ const MatchPage: React.FC = () => {
           }
         }
 
-        if (response.matchPhase) {
+/*         if (response.matchPhase) {
           setCurrentMatchPhase(response.matchPhase);
-        }
+        } */
 
       } catch (error) {
         console.error(
