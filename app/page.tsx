@@ -66,43 +66,53 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-      <div className='contentContainer'>
-        <Image
-          src="/LandingPageCards.png" // Replace with the actual path of your image
-          alt="Hearts Attack Cards"
-          width={275} // Adjust width as needed
-          height={225} // Adjust height as needed
-          className={styles.cardImage} // Add styling as needed in CSS
-        />
+        <div className="contentContainer">
+          <Image
+            src="/LandingPageCards.png" // Replace with the actual path of your image
+            alt="Hearts Attack Cards"
+            width={275} // Adjust width as needed
+            height={225} // Adjust height as needed
+            className={styles.cardImage} // Add styling as needed in CSS
+          />
 
-        <h1 className="luckiestGuy"style={{ marginTop: 15 }}>HEARTS ATTACK!</h1>
+          <h1 className="luckiestGuy" style={{ marginTop: 15 }}>
+            HEARTS ATTACK!
+          </h1>
 
-        <p className='tagline'>
-          A fast-paced card game of strategy & sabotage.<br />
-          Can you survive the Hearts Attack?!
-        </p>
-        <div className={styles.ctas}>
-          <Button block className={styles.whiteButton}            
-            onClick={() => router.push("/login")}
-          >
-            Login
-          </Button>
-          <Button block className={styles.whiteButton}
-            onClick={() => router.push("/register")}
-          >
-            Register
-          </Button>
-          <Button block className={styles.whiteButton}
-            onClick={() => handleGuestLogin()}
-          >
-            Play as Guest
-          </Button>
-          <Button block className={styles.whiteButton}
-            onClick={() => router.push("/rules")}
-          >
-            Rules
-          </Button>
-        </div>
+          <p className="tagline">
+            A fast-paced card game of strategy & sabotage.<br />
+            Can you survive the Hearts Attack?!
+          </p>
+          <div className={styles.ctas}>
+            <Button
+              block
+              className={styles.whiteButton}
+              onClick={() => router.push("/login")}
+            >
+              Login
+            </Button>
+            <Button
+              block
+              className={styles.whiteButton}
+              onClick={() => router.push("/register")}
+            >
+              Register
+            </Button>
+            <Button
+              block
+              className={styles.whiteButton}
+              onClick={() => handleGuestLogin()}
+            >
+              Play as Guest
+            </Button>
+            <Button
+              block
+              className={styles.whiteButton}
+              onClick={() => router.push("/rules")}
+            >
+              Rules
+            </Button>
+          </div>
         </div>
       </main>
     </div>

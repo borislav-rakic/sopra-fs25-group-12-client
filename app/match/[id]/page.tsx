@@ -8,12 +8,14 @@ import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
 // import { Match } from "@/types/match";
 import { useEffect, useState } from "react";
-import { PlayerMatchInformation } from "@/types/playerMatchInformation";
+import { PollingDTO } from "@/types/polling";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
-import { innerCard} from "@/types/playerCard";
+import { innerCard } from "@/types/playerCard";
 
 const MatchPage: React.FC = () => {
+  const USE_AUTOMATIC_POLLING = false; // switch to true for auto every 2000ms
+
   //const router = useRouter();
   const params = useParams();
   const apiService = useApi();
@@ -41,18 +43,18 @@ const MatchPage: React.FC = () => {
   const [trickSlot2, setTrickSlot2] = useState<cardProps[]>([]);
   const [trickSlot3, setTrickSlot3] = useState<cardProps[]>([]);
 
-  const [matchScore, setMatchScore] = useState([0, 0, 0, 0]); 
-  const [roundScore, setRoundScore] = useState([0, 0, 0, 0]); 
+  const [matchScore, setMatchScore] = useState([0, 0, 0, 0]);
+  const [roundScore, setRoundScore] = useState([0, 0, 0, 0]);
 
   const [currentTrick, setCurrentTrick] = useState("");
-  const [currentPlayer, setCurrentPlayer] = useState(""); 
+  const [currentPlayer, setCurrentPlayer] = useState("");
   const [currentGamePhase, setCurrentGamePhase] = useState("");
   const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
   const [opponentToPassTo, setOpponentToPassTo] = useState("");
   const [heartsBroken, setHeartsBroken] = useState(false);
   const [firstCardPlayed, setFirstCardPlayed] = useState(false);
   const [isFirstRound, setIsFirstRound] = useState(true);
-  const [myTurn, setMyTurn] = useState(false); 
+  const [myTurn, setMyTurn] = useState(false);
   //const [currentMatchPhase, setCurrentMatchPhase] = useState("");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -64,212 +66,138 @@ const MatchPage: React.FC = () => {
 
   const [isMatchTesterVisible, setIsMatchTesterVisible] = useState(true);
 
-  useEffect(() => {
-    // This function runs every 5 seconds to receive the current match information.
-    const matchRefreshIntervalId = setInterval(async () => {
-      console.log("Requesting match update...");
+  const fetchMatchData = async () => {
+    try {
+      console.log("📡 Fetching match data");
 
-      try {
-        const response = await apiService.post<PlayerMatchInformation>(
-          `/matches/${matchId}/logic`,
-          {},
+      const response = await apiService.post<PollingDTO>(
+        `/matches/${matchId}/logic`,
+        {},
+      );
+      console.log("Match data response:", response);
+      setHeartsBroken(response.heartsBroken ?? false);
+      setCurrentGamePhase(response.gamePhase ?? "");
+      console.log("Backend says myTurn:", response.myTurn);
+      setMyTurn(response.myTurn ?? false);
+      console.log("myTurn (just set):", response.myTurn ?? false);
+
+      const slot = response.playerSlot ?? 0;
+      const trickLeaderSlot = response.currentTrickLeaderPlayerSlot ?? 1;
+
+      if (response.matchPlayers) {
+        setPlayers([
+          response.matchPlayers[(0 + slot) % 4] ?? null,
+          response.matchPlayers[(1 + slot) % 4] ?? null,
+          response.matchPlayers[(2 + slot) % 4] ?? null,
+          response.matchPlayers[(3 + slot) % 4] ?? null,
+        ]);
+      }
+
+      if (response.avatarUrls) {
+        setPlayerAvatars([
+          response.avatarUrls[(0 + slot) % 4] ?? null,
+          response.avatarUrls[(1 + slot) % 4] ?? null,
+          response.avatarUrls[(2 + slot) % 4] ?? null,
+          response.avatarUrls[(3 + slot) % 4] ?? null,
+        ]);
+      }
+
+      const pointsArray = [
+        response.playerPoints?.[0] ?? 0,
+        response.playerPoints?.[1] ?? 0,
+        response.playerPoints?.[2] ?? 0,
+        response.playerPoints?.[3] ?? 0,
+      ];
+
+      setMatchScore([
+        pointsArray[(0 + slot) % 4],
+        pointsArray[(1 + slot) % 4],
+        pointsArray[(2 + slot) % 4],
+        pointsArray[(3 + slot) % 4],
+      ]);
+
+      setRoundScore([
+        pointsArray[(0 + slot) % 4],
+        pointsArray[(1 + slot) % 4],
+        pointsArray[(2 + slot) % 4],
+        pointsArray[(3 + slot) % 4],
+      ]);
+
+      if (response.playerCards) {
+        response.playerCards.forEach((item) => {
+          setCardsInHand((prev) =>
+            prev.some((card) => card.code === item.card?.code)
+              ? prev
+              : [...prev, generateCard(item.card?.code)]
+          );
+        });
+      }
+
+      if (!firstCardPlayed && (response.currentTrick?.length ?? 0) > 0) {
+        setFirstCardPlayed(true);
+      }
+
+      handleTrickFromLogic(response.currentTrick || [], slot, trickLeaderSlot);
+
+      if (response.cardsInHandPerPlayer) {
+        const hand = [
+          response.cardsInHandPerPlayer["1"] ?? 0,
+          response.cardsInHandPerPlayer["2"] ?? 0,
+          response.cardsInHandPerPlayer["3"] ?? 0,
+          response.cardsInHandPerPlayer["4"] ?? 0,
+        ];
+
+        const shifted = [
+          hand[(0 + slot) % 4],
+          hand[(1 + slot) % 4],
+          hand[(2 + slot) % 4],
+          hand[(3 + slot) % 4],
+        ];
+
+        setOpponent1Cards(
+          Array.from({ length: shifted[1] }, generateEnemyCard),
         );
-
-        console.log(response);
-
-       /*  if (response.slot) {
-          setSlot(response.slot);
-        } */
-       const slot = response.slot || 0; // Default to 1 if slot is not available
-       console.log("Slot:", slot);
-
-      /*   if (response.currentTrickLeaderSlot) {
-          setTrickLeaderSlot(response.currentTrickLeaderSlot);
-        } */
-
-        const trickLeaderSlot = response.currentTrickLeaderSlot || 1; // Default to 1 if trickLeaderSlot is not available
-        console.log("Trick Leader Slot:", trickLeaderSlot);
-
-        if (response.matchPlayers && (response.slot || response.slot === 0)) {
-          setPlayers((/* prevPlayers */) => {
-            //console.log(response.matchPlayers ? response.matchPlayers[(0)] : null);
-            const updatedPlayers = [
-              response.matchPlayers ? response.matchPlayers[(0 + slot) % 4] : null,
-              response.matchPlayers ? response.matchPlayers[(1 + slot) % 4] : null,
-              response.matchPlayers ? response.matchPlayers[(2 + slot) % 4] : null,
-              response.matchPlayers ? response.matchPlayers[(3 + slot) % 4] : null,
-            ];
-            //console.log("Previous players:", prevPlayers);
-            //console.log("Updated players:", updatedPlayers);
-            return updatedPlayers;
-          });
-        }
-
-        if (response.avatarUrls) {
-          setPlayerAvatars((/* prevAvatars */) => {
-            const updatedAvatars = [
-              response.avatarUrls ? response.avatarUrls[(0 + slot) % 4] : null,
-              response.avatarUrls ? response.avatarUrls[(1 + slot) % 4] : null,
-              response.avatarUrls ? response.avatarUrls[(2 + slot) % 4] : null,
-              response.avatarUrls ? response.avatarUrls[(3 + slot) % 4] : null,
-            ];
-            //console.log("Previous avatars:", prevAvatars);
-            //console.log("Updated avatars:", updatedAvatars);
-            return updatedAvatars;
-          });
-        }
-
-        if (response.playerPoints) {
-          const pointsArray = [
-            response.playerPoints["1"] || 0,
-            response.playerPoints["2"] || 0,
-            response.playerPoints["3"] || 0,
-            response.playerPoints["4"] || 0,
-          ];
-        
-          setMatchScore((/* prevMatchScore */) => {
-            const updatedMatchScore = [
-              pointsArray[(0 + slot) % 4],
-              pointsArray[(1 + slot) % 4],
-              pointsArray[(2 + slot) % 4],
-              pointsArray[(3 + slot) % 4],
-            ];
-            //console.log("Previous match score:", prevMatchScore);
-            //console.log("Updated match score:", updatedMatchScore);
-            return updatedMatchScore;
-          });
-
-          setRoundScore((/* prevRoundScore */) => {
-            const updatedRoundScore = [
-              pointsArray[(0 + slot) % 4],
-              pointsArray[(1 + slot) % 4],
-              pointsArray[(2 + slot) % 4],
-              pointsArray[(3 + slot) % 4],
-            ];
-            //console.log("Previous round score:", prevRoundScore);
-            //console.log("Updated round score:", updatedRoundScore);
-            return updatedRoundScore;
-          });
-        }
-        
-        if (response.playerCards) {
-          response.playerCards.forEach((item) => {
-            setCardsInHand((prevCardsInHand) => {
-              // Check if the card already exists in the player's hand
-              if (!prevCardsInHand.some((card) => card.code === item.card?.code)) {
-                // Add the new card to the player's hand
-                return [...prevCardsInHand, generateCard(item.card?.code)];
-              }
-              // If the card already exists, return the current state
-              return prevCardsInHand;
-            });
-          });
-        }
-
-
-        setHeartsBroken(response.heartsBroken || false);
-        setCurrentGamePhase(response.gamePhase || "");
-        setMyTurn(response.myTurn || false);
-
-        if(!firstCardPlayed) {
-          if(response.currentTrick?.length !== 0) {
-            setFirstCardPlayed(true);
-          }
-        }
-        console.log("First card is played:", firstCardPlayed);
-        
-        handleTrickFromLogic(response.currentTrick || [], slot, trickLeaderSlot); // Pass the current trick to the function
-       
-        //checks number of cards in enemy hands
-        if (response.cardsInHandPerPlayer) {
-
-          const cardsInHandArray = [
-            response.cardsInHandPerPlayer["1"] || 0,
-            response.cardsInHandPerPlayer["2"] || 0,
-            response.cardsInHandPerPlayer["3"] || 0,
-            response.cardsInHandPerPlayer["4"] || 0,
-          ];
-        
-          // Shift indices based on the player's slot
-          const shiftedCardsInHand = [
-            cardsInHandArray[(0 + slot + 4) % 4],
-            cardsInHandArray[(1 + slot + 4) % 4],
-            cardsInHandArray[(2 + slot + 4) % 4],
-            cardsInHandArray[(3 + slot + 4) % 4],
-          ];
-
-          const expectedOpponent1Cards = shiftedCardsInHand[1];
-          const expectedOpponent2Cards = shiftedCardsInHand[2];
-          const expectedOpponent3Cards = shiftedCardsInHand[3];
-
-          //console.log("Expected opponent cards:", expectedOpponent1Cards, expectedOpponent2Cards, expectedOpponent3Cards);
-          //console.log("Current opponent cards:", opponent1Cards.length, opponent2Cards.length, opponent3Cards.length);
-
-          if (opponent1Cards.length !== expectedOpponent1Cards) {
-            const difference = expectedOpponent1Cards - opponent1Cards.length;
-            if (difference > 0) {
-              // Add cards to opponent1Cards
-              const newCards = Array.from({ length: difference }, () => generateEnemyCard());
-              setOpponent1Cards(newCards);
-              //console.log(`Added ${difference} cards to opponent1Cards.`);
-            } else if (difference < 0) {
-              // Remove cards from opponent1Cards
-              setOpponent1Cards((prevCards) => prevCards.slice(0, expectedOpponent1Cards));
-              //console.log(`Removed ${Math.abs(difference)} cards from opponent1Cards.`);
-            }
-          }
-          if (opponent2Cards.length !== expectedOpponent2Cards) {
-            const difference = expectedOpponent2Cards - opponent2Cards.length;
-            if (difference > 0) {
-              // Add cards to opponent2Cards
-              const newCards = Array.from({ length: difference }, () => generateEnemyCard());
-              setOpponent2Cards(newCards);
-              //console.log(`Added ${difference} cards to opponent2Cards.`);
-            } else if (difference < 0) {
-              // Remove cards from opponent2Cards
-              setOpponent2Cards((prevCards) => prevCards.slice(0, expectedOpponent2Cards));
-              //console.log(`Removed ${Math.abs(difference)} cards from opponent2Cards.`);
-            }
-          }
-          if (opponent3Cards.length !== expectedOpponent3Cards) {
-            const difference = expectedOpponent3Cards - opponent3Cards.length;
-            if (difference > 0) {
-              // Add cards to opponent3Cards
-              const newCards = Array.from({ length: difference }, () => generateEnemyCard());
-              setOpponent3Cards(newCards);
-              //console.log(`Added ${difference} cards to opponent3Cards.`);
-            } else if (difference < 0) {
-              // Remove cards from opponent3Cards
-              setOpponent3Cards((prevCards) => prevCards.slice(0, expectedOpponent3Cards));
-              //console.log(`Removed ${Math.abs(difference)} cards from opponent3Cards.`);
-            }
-          }
-        }
-
-/*         if (response.matchPhase) {
-          setCurrentMatchPhase(response.matchPhase);
-        } */
-
-      } catch (error) {
-        console.error(
-          `Failed to fetch match data for matchId ${matchId}:`,
-          error,
+        setOpponent2Cards(
+          Array.from({ length: shifted[2] }, generateEnemyCard),
+        );
+        setOpponent3Cards(
+          Array.from({ length: shifted[3] }, generateEnemyCard),
         );
       }
-    }, 2000);
+    } catch (error) {
+      console.error("Error during match data fetch:", error);
+    }
+    console.log("Finished fetchMatchData for", matchId);
+  };
 
-    // When the component unmounts, this stops the function mapped to matchRefreshIntervalId from running every 5 seconds.
-    return () => {
-      clearInterval(matchRefreshIntervalId);
-      console.log("Interval cleared.");
-    };
-  }, [apiService, matchId]);
+  useEffect(() => {
+    if (USE_AUTOMATIC_POLLING) {
+      const intervalId = setInterval(() => {
+        fetchMatchData();
+      }, 2000);
+      return () => {
+        clearInterval(intervalId);
+        console.log("Automatic polling stopped");
+      };
+    } else {
+      const handleKeyPress = (event: KeyboardEvent) => {
+        if (event.code === "Space") {
+          event.preventDefault();
+          console.log("Spacebar pressed — fetching manually");
+          fetchMatchData();
+        }
+      };
 
+      window.addEventListener("keydown", handleKeyPress);
+      return () => {
+        window.removeEventListener("keydown", handleKeyPress);
+      };
+    }
+  }, [matchId]);
 
-  const generateCard = (code : string)  => {
-
+  const generateCard = (code: string) => {
     const rank = code[0];
-    const suit = code[1]; 
+    const suit = code[1];
 
     const rankToValue: { [key: string]: bigint } = {
       "2": BigInt(2),
@@ -305,11 +233,10 @@ const MatchPage: React.FC = () => {
         console.log(`Card clicked: ${code}`);
       },
     };
-  
+
     console.log("Generated card:", card);
     return card;
-
-  }
+  };
 
   const generateEnemyCard = () => {
     const card: cardProps = {
@@ -317,13 +244,12 @@ const MatchPage: React.FC = () => {
       suit: "XX",
       value: BigInt(0),
       image: "",
-      backimage: cardback, 
+      backimage: cardback,
       flipped: false,
-      onClick: () => {}
-    }
+      onClick: () => {},
+    };
     return card;
   };
-
 
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
@@ -356,71 +282,52 @@ const MatchPage: React.FC = () => {
   }, [playmat]);
 
   const handlePlayCard = async (card: cardProps) => {
-    console.log("Selected card in Match Page:", card.code);
+    console.log("Clicked card:", card.code);
+    console.log("myTurn =", myTurn);
+    console.log("currentGamePhase =", currentGamePhase);
 
-    if (currentGamePhase === "PASSING") {
-      if (cardsToPass.find((c) => c.code === card.code)) {
-        setCardsToPass(cardsToPass.filter((c) => c.code !== card.code));
-        console.log("removed card from cardsToPass: ", card.code);
-        console.log("cardsToPass: ", cardsToPass);
-      } else if (cardsToPass.length < 3) {
-        setCardsToPass([...cardsToPass, card]);
-        console.log("added card to cardsToPass: ", card.code);
-        console.log("cardsToPass: ", cardsToPass);
-      } else {
-        console.log("You may not pass more than 3 cards.");
-      }
-    } else if (currentGamePhase === "NORMALROUND" || currentGamePhase === "FIRSTROUND" || currentGamePhase === "FINALROUND") {
-      if (!myTurn) {
-        console.log("You may not play cards while it is not your turn.");
-        return;
-      }
-  
-      if (!verifyTrick(card)) {
-        console.log("Invalid card play. Trick verification failed.");
-        return;
-      }
+    if (
+      currentGamePhase !== "NORMALTRICK" &&
+      currentGamePhase !== "FIRSTTRICK" &&
+      currentGamePhase !== "FINALTRICK"
+    ) {
+      console.log(" Not in a playable phase.");
+      return;
+    }
 
-      try {
-        const payload = {
-          gameId: matchId,
-          card: card.code, // Since card in backend is only a string
-        };
-        console.log("Payload for playing card:", payload);
-  
-        const response = await apiService.post(`/matches/${matchId}/play`, payload);
-  
-        console.log("Response from server:", response);
-  
-        // Check if the response is valid
-        if (!response || typeof response !== "object") {
-          console.error("Error playing card: Invalid or empty response from server.");
-          return;
-        }
+    if (!myTurn) {
+      console.log("Not your turn.");
+      return;
+    }
 
-        if (!firstCardPlayed) {
-          setFirstCardPlayed(true);
-        }
+    const trickOk = verifyTrick(card);
+    console.log("verifyTrick =", trickOk);
+    if (!trickOk) {
+      console.log("Trick verification failed.");
+      return;
+    }
 
-        if (currentTrick === "") {
-          setCurrentTrick(card.suit);
-        }
-  
-        // If the response is valid, proceed with the success logic
-        console.log("Card played successfully:", card.code);
-  
-        const updatedCardsInHand = cardsInHand.filter((c) => c.code !== card.code);
-        const updatedTrick0 = [card];
-  
-        setCardsInHand(updatedCardsInHand);
-        setTrickSlot0(updatedTrick0);
-        setCurrentPlayer(players[1] || ""); // Set the next player to play
-        console.log("Current player:", currentPlayer);
-      } catch (error) {
-        console.error("Error playing card:", error);
-      }
-    } else {
-      console.log("Currently unused game phase option.");
+    try {
+      const payload = {
+        gameId: matchId,
+        card: card.code,
+      };
+      console.log("Sending card play request:", payload);
+
+      const response = await apiService.post(
+        `/matches/${matchId}/play`,
+        payload,
+      );
+      console.log("Card play response:", response);
+
+      const updatedCardsInHand = cardsInHand.filter((c) =>
+        c.code !== card.code
+      );
+      setCardsInHand(updatedCardsInHand);
+      setTrickSlot0([card]);
+      setCurrentPlayer(players[1] || "");
+    } catch (error) {
+      console.error("Error sending card play request:", error);
     }
   };
 
@@ -437,7 +344,7 @@ const MatchPage: React.FC = () => {
       console.log("First card played in the game must be 2 of clubs.");
       return false;
     }
-    if (currentGamePhase === "FIRSTROUND") {
+    if (currentGamePhase === "FIRSTTRICK") {
       if (card.code === "QS" || card.suit === "Hearts") {
         console.log(
           "Queen of Spades or Hearts cannot be played in the first round.",
@@ -477,49 +384,53 @@ const MatchPage: React.FC = () => {
   const handlePassCards = async () => {
     if (cardsToPass.length < 3) {
       console.log("You must pass 3 cards.");
-      return
-    } 
+      return;
+    }
     try {
-
       const payload = {
         gameId: matchId,
         cards: cardsToPass.map((card) => card.code), // Send only the card codes
       };
       console.log("Payload for passing cards:", payload);
 
-    // Make the API request
-    const response = await apiService.post(`/matches/${matchId}/passing`, payload);
+      // Make the API request
+      const response = await apiService.post(
+        `/matches/${matchId}/passing`,
+        payload,
+      );
 
-    // Check if the response indicates an error
-    if (!response || typeof response !== "object") {
-      console.error("Error passing cards: Invalid or empty response from server.");
-      return;
-    }
+      // Check if the response indicates an error
+      if (!response || typeof response !== "object") {
+        console.error(
+          "Error passing cards: Invalid or empty response from server.",
+        );
+        return;
+      }
 
-    // If the response is valid, proceed with the success logic
-    console.log("Response from server:", response);
+      // If the response is valid, proceed with the success logic
+      console.log("Response from server:", response);
 
-    const updatedCardsInHand = cardsInHand.filter(
-      (c) => !cardsToPass.some((card) => card.code === c.code)
-    );
+      const updatedCardsInHand = cardsInHand.filter(
+        (c) => !cardsToPass.some((card) => card.code === c.code),
+      );
 
-    // Update the opponent's hand based on the selected opponent
-    if (opponentToPassTo === "Opponent1") {
-      const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
-      setOpponent1Cards(updatedEnemyHand);
-    } else if (opponentToPassTo === "Opponent2") {
-      const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
-      setOpponent2Cards(updatedEnemyHand);
-    } else if (opponentToPassTo === "Opponent3") {
-      const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
-      setOpponent3Cards(updatedEnemyHand);
-    }
+      // Update the opponent's hand based on the selected opponent
+      if (opponentToPassTo === "Opponent1") {
+        const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
+        setOpponent1Cards(updatedEnemyHand);
+      } else if (opponentToPassTo === "Opponent2") {
+        const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
+        setOpponent2Cards(updatedEnemyHand);
+      } else if (opponentToPassTo === "Opponent3") {
+        const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
+        setOpponent3Cards(updatedEnemyHand);
+      }
 
-    // Update the state
-    setCardsInHand(updatedCardsInHand);
-    setCardsToPass([]);
-    setCurrentGamePhase("playing");
-  } catch (error) {
+      // Update the state
+      setCardsInHand(updatedCardsInHand);
+      setCardsToPass([]);
+      setCurrentGamePhase("playing");
+    } catch (error) {
       console.error("Error passing cards:", error);
     }
   };
@@ -542,7 +453,9 @@ const MatchPage: React.FC = () => {
     ];
 
     if (allCards.length < 4) {
-      console.log("Trick may only be calulated if all players have played a card.");
+      console.log(
+        "Trick may only be calulated if all players have played a card.",
+      );
       return;
     }
 
@@ -552,11 +465,11 @@ const MatchPage: React.FC = () => {
       console.log("No cards match the current trick's suit.");
       return;
     }
-  
+
     // Initialize the highest card and its index
     let highestCardIndex = 0;
     let highestCard = matchingCards[0];
-  
+
     // Iterate through matching cards to find the highest card
     matchingCards.forEach((card) => {
       const cardIndex = allCards.indexOf(card);
@@ -566,7 +479,7 @@ const MatchPage: React.FC = () => {
       }
     });
     return highestCardIndex;
-  }
+  };
 
   useEffect(() => {
     // Function to check if all trick slots contain a card
@@ -581,7 +494,7 @@ const MatchPage: React.FC = () => {
 
         const winningPlayer = calculateTrickWinner();
         console.log("Winning player index:", winningPlayer);
-        
+
         if (winningPlayer !== undefined) {
           console.log("winning player: ", players[winningPlayer]);
         } else {
@@ -591,14 +504,25 @@ const MatchPage: React.FC = () => {
         setTimeout(() => {
           console.log("Clearing trick slots...");
           handleClearTrick();
-
         }, 2500);
       }
     };
 
     checkAndHandleTrick();
-  }, [trickSlot0, trickSlot1, trickSlot2, trickSlot3]); 
+  }, [trickSlot0, trickSlot1, trickSlot2, trickSlot3]);
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.code === "Space") {
+        console.log("⏵ Spacebar pressed — fetching match data");
+        fetchMatchData();
+      }
+    };
 
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
   const sortCards = (cards: cardProps[]) => {
     return cards.sort((a, b) => {
       console.log("Comparing cards:", a.code, " | ", b.code);
@@ -617,51 +541,67 @@ const MatchPage: React.FC = () => {
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
 
-  const handleTrickFromLogic = (trick: innerCard[], slot: number, trickLeaderSlot: number) => {
+  const handleTrickFromLogic = (
+    trick: innerCard[],
+    slot: number,
+    trickLeaderSlot: number,
+  ) => {
     console.log("Received trick from logic:", trick);
     const tempTrick: string[] = ["", "", "", ""];
     const indexShift = (trickLeaderSlot - slot + 4) % 4;
 
     trick.forEach((card, index) => {
       if (card) {
-        const shiftedIndex = (index + indexShift) % 4; 
-        tempTrick[shiftedIndex] = card.code; 
+        const shiftedIndex = (index + indexShift) % 4;
+        tempTrick[shiftedIndex] = card.code;
       }
     });
 
     console.log("Shifted trick array:", tempTrick);
 
     // if trick is empty and shouldnt be or if trick is not what it should be, set it to the new trick for trick 0
-    if ((tempTrick[0] || tempTrick[0] === "") && (trickSlot0.length === 0 || trickSlot0[0].code !== tempTrick[0])) {
-      if(tempTrick[0]===""){
+    if (
+      (tempTrick[0] || tempTrick[0] === "") &&
+      (trickSlot0.length === 0 || trickSlot0[0].code !== tempTrick[0])
+    ) {
+      if (tempTrick[0] === "") {
         setTrickSlot0([]);
       } else {
         setTrickSlot0([generateCard(tempTrick[0])]);
       }
     }
-    if ((tempTrick[1] || tempTrick[1] === "") && (trickSlot1.length === 0 || trickSlot1[0].code !== tempTrick[1])) {
-      if(tempTrick[1]===""){
+    if (
+      (tempTrick[1] || tempTrick[1] === "") &&
+      (trickSlot1.length === 0 || trickSlot1[0].code !== tempTrick[1])
+    ) {
+      if (tempTrick[1] === "") {
         setTrickSlot1([]);
       } else {
         setTrickSlot1([generateCard(tempTrick[1])]);
       }
     }
-    if ((tempTrick[2] || tempTrick[2] === "") && (trickSlot2.length === 0 || trickSlot2[0].code !== tempTrick[2])) {
-      if(tempTrick[2]===""){
+    if (
+      (tempTrick[2] || tempTrick[2] === "") &&
+      (trickSlot2.length === 0 || trickSlot2[0].code !== tempTrick[2])
+    ) {
+      if (tempTrick[2] === "") {
         setTrickSlot2([]);
       } else {
         setTrickSlot2([generateCard(tempTrick[2])]);
       }
     }
-    if ((tempTrick[3] || tempTrick[3] === "") && (trickSlot3.length === 0 || trickSlot3[0].code !== tempTrick[3])) {
-      if(tempTrick[3]===""){
+    if (
+      (tempTrick[3] || tempTrick[3] === "") &&
+      (trickSlot3.length === 0 || trickSlot3[0].code !== tempTrick[3])
+    ) {
+      if (tempTrick[3] === "") {
         setTrickSlot3([]);
       } else {
         setTrickSlot3([generateCard(tempTrick[3])]);
       }
     }
   };
-/* 
+  /*
   const resetGame = () => {
     setCardsInHand([]);
     setOpponent1Cards([]);
@@ -1115,27 +1055,27 @@ const MatchPage: React.FC = () => {
           >
             ToggleIsFirstCard
           </Button>
-            
+
           <Button
-          onClick={() => {
-            calculateTrickWinner();
-          }}
+            onClick={() => {
+              calculateTrickWinner();
+            }}
           >
-          CalculateTrickWinner
+            CalculateTrickWinner
           </Button>
 
           <Button
-      onClick={() => {
-        setIsMatchTesterVisible(false); // Hide the matchtester
-        setTimeout(() => {
-          setIsMatchTesterVisible(true); // Show it again after 10 seconds
-        }, 10000); // 10 seconds
-      }}
-    >
-      Hide MatchTester
-    </Button>
+            onClick={() => {
+              setIsMatchTesterVisible(false); // Hide the matchtester
+              setTimeout(() => {
+                setIsMatchTesterVisible(true); // Show it again after 10 seconds
+              }, 10000); // 10 seconds
+            }}
+          >
+            Hide MatchTester
+          </Button>
         </div>
-      )}  
+      )}
       <div className="gameboard">
         <div className="score-table">
           <table>
@@ -1296,7 +1236,9 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src={playerAvatars[0] ? playerAvatars[0] : "/avatars_118x118/a104.png"}
+              src={playerAvatars[0]
+                ? playerAvatars[0]
+                : "/avatars_118x118/a104.png"}
               alt="avatar"
               width={72}
               height={72}
@@ -1312,7 +1254,9 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src={playerAvatars[1] ? playerAvatars[1] : "/avatars_118x118/a104.png"}
+              src={playerAvatars[1]
+                ? playerAvatars[1]
+                : "/avatars_118x118/a104.png"}
               alt="avatar"
               width={72}
               height={72}
@@ -1328,7 +1272,9 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src={playerAvatars[2] ? playerAvatars[2] : "/avatars_118x118/a104.png"}
+              src={playerAvatars[2]
+                ? playerAvatars[2]
+                : "/avatars_118x118/a104.png"}
               alt="avatar"
               width={72}
               height={72}
@@ -1344,7 +1290,9 @@ const MatchPage: React.FC = () => {
           <div className="game-avatarbox">
             <Image
               className="player-avatar"
-              src={playerAvatars[3] ? playerAvatars[3] : "/avatars_118x118/a104.png"}
+              src={playerAvatars[3]
+                ? playerAvatars[3]
+                : "/avatars_118x118/a104.png"}
               alt="avatar"
               width={72}
               height={72}
@@ -1376,13 +1324,16 @@ const MatchPage: React.FC = () => {
               cursor: "pointer",
               transition: "background-color 0.3s ease", // Smooth transition for hover effect
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1890ff")} // Blue on hover
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#d3d3d3")} // Back to grey
+            onMouseEnter={(
+              e,
+            ) => (e.currentTarget.style.backgroundColor = "#1890ff")} // Blue on hover
+            onMouseLeave={(
+              e,
+            ) => (e.currentTarget.style.backgroundColor = "#d3d3d3")} // Back to grey
           >
             Pass Cards
           </button>
         )}
-
       </div>
     </div>
   );

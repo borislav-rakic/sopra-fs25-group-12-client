@@ -16,7 +16,9 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = (
 
   return (
     <div className="avatar-selector">
-     <p style={{ color: "white", fontWeight: "bold",  marginBottom: "12px" }}>Select an Avatar:</p>
+      <p style={{ color: "white", fontWeight: "bold", marginBottom: "12px" }}>
+        Select an Avatar:
+      </p>
       <div className="avatar-grid">
         {avatars.map((num) => (
           <Image

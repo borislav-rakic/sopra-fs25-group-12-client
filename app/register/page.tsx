@@ -37,7 +37,7 @@ const Register: React.FC = () => {
   };
 
   return (
-      <div className="contentContainer">
+    <div className="contentContainer">
       <Form
         form={form}
         name="login"
@@ -80,7 +80,8 @@ const Register: React.FC = () => {
           }}
         >
           <Button
-            block className={styles.whiteButton}
+            block
+            className={styles.whiteButton}
             onClick={() => router.push("/")}
           >
             Back
@@ -88,7 +89,8 @@ const Register: React.FC = () => {
 
           <Button
             htmlType="submit"
-            block className={styles.whiteButton}
+            block
+            className={styles.whiteButton}
           >
             Register
           </Button>

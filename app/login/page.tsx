@@ -51,7 +51,7 @@ const Login: React.FC = () => {
   };
 
   return (
-      <div className="contentContainer">
+    <div className="contentContainer">
       <Form
         form={form}
         name="login"
@@ -93,7 +93,8 @@ const Login: React.FC = () => {
           }}
         >
           <Button
-            block className={styles.whiteButton}
+            block
+            className={styles.whiteButton}
             onClick={() => router.push("/")}
           >
             Back
@@ -101,13 +102,14 @@ const Login: React.FC = () => {
 
           <Button
             htmlType="submit"
-            block className={styles.whiteButton}
+            block
+            className={styles.whiteButton}
           >
             Login
           </Button>
         </div>
 
-        <div style={{ marginTop: "16px",textAlign: "center", }}>
+        <div style={{ marginTop: "16px", textAlign: "center" }}>
           <Button type="link" onClick={() => router.push("/register")}>
             Don&apos;t have an account? Register here.
           </Button>

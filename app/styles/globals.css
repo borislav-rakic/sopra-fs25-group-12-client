@@ -72,7 +72,6 @@ a {
   align-items: center;
 }
 
-
 .login-button,
 .back-button {
   font-weight: bold;
@@ -91,7 +90,7 @@ a {
 }
 
 .greyButton {
-  background-color: grey !important;;
+  background-color: grey !important;
   color: black;
   width: 100%;
   font-weight: 500;
@@ -101,7 +100,6 @@ a {
 .points-button:hover {
   background-color: green !important;
 }
-
 
 .login-button {
   background-color: #24a424 !important;
@@ -174,7 +172,6 @@ a {
   background-color: green !important;
   transition: none !important;
 }
-
 
 .white-bordered-table .ant-table {
   background: white;
@@ -723,7 +720,6 @@ a {
   border-color: lightgrey;
 }
 
-
 .luckiestGuy {
   font-family: var(--font-luckiest-guy);
   font-weight: 400;
@@ -734,9 +730,9 @@ a {
   color: #de1b1b;
   text-shadow:
     -1px -1px 0 #fff,
-     1px -1px 0 #fff,
-    -1px  1px 0 #fff,
-     1px  1px 0 #fff;
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff;
   text-align: center;
   letter-spacing: 1px;
 }
@@ -751,4 +747,3 @@ a {
   text-shadow: 1px 1px 2px #00000055;
   margin-bottom: 1rem;
 }
-
