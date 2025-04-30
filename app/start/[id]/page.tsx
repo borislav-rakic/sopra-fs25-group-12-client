@@ -25,7 +25,7 @@ const StartPage: React.FC = () => {
   const gameId = params?.id?.toString();
   const router = useRouter();
   const apiService = useApi();
-  const frontendIndexToSlot = (index: number): number => index + 1;
+  const frontendIndexToSlot = (index: number): number => index;
   const slotToFrontendIndex = (slot: number): number => slot - 1;
   const frontendPlayerIndices = [0, 1, 2, 3];
   const TOTAL_SLOTS = 4;
@@ -105,6 +105,7 @@ const StartPage: React.FC = () => {
     const loadMatch = async () => {
       try {
         const match = await apiService.get<Match>(`/matches/${gameId}`);
+        console.log(match);
         const playerIdList = [
           match.player1Id,
           match.player2Id,
@@ -142,7 +143,7 @@ const StartPage: React.FC = () => {
             continue;
           }
         
-          if ([1, 2, 3].includes(pid)) {
+          if ([1, 2, 3, 4, 5, 6, 7, 8, 9].includes(pid)) {
             // It's an AI player
             const slot = frontendIndexToSlot(i);
             const difficulty = match.aiPlayers?.[slot] ?? 1;
