@@ -80,7 +80,7 @@ const MatchPage: React.FC = () => {
        /*  if (response.slot) {
           setSlot(response.slot);
         } */
-       const slot = response.slot || 1; // Default to 1 if slot is not available
+       const slot = response.slot || 0; // Default to 1 if slot is not available
        console.log("Slot:", slot);
 
       /*   if (response.currentTrickLeaderSlot) {
@@ -90,13 +90,14 @@ const MatchPage: React.FC = () => {
         const trickLeaderSlot = response.currentTrickLeaderSlot || 1; // Default to 1 if trickLeaderSlot is not available
         console.log("Trick Leader Slot:", trickLeaderSlot);
 
-        if (response.matchPlayers && response.slot) {
+        if (response.matchPlayers && (response.slot || response.slot === 0)) {
           setPlayers((/* prevPlayers */) => {
+            //console.log(response.matchPlayers ? response.matchPlayers[(0)] : null);
             const updatedPlayers = [
-              response.matchPlayers ? response.matchPlayers[(0 + slot - 1) % 4] : null,
-              response.matchPlayers ? response.matchPlayers[(1 + slot - 1) % 4] : null,
-              response.matchPlayers ? response.matchPlayers[(2 + slot - 1) % 4] : null,
-              response.matchPlayers ? response.matchPlayers[(3 + slot - 1) % 4] : null,
+              response.matchPlayers ? response.matchPlayers[(0 + slot) % 4] : null,
+              response.matchPlayers ? response.matchPlayers[(1 + slot) % 4] : null,
+              response.matchPlayers ? response.matchPlayers[(2 + slot) % 4] : null,
+              response.matchPlayers ? response.matchPlayers[(3 + slot) % 4] : null,
             ];
             //console.log("Previous players:", prevPlayers);
             //console.log("Updated players:", updatedPlayers);
@@ -107,10 +108,10 @@ const MatchPage: React.FC = () => {
         if (response.avatarUrls) {
           setPlayerAvatars((/* prevAvatars */) => {
             const updatedAvatars = [
-              response.avatarUrls ? response.avatarUrls[(0 + slot - 1) % 4] : null,
-              response.avatarUrls ? response.avatarUrls[(1 + slot - 1) % 4] : null,
-              response.avatarUrls ? response.avatarUrls[(2 + slot - 1) % 4] : null,
-              response.avatarUrls ? response.avatarUrls[(3 + slot - 1) % 4] : null,
+              response.avatarUrls ? response.avatarUrls[(0 + slot) % 4] : null,
+              response.avatarUrls ? response.avatarUrls[(1 + slot) % 4] : null,
+              response.avatarUrls ? response.avatarUrls[(2 + slot) % 4] : null,
+              response.avatarUrls ? response.avatarUrls[(3 + slot) % 4] : null,
             ];
             //console.log("Previous avatars:", prevAvatars);
             //console.log("Updated avatars:", updatedAvatars);
@@ -128,10 +129,10 @@ const MatchPage: React.FC = () => {
         
           setMatchScore((/* prevMatchScore */) => {
             const updatedMatchScore = [
-              pointsArray[(0 + slot - 1) % 4],
-              pointsArray[(1 + slot - 1) % 4],
-              pointsArray[(2 + slot - 1) % 4],
-              pointsArray[(3 + slot - 1) % 4],
+              pointsArray[(0 + slot) % 4],
+              pointsArray[(1 + slot) % 4],
+              pointsArray[(2 + slot) % 4],
+              pointsArray[(3 + slot) % 4],
             ];
             //console.log("Previous match score:", prevMatchScore);
             //console.log("Updated match score:", updatedMatchScore);
@@ -140,10 +141,10 @@ const MatchPage: React.FC = () => {
 
           setRoundScore((/* prevRoundScore */) => {
             const updatedRoundScore = [
-              pointsArray[(0 + slot - 1) % 4],
-              pointsArray[(1 + slot - 1) % 4],
-              pointsArray[(2 + slot - 1) % 4],
-              pointsArray[(3 + slot - 1) % 4],
+              pointsArray[(0 + slot) % 4],
+              pointsArray[(1 + slot) % 4],
+              pointsArray[(2 + slot) % 4],
+              pointsArray[(3 + slot) % 4],
             ];
             //console.log("Previous round score:", prevRoundScore);
             //console.log("Updated round score:", updatedRoundScore);
@@ -191,10 +192,10 @@ const MatchPage: React.FC = () => {
         
           // Shift indices based on the player's slot
           const shiftedCardsInHand = [
-            cardsInHandArray[(0 + slot - 1 + 4) % 4],
-            cardsInHandArray[(1 + slot - 1 + 4) % 4],
-            cardsInHandArray[(2 + slot - 1 + 4) % 4],
-            cardsInHandArray[(3 + slot - 1 + 4) % 4],
+            cardsInHandArray[(0 + slot + 4) % 4],
+            cardsInHandArray[(1 + slot + 4) % 4],
+            cardsInHandArray[(2 + slot + 4) % 4],
+            cardsInHandArray[(3 + slot + 4) % 4],
           ];
 
           const expectedOpponent1Cards = shiftedCardsInHand[1];
