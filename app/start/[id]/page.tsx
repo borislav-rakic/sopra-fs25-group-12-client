@@ -142,10 +142,9 @@ const StartPage: React.FC = () => {
             continue;
           }
 
-          if ([1, 2, 3, 4, 5, 6, 7, 8, 9].includes(pid)) {
-            // It's an AI player
-            const slot = i;
-            const difficulty = match.aiPlayers?.[slot] ?? 1;
+          if (AI_PLAYER_INFO[pid]) {
+            const { difficulty } = AI_PLAYER_INFO[pid];
+          
             updatedSelectedPlayers[i] = "computer";
             updatedDifficulties[i] = difficulty;
           } else {
@@ -351,6 +350,18 @@ const StartPage: React.FC = () => {
     }
   };
 
+  const AI_PLAYER_INFO: Record<number, { slot: number; difficulty: number }> = {
+    1: { slot: 1, difficulty: 1 },
+    2: { slot: 2, difficulty: 1 },
+    3: { slot: 3, difficulty: 1 },
+    4: { slot: 1, difficulty: 2 },
+    5: { slot: 2, difficulty: 2 },
+    6: { slot: 3, difficulty: 2 },
+    7: { slot: 1, difficulty: 3 },
+    8: { slot: 2, difficulty: 3 },
+    9: { slot: 3, difficulty: 3 },
+  };
+
   const handleCancelMatch = async () => {
     try {
       await apiService.delete(`/matches/${gameId}`);
@@ -429,7 +440,7 @@ const StartPage: React.FC = () => {
       if (!gameId) return;
 
       try {
-        await apiService.post(`/matches/${gameId}/ai/remove`, { slot: index });
+        await apiService.post(`/matches/${gameId}/ai/remove`, { playerSlot: index });
 
         const updatedPlayers = [...selectedPlayers];
         updatedPlayers[index] = "";
