@@ -55,6 +55,7 @@ const MatchPage: React.FC = () => {
   const [firstCardPlayed, setFirstCardPlayed] = useState(false);
   const [isFirstRound, setIsFirstRound] = useState(true);
   const [myTurn, setMyTurn] = useState(false);
+  const [playableCards, setPlayableCards] = useState<Array<string | null>>([]);
   //const [currentMatchPhase, setCurrentMatchPhase] = useState("");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -132,6 +133,12 @@ const MatchPage: React.FC = () => {
           );
         });
       }
+
+      if (response.playableCards) {
+        const playableCardCodes = response.playableCards.map((item) => item.card.code);
+        setPlayableCards(playableCardCodes);
+      }
+      
 
       if (!firstCardPlayed && (response.currentTrick?.length ?? 0) > 0) {
         setFirstCardPlayed(true);
@@ -238,6 +245,10 @@ const MatchPage: React.FC = () => {
     return card;
   };
 
+  useEffect(() => {
+    console.log("PlayableCards updated:", playableCards);
+  }, [playableCards]);
+
   const generateEnemyCard = () => {
     const card: cardProps = {
       code: "XX",
@@ -286,7 +297,21 @@ const MatchPage: React.FC = () => {
     console.log("myTurn =", myTurn);
     console.log("currentGamePhase =", currentGamePhase);
 
-    if (
+    if (currentGamePhase === "PASSING") {
+      if (cardsToPass.find((c) => c.code === card.code)) {
+        setCardsToPass(cardsToPass.filter((c) => c.code !== card.code));
+        console.log("removed card from cardsToPass: ", card.code);
+        console.log("cardsToPass: ", cardsToPass);
+      } else if (cardsToPass.length < 3) {
+        setCardsToPass([...cardsToPass, card]);
+        console.log("added card to cardsToPass: ", card.code);
+        console.log("cardsToPass: ", cardsToPass);
+      } else {
+        console.log("You may not pass more than 3 cards.");
+      }
+    }
+
+    else if (
       currentGamePhase !== "NORMALTRICK" &&
       currentGamePhase !== "FIRSTTRICK" &&
       currentGamePhase !== "FINALTRICK"
@@ -326,6 +351,7 @@ const MatchPage: React.FC = () => {
       setCardsInHand(updatedCardsInHand);
       setTrickSlot0([card]);
       setCurrentPlayer(players[1] || "");
+      console.log("currentPlayer:", currentPlayer);
     } catch (error) {
       console.error("Error sending card play request:", error);
     }
@@ -336,6 +362,17 @@ const MatchPage: React.FC = () => {
   // We use the status of trickslot3 to determine if the player is playing the first card of the trick or not.
   const verifyTrick = (card: cardProps) => {
     console.log("Verifying trick for card: ", card.code);
+    console.log("playbleCards: ", playableCards);
+
+    if (playableCards.includes(card.code)) {
+      console.log("Card is valid according to the backend.");
+      return true;
+    } else {
+      console.log("Card is not valid according to the backend.");
+      return false;
+    }
+
+/* 
     if (!firstCardPlayed) {
       if (card.code === "2C") {
         console.log("First card played in the game is 2 of clubs.");
@@ -378,7 +415,7 @@ const MatchPage: React.FC = () => {
         );
         return true; // Player can play any card if they don't have the trick's suit
       }
-    }
+    } */
   };
 
   const handlePassCards = async () => {
