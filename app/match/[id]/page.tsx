@@ -1,6 +1,6 @@
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 import "@ant-design/v5-patch-for-react-19";
-import { useParams /*, useRouter */ } from "next/navigation";
+import { useParams , useRouter  } from "next/navigation";
 import Image from "next/image";
 import { Button /* , Row, Col, Space */ } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
@@ -19,6 +19,7 @@ const MatchPage: React.FC = () => {
   //const router = useRouter();
   const params = useParams();
   const apiService = useApi();
+  const router = useRouter();
 
   const matchId = params?.id?.toString();
 
@@ -56,6 +57,7 @@ const MatchPage: React.FC = () => {
   const [isFirstRound, setIsFirstRound] = useState(true);
   const [myTurn, setMyTurn] = useState(false);
   const [playableCards, setPlayableCards] = useState<Array<string | null>>([]);
+  const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false);
   //const [currentMatchPhase, setCurrentMatchPhase] = useState("");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -638,6 +640,28 @@ const MatchPage: React.FC = () => {
       } else {
         setTrickSlot3([generateCard(tempTrick[3])]);
       }
+    }
+  };
+
+  const handleConfirmNewGame = async () => {
+    try {
+      console.log("Confirming new game...");
+      await apiService.post(`/matches/${matchId}/game/confirm`, {});
+      console.log("New game confirmed.");
+      setIsWaitingForPlayers(true); // Update state to show "Waiting for other players"
+    } catch (error) {
+      console.error("Error confirming new game:", error);
+    }
+  };
+  
+  const handleLeaveGame = async () => {
+    try {
+      console.log("Leaving game...");
+      await apiService.post(`/matches/${matchId}/leave`, {});
+      router.push("/"); // Redirect to the home page after leaving the game
+      console.log("Game left.");
+    } catch (error) {
+      console.error("Error leaving game:", error);
     }
   };
   /*
@@ -1372,6 +1396,82 @@ const MatchPage: React.FC = () => {
           >
             Pass Cards
           </button>
+        )}
+
+        {currentGamePhase === "RESULT" && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 1000,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "20px",
+            }}
+          >
+            {!isWaitingForPlayers ? (
+              <>
+                <button
+                  onClick={handleConfirmNewGame}
+                  style={{
+                    padding: "15px 30px",
+                    fontSize: "1.2rem",
+                    backgroundColor: "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3s ease",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#45a049")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#4CAF50")
+                  }
+                >
+                  Confirm New Game
+                </button>
+                <button
+                  onClick={handleLeaveGame}
+                  style={{
+                    padding: "15px 30px",
+                    fontSize: "1.2rem",
+                    backgroundColor: "#f44336",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3s ease",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#d32f2f")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#f44336")
+                  }
+                >
+                  Leave Game
+                </button>
+              </>
+            ) : (
+              <div
+                style={{
+                  padding: "15px 30px",
+                  fontSize: "1.2rem",
+                  backgroundColor: "#d3d3d3",
+                  color: "#000",
+                  borderRadius: "10px",
+                  textAlign: "center",
+                }}
+              >
+                Waiting for other players...
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>
