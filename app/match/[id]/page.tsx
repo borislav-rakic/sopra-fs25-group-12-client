@@ -58,6 +58,7 @@ const MatchPage: React.FC = () => {
   const [myTurn, setMyTurn] = useState(false);
   const [playableCards, setPlayableCards] = useState<Array<string | null>>([]);
   const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false);
+  const [isLeaveGameModalVisible, setIsLeaveGameModalVisible] = useState(false);
   //const [currentMatchPhase, setCurrentMatchPhase] = useState("");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -654,16 +655,27 @@ const MatchPage: React.FC = () => {
     }
   };
   
+  const showLeaveGameModal = () => {
+    setIsLeaveGameModalVisible(true);
+  };
+  
+  const hideLeaveGameModal = () => {
+    setIsLeaveGameModalVisible(false);
+  };
+
   const handleLeaveGame = async () => {
     try {
       console.log("Leaving game...");
-      await apiService.post(`/matches/${matchId}/leave`, {});
+      await apiService.delete(`/matches/${matchId}/leave`);
       router.push("/"); // Redirect to the home page after leaving the game
       console.log("Game left.");
     } catch (error) {
       console.error("Error leaving game:", error);
+    } finally {
+      hideLeaveGameModal(); // Hide the modal
     }
   };
+
   /*
   const resetGame = () => {
     setCardsInHand([]);
@@ -697,6 +709,26 @@ const MatchPage: React.FC = () => {
           }}
         />
       </div>
+
+      <button
+      className="leave-game-button"
+      onClick={showLeaveGameModal}
+      style={{
+        position: "absolute",
+        top: "10px",
+        left: "80px", // Adjust position relative to the gear icon
+        padding: "10px 20px",
+        fontSize: "0.9rem",
+        backgroundColor: "#f44336",
+        color: "white",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        zIndex: 1000,
+      }}
+    >
+      Leave Game
+    </button>
 
       <SettingsPopup
         isOpen={isSettingsOpen}
@@ -1471,6 +1503,68 @@ const MatchPage: React.FC = () => {
                 Waiting for other players...
               </div>
             )}
+          </div>
+        )}
+
+        {isLeaveGameModalVisible && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0, 0, 0, 0.7)", // Dark overlay
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 2000,
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: "#333", // Dark background for the modal
+                padding: "20px",
+                borderRadius: "10px",
+                textAlign: "center",
+                width: "300px",
+                color: "#fff", // Light text color for contrast
+              }}
+            >
+              <p style={{ fontSize: "1.2rem", marginBottom: "20px" }}>
+                Are you sure you want to leave the game?
+              </p>
+              <div style={{ display: "flex", justifyContent: "space-around" }}>
+                <button
+                  onClick={handleLeaveGame}
+                  style={{
+                    padding: "10px 20px",
+                    fontSize: "1rem",
+                    backgroundColor: "#f44336",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Confirm
+                </button>
+                <button
+                  onClick={hideLeaveGameModal}
+                  style={{
+                    padding: "10px 20px",
+                    fontSize: "1rem",
+                    backgroundColor: "#555", // Darker grey for the cancel button
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
