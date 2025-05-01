@@ -311,7 +311,8 @@ const MatchPage: React.FC = () => {
       }
     }
 
-    else if (
+    else{ 
+    if (
       currentGamePhase !== "NORMALTRICK" &&
       currentGamePhase !== "FIRSTTRICK" &&
       currentGamePhase !== "FINALTRICK"
@@ -355,6 +356,7 @@ const MatchPage: React.FC = () => {
     } catch (error) {
       console.error("Error sending card play request:", error);
     }
+  }
   };
 
   // Checks if the played card is a valid play in the current trick.
