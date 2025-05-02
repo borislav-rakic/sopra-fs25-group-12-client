@@ -975,11 +975,16 @@ const MatchPage: React.FC = () => {
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)", // Add a shadow for better visibility
             }}
           >
-            {/* Provided HTML content */}
             <div>
               <h2>Round Complete</h2>
-              <p>Here is the summary of the round...</p>
-              {/* Add any other HTML content here */}
+              <div
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
+                style={{
+                  marginTop: "10px",
+                  textAlign: "left", // Optional: Adjust text alignment
+                  color: "#fff", // Ensure text is visible in dark mode
+                }}
+              />
             </div>
 
             {/* Confirm button or waiting message */}
