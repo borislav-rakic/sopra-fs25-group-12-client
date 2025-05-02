@@ -69,9 +69,11 @@ const MatchPage: React.FC = () => {
   //const [slot, setSlot] = useState(1);
   //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isMatchTesterVisible, setIsMatchTesterVisible] = useState(true);
 
   const [htmlContent, setHtmlContent] = useState<string>("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const HtmlRenderer: React.FC<{ htmlString: string }> = ({ htmlString }) => {
     return (
       <div
