@@ -996,66 +996,55 @@ const MatchPage: React.FC = () => {
               left: "50%",
               transform: "translate(-50%, -50%)",
               zIndex: 1000,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "20px",
+              backgroundColor: "#333", // Dark background for the box
+              color: "#fff", // Light text color for contrast
+              padding: "20px",
+              borderRadius: "10px",
+              textAlign: "center",
+              width: "400px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)", // Add a shadow for better visibility
             }}
           >
+            {/* Provided HTML content */}
+            <div>
+              <h2>Round Complete</h2>
+              <p>Here is the summary of the round...</p>
+              {/* Add any other HTML content here */}
+            </div>
+
+            {/* Confirm button or waiting message */}
             {!isWaitingForPlayers ? (
-              <>
-                <button
-                  onClick={handleConfirmNewGame}
-                  style={{
-                    padding: "15px 30px",
-                    fontSize: "1.2rem",
-                    backgroundColor: "#4CAF50",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#45a049")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#4CAF50")
-                  }
-                >
-                  Confirm New Game
-                </button>
-                <button
-                  onClick={handleLeaveGame}
-                  style={{
-                    padding: "15px 30px",
-                    fontSize: "1.2rem",
-                    backgroundColor: "#f44336",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#d32f2f")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#f44336")
-                  }
-                >
-                  Leave Game
-                </button>
-              </>
+              <button
+                onClick={handleConfirmNewGame}
+                style={{
+                  marginTop: "20px",
+                  padding: "10px 20px",
+                  fontSize: "1rem",
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  transition: "background-color 0.3s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#45a049")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#4CAF50")
+                }
+              >
+                Confirm
+              </button>
             ) : (
               <div
                 style={{
-                  padding: "15px 30px",
-                  fontSize: "1.2rem",
-                  backgroundColor: "#d3d3d3",
-                  color: "#000",
-                  borderRadius: "10px",
-                  textAlign: "center",
+                  marginTop: "20px",
+                  padding: "10px 20px",
+                  fontSize: "1rem",
+                  backgroundColor: "#555",
+                  color: "white",
+                  borderRadius: "5px",
                 }}
               >
                 Waiting for other players...
