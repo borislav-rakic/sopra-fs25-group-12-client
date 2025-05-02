@@ -13,7 +13,6 @@ import type { UserPrivateDTO } from "@/types/user";
 import { /*Avatar*/ Dropdown /*Menu*/ } from "antd";
 // import { UserOutlined } from "@ant-design/icons";
 
-
 const LandingPageUser: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
@@ -78,134 +77,144 @@ const LandingPageUser: React.FC = () => {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-      <div className='contentContainer'>
-        {user && !user.isGuest && (
-          <div style={{ position: "absolute", top: 20, right: 30, zIndex: 1000 }}>
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: "friends",
-                    label: "Friends",
-                    onClick: () => router.push("/friends"),
-                  },
-                  {
-                    key: "profile",
-                    label: "Profile",
-                    onClick: () => router.push("/profile"),
-                  },
-                  {
-                    key: "logout",
-                    label: "Logout",
-                    onClick: handleLogout,
-                  },
-                ],
-              }}
-              placement="bottomRight"
-              arrow
+        <div className="contentContainer">
+          {user && !user.isGuest && (
+            <div
+              style={{ position: "absolute", top: 20, right: 30, zIndex: 1000 }}
             >
-              <Image
-                src={`/avatars_118x118/a${user.avatar || 101}.png`}
-                alt="User avatar"
-                width={50}
-                height={50}
-                style={{
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  border: "2px solid white",
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "friends",
+                      label: "Friends",
+                      onClick: () => router.push("/friends"),
+                    },
+                    {
+                      key: "profile",
+                      label: "Profile",
+                      onClick: () => router.push("/profile"),
+                    },
+                    {
+                      key: "logout",
+                      label: "Logout",
+                      onClick: handleLogout,
+                    },
+                  ],
                 }}
-              />
-            </Dropdown>
-          </div>
-        )}
-  
-        <Image
-          src="/LandingPageCards.png"
-          alt="Hearts Attack Cards"
-          width={200}
-          height={150}
-          className={styles.cardImage}
-        />
-
-        <h1 className="luckiestGuy" style={{ marginTop: 24 }}>HEARTS ATTACK!</h1>
-
-        <Space direction="vertical" size="middle" style={{ marginTop: 24 }}>
-          <Row gutter={16} justify="center">
-            <Col>
-              <Button
-                block className={styles.whiteButton}
-                onClick={handleNewMatch}
+                placement="bottomRight"
+                arrow
               >
-                New Match
-              </Button>
-            </Col>
-            <Col>
-              <Button
-                block className={styles.whiteButton}
-                onClick={() => router.push("/join")}
-              >
-                Join Match
-              </Button>
-            </Col>
-          </Row>
+                <Image
+                  src={`/avatars_118x118/a${user.avatar || 101}.png`}
+                  alt="User avatar"
+                  width={50}
+                  height={50}
+                  style={{
+                    borderRadius: "50%",
+                    cursor: "pointer",
+                    border: "2px solid white",
+                  }}
+                />
+              </Dropdown>
+            </div>
+          )}
 
-          <Row gutter={16} justify="center">
-            <Col>
-              <Button
-                block className={styles.whiteButton}
-                onClick={() => router.push("/leaderboard")}
-              >
-                Leaderboard
-              </Button>
-            </Col>
-            <Col>
-              <Button
-                block className={styles.whiteButton}
-                onClick={() => router.push("/rules")}
-              >
-                Rules
-              </Button>
-            </Col>
-          </Row>
-          <Row justify="center">
-            {user && user.isGuest && (
-              <>
-                <Col>
-                  <span style={{ marginLeft: "1em" }}>
-                    You are logged in as a guest only.
-                  </span>
-                  <Button
-                    block className={styles.whiteButton}
-                    onClick={() => router.push("/login")}
-                    style={{ marginLeft: "1em" }}
-                  >
-                    Login
-                  </Button>
-                </Col>
+          <Image
+            src="/LandingPageCards.png"
+            alt="Hearts Attack Cards"
+            width={200}
+            height={150}
+            className={styles.cardImage}
+          />
 
-                <Col>
-                  <Button
-                    block className={styles.whiteButton}
-                    onClick={() => router.push("/register")}
-                    style={{ marginLeft: "1em" }}
-                  >
-                    Register
-                  </Button>
-                </Col>
-              </>
-            )}
-          </Row>
-        </Space>
+          <h1 className="luckiestGuy" style={{ marginTop: 24 }}>
+            HEARTS ATTACK!
+          </h1>
 
-        <SettingsPopup
-          isOpen={settingsOpen}
-          onClose={() => setSettingsOpen(false)}
-          playmat={playmat}
-          setPlaymat={setPlaymat}
-          cardback={cardback}
-          setCardback={setCardback}
-        />
-         </div>
+          <Space direction="vertical" size="middle" style={{ marginTop: 24 }}>
+            <Row gutter={16} justify="center">
+              <Col>
+                <Button
+                  block
+                  className={styles.whiteButton}
+                  onClick={handleNewMatch}
+                >
+                  New Match
+                </Button>
+              </Col>
+              <Col>
+                <Button
+                  block
+                  className={styles.whiteButton}
+                  onClick={() => router.push("/join")}
+                >
+                  Join Match
+                </Button>
+              </Col>
+            </Row>
+
+            <Row gutter={16} justify="center">
+              <Col>
+                <Button
+                  block
+                  className={styles.whiteButton}
+                  onClick={() => router.push("/leaderboard")}
+                >
+                  Leaderboard
+                </Button>
+              </Col>
+              <Col>
+                <Button
+                  block
+                  className={styles.whiteButton}
+                  onClick={() => router.push("/rules")}
+                >
+                  Rules
+                </Button>
+              </Col>
+            </Row>
+            <Row justify="center">
+              {user && user.isGuest && (
+                <>
+                  <Col>
+                    <span style={{ marginLeft: "1em" }}>
+                      You are logged in as a guest only.
+                    </span>
+                    <Button
+                      block
+                      className={styles.whiteButton}
+                      onClick={() => router.push("/login")}
+                      style={{ marginLeft: "1em" }}
+                    >
+                      Login
+                    </Button>
+                  </Col>
+
+                  <Col>
+                    <Button
+                      block
+                      className={styles.whiteButton}
+                      onClick={() => router.push("/register")}
+                      style={{ marginLeft: "1em" }}
+                    >
+                      Register
+                    </Button>
+                  </Col>
+                </>
+              )}
+            </Row>
+          </Space>
+
+          <SettingsPopup
+            isOpen={settingsOpen}
+            onClose={() => setSettingsOpen(false)}
+            playmat={playmat}
+            setPlaymat={setPlaymat}
+            cardback={cardback}
+            setCardback={setCardback}
+          />
+        </div>
       </main>
     </div>
   );

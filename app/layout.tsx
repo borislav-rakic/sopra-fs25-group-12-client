@@ -22,7 +22,6 @@ const luckiestGuy = Luckiest_Guy({
   variable: "--font-luckiest-guy",
 });
 
-
 export const metadata: Metadata = {
   title: "SoPra Group 12: Hearts Attack",
   description: "sopra-fs25-template-client",
@@ -47,7 +46,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${luckiestGuy.variable}`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${luckiestGuy.variable}`}
+      >
         <ConfigProvider
           theme={{
             algorithm: theme.defaultAlgorithm,

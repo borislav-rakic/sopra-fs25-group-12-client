@@ -38,7 +38,6 @@
   width: 100%; /* Fill the width of the container */
   height: 100%; /* Fill the height of the container */
   object-fit: fill; /* Ensure the image scales without distortion */
-  border-radius: 10px;
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
   z-index: 20;
@@ -49,7 +48,6 @@
   position: relative; /* Required for layout="fill" */
   width: 100%; /* Ensure the wrapper fills the card container */
   height: 100%; /* Ensure the wrapper fills the card container */
-  border-radius: 10px; /* Add rounded corners to the image wrapper */
   overflow: hidden; /* Ensure the image respects the rounded corners */
 }
 
@@ -75,7 +73,6 @@
   width: 100%; /* Fill the width of the container */
   height: 100%; /* Fill the height of the container */
   object-fit: fill; /* Ensure the image scales without distortion */
-  border-radius: 10px;
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
   z-index: 20;

@@ -77,33 +77,36 @@ const FriendsPage: React.FC = () => {
 
   return (
     <div className="contentContainer">
-    <div className="friends-page">
-      {renderFriendSection(
-        "My Friends",
-        acceptedRequests,
-        "No accepted friends yet.",
-      )}
-      {renderFriendSection(
-        "Incoming Friend Requests",
-        pendingRequests,
-        "No incoming requests.",
-      )}
-      {renderFriendSection(
-        "Declined Friend Requests",
-        declinedRequests,
-        "No declined requests.",
-      )}
-      <h3 style={{ color: "white", fontWeight: "bold" }}>Search for new friends:</h3>
-      <UserSearchPanel />
+      <div className="friends-page">
+        {renderFriendSection(
+          "My Friends",
+          acceptedRequests,
+          "No accepted friends yet.",
+        )}
+        {renderFriendSection(
+          "Incoming Friend Requests",
+          pendingRequests,
+          "No incoming requests.",
+        )}
+        {renderFriendSection(
+          "Declined Friend Requests",
+          declinedRequests,
+          "No declined requests.",
+        )}
+        <h3 style={{ color: "white", fontWeight: "bold" }}>
+          Search for new friends:
+        </h3>
+        <UserSearchPanel />
 
-      <Button
-        block className={styles.whiteButton}
-        style={{ width: 200, marginTop: "10px"}}
-        onClick={() => router.push("/landingpageuser")}
-      >
-        Back to Home Page
-      </Button>
-    </div>
+        <Button
+          block
+          className={styles.whiteButton}
+          style={{ width: 200, marginTop: "10px" }}
+          onClick={() => router.push("/landingpageuser")}
+        >
+          Back to Home Page
+        </Button>
+      </div>
     </div>
   );
 };

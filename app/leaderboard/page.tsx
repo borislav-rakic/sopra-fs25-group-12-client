@@ -119,12 +119,12 @@ const LeaderboardPage: React.FC = () => {
         >
           {/* Top-right controls */}
           <Space style={{ justifyContent: "flex-end", width: "100%" }}>
-          <Input
-            placeholder="Search username..."
-            size="large"
-            value={searchValue}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
+            <Input
+              placeholder="Search username..."
+              size="large"
+              value={searchValue}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
 
             <Dropdown
               menu={{
@@ -165,7 +165,8 @@ const LeaderboardPage: React.FC = () => {
           >
             {/* Back to Home */}
             <Button
-              block className={styles.whiteButton}
+              block
+              className={styles.whiteButton}
               onClick={() => router.push("/landingpageuser")}
             >
               Back To Home Page

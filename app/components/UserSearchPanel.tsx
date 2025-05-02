@@ -56,13 +56,13 @@ const UserSearchPanel: React.FC = () => {
 
   return (
     <div style={{ width: "100%", maxWidth: 1200 }}>
-     <Input
-      placeholder="Search username..."
-      size="large"
-      value={query}
-      onChange={(e) => setQuery(e.target.value)}
-      allowClear
-      style={{ backgroundColor: "white", width: "260px" }}
+      <Input
+        placeholder="Search username..."
+        size="large"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        allowClear
+        style={{ backgroundColor: "white", width: "260px" }}
       />{" "}
       {query.trim() && (
         <div>

@@ -25,10 +25,11 @@ const StartPage: React.FC = () => {
   const gameId = params?.id?.toString();
   const router = useRouter();
   const apiService = useApi();
-  const frontendIndexToSlot = (index: number): number => index + 1;
-  const slotToFrontendIndex = (slot: number): number => slot - 1;
-  const frontendPlayerIndices = [0, 1, 2, 3];
   const TOTAL_SLOTS = 4;
+  const frontendPlayerIndices = Array.from(
+    { length: TOTAL_SLOTS },
+    (_, i) => i,
+  );
 
   const [selectedPlayers, setSelectedPlayers] = useState(["", "", "", ""]);
   const [showDifficulty, setShowDifficulty] = useState([
@@ -86,18 +87,16 @@ const StartPage: React.FC = () => {
 
     const loadUsers = async () => {
       try {
-        const result = await apiService.get<User[]>("/users");
-        const onlineUsers = result.filter((user) =>
-          user.status === "ONLINE" &&
-          !user.isAiPlayer
+        const result = await apiService.get<User[]>(
+          `/matches/${gameId}/eligibleusers`,
         );
-        setUsers(onlineUsers);
-        setFilteredUsers(onlineUsers);
-        usersRef.current = onlineUsers;
+        setUsers(result);
+        setFilteredUsers(result);
+        usersRef.current = result;
       } catch {
         message.open({
           type: "error",
-          content: "Could not load user list.",
+          content: "Could not load eligible users.",
         });
       }
     };
@@ -105,6 +104,7 @@ const StartPage: React.FC = () => {
     const loadMatch = async () => {
       try {
         const match = await apiService.get<Match>(`/matches/${gameId}`);
+        console.log(match);
         const playerIdList = [
           match.player1Id,
           match.player2Id,
@@ -133,19 +133,18 @@ const StartPage: React.FC = () => {
           match.player3Id,
           match.player4Id,
         ];
-                
+
         for (let i = 0; i < playerIdsArray.length; i++) {
           const pid = playerIdsArray[i];
-        
+
           if (pid === null || pid === undefined) {
             updatedSelectedPlayers[i] = "";
             continue;
           }
-        
-          if ([1, 2, 3].includes(pid)) {
-            // It's an AI player
-            const slot = frontendIndexToSlot(i);
-            const difficulty = match.aiPlayers?.[slot] ?? 1;
+
+          if (AI_PLAYER_INFO[pid]) {
+            const { difficulty } = AI_PLAYER_INFO[pid];
+          
             updatedSelectedPlayers[i] = "computer";
             updatedDifficulties[i] = difficulty;
           } else {
@@ -153,12 +152,12 @@ const StartPage: React.FC = () => {
             const user = usersRef.current.find((u) => Number(u.id) === pid);
             updatedSelectedPlayers[i] = user?.username ?? "Unknown User";
           }
-        };
-        
+        }
+
         Object.entries(match.invites || {}).forEach(([slotStr, userId]) => {
           const slot = Number(slotStr);
-          const index = slotToFrontendIndex(slot);
-        
+          const index = slot;
+
           const user = usersRef.current.find((u) => Number(u.id) === userId);
           updatedSelectedPlayers[index] = user?.username ?? "Waiting...";
           updatedInviteStatus[index] = "waiting";
@@ -169,6 +168,11 @@ const StartPage: React.FC = () => {
         setInviteStatus(updatedInviteStatus);
         setPendingInvites(updatedPendingInvites);
         setSelectedDifficulties(updatedDifficulties);
+
+        if(match.started){
+          router.push(`/match/${gameId}`);
+        }
+
       } catch {
         message.open({
           type: "error",
@@ -262,7 +266,7 @@ const StartPage: React.FC = () => {
       }
       await apiService.post(`/matches/${gameId}/invite`, {
         userId: user.id,
-        playerSlot: frontendIndexToSlot(index),
+        playerSlot: index,
       });
 
       const updated = [...selectedPlayers];
@@ -301,25 +305,25 @@ const StartPage: React.FC = () => {
 
   const handleCancelInvite = async (index: number) => {
     if (!gameId) return;
-  
+
     try {
-      await apiService.delete(`/matches/${gameId}/invite/${frontendIndexToSlot(index)}`);
-  
+      await apiService.delete(`/matches/${gameId}/invite/${index}`);
+
       const updatedPlayers = [...selectedPlayers];
       updatedPlayers[index] = "";
       setSelectedPlayers(updatedPlayers);
-  
+
       const updatedStatuses = [...inviteStatus];
       updatedStatuses[index] = null;
       setInviteStatus(updatedStatuses);
-  
+
       const updatedPending = [...pendingInvites];
       updatedPending[index] = null;
       setPendingInvites(updatedPending);
-  
+
       message.open({
         type: "info",
-        content: `Invite for slot ${frontendIndexToSlot(index)} has been cancelled.`,
+        content: `Invite for slot ${index} has been cancelled.`,
       });
     } catch {
       message.open({
@@ -328,7 +332,6 @@ const StartPage: React.FC = () => {
       });
     }
   };
-  
 
   const handleStart = async () => {
     try {
@@ -350,6 +353,18 @@ const StartPage: React.FC = () => {
         });
       }
     }
+  };
+
+  const AI_PLAYER_INFO: Record<number, { slot: number; difficulty: number }> = {
+    1: { slot: 1, difficulty: 1 },
+    2: { slot: 2, difficulty: 1 },
+    3: { slot: 3, difficulty: 1 },
+    4: { slot: 1, difficulty: 2 },
+    5: { slot: 2, difficulty: 2 },
+    6: { slot: 3, difficulty: 2 },
+    7: { slot: 1, difficulty: 3 },
+    8: { slot: 2, difficulty: 3 },
+    9: { slot: 3, difficulty: 3 },
   };
 
   const handleCancelMatch = async () => {
@@ -390,7 +405,7 @@ const StartPage: React.FC = () => {
     const player = selectedPlayers[index];
     const isComputer = player === "computer";
     const isFilled = player && player !== "computer" && player !== "invite";
-    const difficultyLabel = ["","Easy", "Medium", "Difficult"];
+    const difficultyLabel = ["", "Easy", "Medium", "Difficult"];
 
     const handleDifficultySelect = async (difficulty: number) => {
       const updated = [...selectedPlayers];
@@ -412,11 +427,11 @@ const StartPage: React.FC = () => {
       try {
         await apiService.post(`/matches/${gameId}/ai`, {
           difficulty: difficulty,
-          slot: frontendIndexToSlot(index),
+          playerSlot: index,
         });
         message.open({
           type: "success",
-          content: `Computer added at position ${frontendIndexToSlot(index)}`,
+          content: `Computer added at position ${index}`,
         });
       } catch {
         message.open({
@@ -428,21 +443,21 @@ const StartPage: React.FC = () => {
 
     const handleRemoveAi = async (index: number) => {
       if (!gameId) return;
-    
+
       try {
-        await apiService.post(`/matches/${gameId}/ai/remove`, { slot: frontendIndexToSlot(index) });
-    
+        await apiService.post(`/matches/${gameId}/ai/remove`, { playerSlot: index });
+
         const updatedPlayers = [...selectedPlayers];
         updatedPlayers[index] = "";
         setSelectedPlayers(updatedPlayers);
-    
+
         const updatedDiffs = [...selectedDifficulties];
         updatedDiffs[index] = 0;
         setSelectedDifficulties(updatedDiffs);
-    
+
         message.open({
           type: "success",
-          content: `AI player removed from slot ${frontendIndexToSlot(index)}`,
+          content: `AI player removed from slot ${index}`,
         });
       } catch {
         message.open({
@@ -454,25 +469,25 @@ const StartPage: React.FC = () => {
 
     const handleRemovePlayer = async (index: number) => {
       if (!gameId) return;
-    
+
       try {
-        await apiService.delete(`/matches/${gameId}/player/${frontendIndexToSlot(index)}`);
-    
+        await apiService.delete(`/matches/${gameId}/player/${index}`);
+
         const updatedPlayers = [...selectedPlayers];
         updatedPlayers[index] = "";
         setSelectedPlayers(updatedPlayers);
-    
+
         const updatedStatuses = [...inviteStatus];
         updatedStatuses[index] = null;
         setInviteStatus(updatedStatuses);
-    
+
         const updatedPending = [...pendingInvites];
         updatedPending[index] = null;
         setPendingInvites(updatedPending);
-    
+
         message.open({
           type: "info",
-          content: `Player removed from slot ${frontendIndexToSlot(index)}`,
+          content: `Player removed from slot ${index}`,
         });
       } catch {
         message.open({
@@ -481,10 +496,10 @@ const StartPage: React.FC = () => {
         });
       }
     };
-    
+
     const handleLeaveMatch = async () => {
       if (!gameId) return;
-    
+
       try {
         await apiService.delete(`/matches/${gameId}/leave`);
         message.open({
@@ -499,8 +514,6 @@ const StartPage: React.FC = () => {
         });
       }
     };
-    
-    
 
     const difficultyItems = [
       { label: <span style={{ color: "black" }}>Easy</span>, key: "1" },
@@ -551,84 +564,116 @@ const StartPage: React.FC = () => {
         >
           {inviteStatus[index] === "waiting"
             ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <p
-                style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
               >
-                Waiting...
-              </p>
-              {isHost && (
-                <Button
-                  danger
-                  size="small"
-                  type="link"
-                  onClick={() => handleCancelInvite(index)}
+                <p
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                    color: "black",
+                  }}
                 >
-                  Cancel
-                </Button>
-              )}
+                  Waiting...
+                </p>
+                {isHost && (
+                  <Button
+                    danger
+                    size="small"
+                    type="link"
+                    onClick={() => handleCancelInvite(index)}
+                  >
+                    Cancel
+                  </Button>
+                )}
               </div>
             )
             : isComputer
             ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <p style={{ fontWeight: "bold", fontSize: "16px", color: "black", marginBottom: 0 }}>
-                AI Player: {difficultyLabel[selectedDifficulties[index]]}
-              </p>
-              {isHost && (
-                <Button
-                  size="small"
-                  danger
-                  type="link"
-                  onClick={() => handleRemoveAi(index)}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <p
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                    color: "black",
+                    marginBottom: 0,
+                  }}
                 >
-                  Remove
-                </Button>
-              )}
-            </div>
-
+                  AI Player: {difficultyLabel[selectedDifficulties[index]]}
+                </p>
+                {isHost && (
+                  <Button
+                    size="small"
+                    danger
+                    type="link"
+                    onClick={() => handleRemoveAi(index)}
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
             )
             : isFilled
             ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <p
-                style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
               >
-                {player}
-              </p>
-              {isHost && (
-              <Button
-                size="small"
-                danger
-                type="link"
-                onClick={() => handleRemovePlayer(index)}
-              >
-                Remove
-              </Button>
-            )}
-            {player === currentUsername && !isHost && (
-              <Button
-                size="small"
-                danger
-                type="link"
-                onClick={handleLeaveMatch}
-              >
-                Leave
-              </Button>
-            )}
-             </div>
+                <p
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: "16px",
+                    color: "black",
+                  }}
+                >
+                  {player}
+                </p>
+                {isHost && (
+                  <Button
+                    size="small"
+                    danger
+                    type="link"
+                    onClick={() => handleRemovePlayer(index)}
+                  >
+                    Remove
+                  </Button>
+                )}
+                {player === currentUsername && !isHost && (
+                  <Button
+                    size="small"
+                    danger
+                    type="link"
+                    onClick={handleLeaveMatch}
+                  >
+                    Leave
+                  </Button>
+                )}
+              </div>
             )
             : !isHost
             ? (
               <p style={{ fontSize: "16px", color: "black" }}>
                 Waiting for other players...
               </p>
-
             )
             : (
               <>
                 <Button
-                  block className={styles.whiteButton}
+                  block
+                  className={styles.whiteButton}
                   onClick={() => {
                     const updated = [...selectedPlayers];
                     const toggleInvite = [...showInvite];
@@ -669,7 +714,8 @@ const StartPage: React.FC = () => {
                   trigger={["click"]}
                 >
                   <Button
-                    block className={styles.whiteButton}
+                    block
+                    className={styles.whiteButton}
                   >
                     {isComputer
                       ? `Computer (${
@@ -804,21 +850,37 @@ const StartPage: React.FC = () => {
 
         {isHost && (
           <>
-            <div style={{ marginTop: "5",marginBottom: "10px", textAlign: "center" }}>
-              <p style={{ color: "white", fontWeight: "bold", marginBottom: "10px", fontSize: "20px",}}>
+            <div
+              style={{
+                marginTop: "5",
+                marginBottom: "10px",
+                textAlign: "center",
+              }}
+            >
+              <p
+                style={{
+                  color: "white",
+                  fontWeight: "bold",
+                  marginBottom: "10px",
+                  fontSize: "20px",
+                }}
+              >
                 Amount of points to be reached until the end:
               </p>
               <Row gutter={[8, 8]} justify="center">
                 {[50, 75, 100, 150, 200].map((points) => (
                   <Col key={points}>
                     <Button
-                    type="default"
+                      type="default"
                       onClick={async () => {
                         setSelectedPoints(points);
                         try {
-                          await apiService.post(`/matches/${gameId}/matchGoal`, {
-                            matchGoal: points,
-                          });
+                          await apiService.post(
+                            `/matches/${gameId}/matchGoal`,
+                            {
+                              matchGoal: points,
+                            },
+                          );
                           message.open({
                             type: "success",
                             content: `Points set to ${points}`,
@@ -853,10 +915,18 @@ const StartPage: React.FC = () => {
                 gap: "20px",
               }}
             >
-              <Button block className={styles.whiteButton} onClick={handleCancelMatch}>
+              <Button
+                block
+                className={styles.whiteButton}
+                onClick={handleCancelMatch}
+              >
                 Cancel Match
               </Button>
-              <Button block className={styles.whiteButton} onClick={handleStart}>
+              <Button
+                block
+                className={styles.whiteButton}
+                onClick={handleStart}
+              >
                 Start
               </Button>
             </div>

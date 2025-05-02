@@ -14,13 +14,13 @@ interface SettingsPopupProps {
 }
 
 const playMatColors = [
-  "#008000",
-  "#ec4d40",
-  "#57d2e4",
-  "#42db83",
-  "#f4e841",
-  "#040400",
-  "#fffefa",
+  "darkgreen",
+  "darkred",
+  "darkblue",
+  "rebeccapurple",
+  "orange",
+  "white",
+  "black",
 ];
 
 const cardBackFiles = Array.from({ length: 6 }, (_, i) => `b10${i + 1}.png`);
@@ -62,7 +62,11 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
   return (
     <div className={styles.settingsPopupOverlay}>
       <div className={styles.settingsPopup}>
-        <button type="button" className={styles.closeButton} onClick={handleCancel}>
+        <button
+          type="button"
+          className={styles.closeButton}
+          onClick={handleCancel}
+        >
           ✖
         </button>
         <h2>Settings</h2>
@@ -101,7 +105,11 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
             ))}
           </div>
         </div>
-        <button type="button" className={styles.settingsApply} onClick={handleApply}>
+        <button
+          type="button"
+          className={styles.settingsApply}
+          onClick={handleApply}
+        >
           Apply
         </button>
       </div>

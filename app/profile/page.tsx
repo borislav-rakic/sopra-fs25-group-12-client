@@ -13,8 +13,6 @@ import "@/styles/globals.css";
 import styles from "@/styles/page.module.css";
 import { Input } from "antd";
 
-
-
 const MyProfile: React.FC = () => {
   const router = useRouter();
   const [form, setForm] = useState({
@@ -173,58 +171,62 @@ const MyProfile: React.FC = () => {
         </div>
       </div>
       <div className="contentContainer">
-      <h2 style={{ color: "white", marginBottom: "16px" }}>Your Profile</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Change Username:
-          <Input
-            name="username"
-            value={form.username}
-            onChange={handleChange}
-            maxLength={36}
-          />
-        </label>
-        <label>
-          Change Password:
-          <Input.Password
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            placeholder="Enter new password"
-          />
-        </label>
-        <label>
-          Confirm Password:
-          <Input.Password
-            name="passwordConfirmed"
-            value={form.passwordConfirmed}
-            onChange={handleChange}
-            placeholder="Re-enter new password"
-          />
-        </label>
-        <label>
-          Change Birthday:
-          <Input
-            type="date"
-            name="birthday"
-            value={form.birthday}
-            onChange={handleChange}
-          />
-        </label>
+        <h2 style={{ color: "white", marginBottom: "16px" }}>Your Profile</h2>
+        <form onSubmit={handleSubmit}>
+          <label>
+            Change Username:
+            <Input
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              maxLength={36}
+            />
+          </label>
+          <label>
+            Change Password:
+            <Input.Password
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Enter new password"
+            />
+          </label>
+          <label>
+            Confirm Password:
+            <Input.Password
+              name="passwordConfirmed"
+              value={form.passwordConfirmed}
+              onChange={handleChange}
+              placeholder="Re-enter new password"
+            />
+          </label>
+          <label>
+            Change Birthday:
+            <Input
+              type="date"
+              name="birthday"
+              value={form.birthday}
+              onChange={handleChange}
+            />
+          </label>
 
-        <AvatarSelector selected={form.avatar} onSelect={handleAvatarSelect} />
+          <AvatarSelector
+            selected={form.avatar}
+            onSelect={handleAvatarSelect}
+          />
 
-        <Button htmlType="submit" block className={styles.whiteButton}>
-          Save Changes
-        </Button>
-        <Button
-          block className={styles.whiteButton}
-          onClick={() => router.push("/landingpageuser")}
-        >
-          Back to Homepage
-        </Button>
-      </form>
-    </div>
+          <Button htmlType="submit" block className={styles.whiteButton}>
+            Save Changes
+          </Button>
+          <Button
+            block
+            className={styles.whiteButton}
+            onClick={() => router.push("/landingpageuser")}
+          >
+            Back to Homepage
+          </Button>
+        </form>
+      </div>
     </div>
   );
 };
