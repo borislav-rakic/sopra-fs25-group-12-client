@@ -69,6 +69,17 @@ const MatchPage: React.FC = () => {
   //const [slot, setSlot] = useState(1);
   //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
 
+  const [isMatchTesterVisible, setIsMatchTesterVisible] = useState(true);
+
+  const [htmlContent, setHtmlContent] = useState<string>("");
+  const HtmlRenderer: React.FC<{ htmlString: string }> = ({ htmlString }) => {
+    return (
+      <div
+        dangerouslySetInnerHTML={{ __html: htmlString }}
+      />
+    );
+  };
+
   const fetchMatchData = async () => {
     try {
       console.log("📡 Fetching match data");
@@ -86,6 +97,10 @@ const MatchPage: React.FC = () => {
 
       const slot = response.playerSlot ?? 0;
       const trickLeaderSlot = response.currentTrickLeaderPlayerSlot ?? 1;
+
+      if(response.resultHtml) {
+        setHtmlContent(response.resultHtml);
+      }
 
       if (response.matchPlayers) {
         setPlayers([
@@ -375,51 +390,6 @@ const MatchPage: React.FC = () => {
       console.log("Card is not valid according to the backend.");
       return false;
     }
-
-/* 
-    if (!firstCardPlayed) {
-      if (card.code === "2C") {
-        console.log("First card played in the game is 2 of clubs.");
-        return true; // 2 of clubs is played first
-      }
-      console.log("First card played in the game must be 2 of clubs.");
-      return false;
-    }
-    if (currentGamePhase === "FIRSTTRICK") {
-      if (card.code === "QS" || card.suit === "Hearts") {
-        console.log(
-          "Queen of Spades or Hearts cannot be played in the first round.",
-        );
-        return false; // Queen of Spades or Hearts cannot be played in the first round
-      }
-    }
-    if (trickSlot3.length === 0) {
-      console.log("First card played in the trick.");
-      if (heartsBroken) {
-        console.log("Hearts are broken, any card can be played.");
-        return true; // Any card can be played if hearts are broken
-      } else if (card.suit === "Hearts") {
-        console.log("Hearts cannot be played until they are broken.");
-        return false; // Hearts cannot be played if they haven't been broken
-      } else {
-        console.log("No constraints on the first card played.");
-        return true; // Any non-heart card can be played
-      }
-    } else {
-      console.log("Subsequent card played in the trick.");
-      if (card.suit === currentTrick) {
-        console.log("Card matches the suit of the trick.");
-        return true; // Card matches the suit of the trick
-      } else if (cardsInHand.some((c) => c.suit === currentTrick)) {
-        console.log("Player must follow the suit.");
-        return false; // Player must follow the suit if they have it in hand
-      } else {
-        console.log(
-          "Player can play any card if they don't have the trick's suit.",
-        );
-        return true; // Player can play any card if they don't have the trick's suit
-      }
-    } */
   };
 
   const handlePassCards = async () => {
@@ -1114,6 +1084,7 @@ const MatchPage: React.FC = () => {
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
