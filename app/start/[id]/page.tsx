@@ -168,6 +168,11 @@ const StartPage: React.FC = () => {
         setInviteStatus(updatedInviteStatus);
         setPendingInvites(updatedPendingInvites);
         setSelectedDifficulties(updatedDifficulties);
+
+        if(match.started){
+          router.push(`/match/${gameId}`);
+        }
+
       } catch {
         message.open({
           type: "error",
