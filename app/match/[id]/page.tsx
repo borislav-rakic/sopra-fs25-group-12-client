@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button, Dropdown} from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
+import modalStyles from "@/styles/modalMessage.module.css";
 import { useApi } from "@/hooks/useApi";
 // import { Match } from "@/types/match";
 import { useEffect, useState } from "react";
@@ -69,19 +70,8 @@ const MatchPage: React.FC = () => {
   //const [slot, setSlot] = useState(1);
   //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isMatchTesterVisible, setIsMatchTesterVisible] = useState(true);
-
   const [htmlContent, setHtmlContent] = useState<string>("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const HtmlRenderer: React.FC<{ htmlString: string }> = ({ htmlString }) => {
-    return (
-      <div
-        dangerouslySetInnerHTML={{ __html: htmlString }}
-      />
-    );
-  };
-
+ 
   const fetchMatchData = async () => {
     try {
       console.log("📡 Fetching match data");
@@ -980,12 +970,8 @@ const MatchPage: React.FC = () => {
             <div>
               <h2>Round Complete</h2>
               <div
+                className={`${modalStyles.modalMessage} ${modalStyles.modalMessageGameResult}`}
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
-                style={{
-                  marginTop: "10px",
-                  textAlign: "left", // Optional: Adjust text alignment
-                  color: "#fff", // Ensure text is visible in dark mode
-                }}
               />
             </div>
 

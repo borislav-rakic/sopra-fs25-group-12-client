@@ -1,0 +1,44 @@
+.modalMessage {
+    font-family: Arial, sans-serif;
+    background-color: #e6f2e6; /* Light green background */
+    padding: auto;
+    border-radius: 8px;
+    color: black; /* Ensure text is black */
+  }
+  
+  .modalMessageGameResult table {
+    width: fit-content;
+    border-collapse: collapse;
+    border: 2px solid #4a773c; /* Dark green border */
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #ffffff; /* White background for the table */
+  }
+  
+  .modalMessageGameResult th {
+    background-color: #2e5c1f; /* Dark green header background */
+    color: white; /* White text for contrast */
+    padding: 10px 15px;
+    text-align: center;
+  }
+  
+  .modalMessageGameResult td {
+    border-top: 1px solid #cfcfcf; /* Light grey border for rows */
+    padding: 8px 12px;
+    text-align: center;
+    color: black; /* Ensure table cell text is black */
+  }
+  
+  .modalMessageGameResult td:first-child {
+    text-align: left; /* Align player names to the left */
+  }
+  
+  .modalMessageGameResult .note {
+    margin-top: 15px;
+    font-style: italic;
+    background-color: #f0f8f0; /* Light green background for the note */
+    padding: 10px;
+    border-left: 4px solid #4a773c; /* Green border on the left */
+    max-width: 500px;
+    color: black; /* Ensure note text is black */
+  }
