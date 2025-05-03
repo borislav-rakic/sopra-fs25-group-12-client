@@ -24,7 +24,7 @@ const Card: React.FC<cardProps> = (
     backimage,
     onClick,
     isSelected = false,
-    isPlayable = false
+    isPlayable = false,
   },
 ) => {
   const [flipped] = useState(initialFlipped);
@@ -42,8 +42,7 @@ const Card: React.FC<cardProps> = (
     <div
       className={`${styles.cardContainer} ${flipped ? styles.scalable : ""} 
       ${isSelected ? styles.selected : ""}
-      ${isPlayable ? styles.playableCard : ""}`
-    }
+      ${isPlayable ? styles.playableCard : ""}`}
       onClick={handleCardClick}
     >
       {flipped

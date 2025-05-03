@@ -13,6 +13,13 @@ export default function Home() {
   const router = useRouter();
   const apiService = useApi();
 
+  const handleResetStorage = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    console.log("Storage cleared.");
+    router.push("/"); // Optional: refresh or redirect after clearing
+  };
+
   useEffect(() => {
     const checkLoginAndPopulate = async () => {
       const token = localStorage.getItem("token");
@@ -115,6 +122,24 @@ export default function Home() {
           </div>
         </div>
       </main>
+      <div
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          backgroundColor: "#1d4b2b", // matches deep green
+          color: "#1b5928", // soft mint green
+          border: "none",
+          padding: "12px 20px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
+          zIndex: 9999,
+        }}
+        onClick={handleResetStorage}
+      >
+        r
+      </div>
     </div>
   );
 }

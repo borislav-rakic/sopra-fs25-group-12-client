@@ -144,7 +144,7 @@ const StartPage: React.FC = () => {
 
           if (AI_PLAYER_INFO[pid]) {
             const { difficulty } = AI_PLAYER_INFO[pid];
-          
+
             updatedSelectedPlayers[i] = "computer";
             updatedDifficulties[i] = difficulty;
           } else {
@@ -169,10 +169,9 @@ const StartPage: React.FC = () => {
         setPendingInvites(updatedPendingInvites);
         setSelectedDifficulties(updatedDifficulties);
 
-        if(match.started){
+        if (match.started) {
           router.push(`/match/${gameId}`);
         }
-
       } catch {
         message.open({
           type: "error",
@@ -189,8 +188,9 @@ const StartPage: React.FC = () => {
       } catch {
         message.open({
           type: "error",
-          content: "Could not load current user.",
+          content: "Session expired. Please log in again.",
         });
+        router.push("/login"); // or your auth page
       }
     };
 
@@ -445,7 +445,9 @@ const StartPage: React.FC = () => {
       if (!gameId) return;
 
       try {
-        await apiService.post(`/matches/${gameId}/ai/remove`, { playerSlot: index });
+        await apiService.post(`/matches/${gameId}/ai/remove`, {
+          playerSlot: index,
+        });
 
         const updatedPlayers = [...selectedPlayers];
         updatedPlayers[index] = "";

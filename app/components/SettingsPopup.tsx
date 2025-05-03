@@ -41,7 +41,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({
       setOldPlaymat(playmat);
       setOldCardback(cardback);
     }
-  }, [isOpen]);
+  }, [isOpen, playmat, cardback]);
 
   if (!isOpen) return null;
 

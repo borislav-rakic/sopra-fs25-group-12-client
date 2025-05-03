@@ -1,19 +1,22 @@
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 import "@ant-design/v5-patch-for-react-19";
-import { useParams , useRouter  } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Button, Dropdown, message} from "antd";
+import { Button, Dropdown, message } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import modalStyles from "@/styles/modalMessage.module.css";
 import { useApi } from "@/hooks/useApi";
+import { handleApiError } from "@/utils/errorHandlers";
+
 // import { Match } from "@/types/match";
 import { useEffect, useState } from "react";
 import { PollingDTO } from "@/types/polling";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
 import { innerCard } from "@/types/playerCard";
-import { DownOutlined } from "@ant-design/icons"
+import { DownOutlined } from "@ant-design/icons";
+import { useCallback } from "react";
 
 const MatchPage: React.FC = () => {
   const USE_AUTOMATIC_POLLING = false; // switch to true for auto every 2000ms
@@ -53,7 +56,7 @@ const MatchPage: React.FC = () => {
   const [currentPlayer, setCurrentPlayer] = useState("");
   const [currentGamePhase, setCurrentGamePhase] = useState("");
   const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
-  const [opponentToPassTo, /*setOpponentToPassTo*/] = useState("");
+  const [opponentToPassTo /*setOpponentToPassTo*/] = useState("");
   const [/*heartsBroken*/, setHeartsBroken] = useState(false);
   const [firstCardPlayed, setFirstCardPlayed] = useState(false);
   //const [isFirstRound, setIsFirstRound] = useState(true);
@@ -78,19 +81,134 @@ const MatchPage: React.FC = () => {
       message.warning("Fast forward is only available during a normal trick.");
       return;
     }
-  
+
     try {
+      console.log("Fast forwarding game...");
       await apiService.post(`/matches/${matchId}/game/fastforward`, {});
-      message.success("Fast-forward complete");
-      fetchMatchData();
+      message.open({
+        type: "success",
+        content: "Fast-forward complete",
+      });
+      await fetchMatchData(); // refresh cards, trick, scores
     } catch (error) {
-      console.error("Fast-forward failed:", error);
-      message.error("Fast-forward failed");
+      handleApiError(error, "Fast-forward failed.");
     }
   };
+
   const isFastForwardAvailable = currentGamePhase === "NORMALTRICK";
- 
-  const fetchMatchData = async () => {
+
+  const generateEnemyCard = useCallback((): cardProps => ({
+    code: "XX",
+    suit: "XX",
+    value: BigInt(0),
+    image: "",
+    backimage: cardback,
+    flipped: false,
+    onClick: () => {},
+  }), [cardback]);
+
+  const generateCard = useCallback((code: string): cardProps => {
+    const rank = code[0];
+    const suit = code[1];
+
+    const rankToValue: { [key: string]: bigint } = {
+      "2": BigInt(2),
+      "3": BigInt(3),
+      "4": BigInt(4),
+      "5": BigInt(5),
+      "6": BigInt(6),
+      "7": BigInt(7),
+      "8": BigInt(8),
+      "9": BigInt(9),
+      "0": BigInt(10),
+      J: BigInt(11),
+      Q: BigInt(12),
+      K: BigInt(13),
+      A: BigInt(14),
+    };
+
+    const suitToName: { [key: string]: string } = {
+      H: "Hearts",
+      S: "Spades",
+      D: "Diamonds",
+      C: "Clubs",
+    };
+
+    return {
+      code,
+      suit: suitToName[suit] || suit,
+      value: rankToValue[rank],
+      image: `https://deckofcardsapi.com/static/img/${code}.png`,
+      flipped: false,
+      backimage: cardback,
+      onClick: (code: string) => console.log(`Card clicked: ${code}`),
+    };
+  }, [cardback]);
+
+  const handleTrickFromLogic = useCallback(
+    (trick: innerCard[], slot: number, trickLeaderSlot: number) => {
+      const tempTrick: string[] = ["", "", "", ""];
+      const indexShift = (trickLeaderSlot - slot + 4) % 4;
+
+      trick.forEach((card, index) => {
+        if (card) {
+          const shiftedIndex = (index + indexShift) % 4;
+          tempTrick[shiftedIndex] = card.code;
+        }
+      });
+
+      const updateSlot = (
+        __index: number,
+        code: string,
+        setSlot: (val: cardProps[]) => void,
+        current: cardProps[],
+      ) => {
+        if (
+          (code || code === "") &&
+          (current.length === 0 || current[0].code !== code)
+        ) {
+          setSlot(code === "" ? [] : [generateCard(code)]);
+        }
+      };
+
+      updateSlot(0, tempTrick[0], setTrickSlot0, trickSlot0);
+      updateSlot(1, tempTrick[1], setTrickSlot1, trickSlot1);
+      updateSlot(2, tempTrick[2], setTrickSlot2, trickSlot2);
+      updateSlot(3, tempTrick[3], setTrickSlot3, trickSlot3);
+    },
+    [generateCard, trickSlot0, trickSlot1, trickSlot2, trickSlot3],
+  );
+
+  const calculateTrickWinner = useCallback(() => {
+    const allCards = [
+      ...trickSlot0,
+      ...trickSlot1,
+      ...trickSlot2,
+      ...trickSlot3,
+    ];
+
+    if (allCards.length < 4) return;
+
+    const matchingCards = allCards.filter((card) => card.suit === currentTrick);
+    if (matchingCards.length === 0) return;
+
+    let highestCardIndex = 0;
+    let highestCard = matchingCards[0];
+
+    matchingCards.forEach((card) => {
+      const cardIndex = allCards.indexOf(card);
+      if (card.value > highestCard.value) {
+        highestCard = card;
+        highestCardIndex = cardIndex;
+      }
+    });
+
+    return highestCardIndex;
+  }, [trickSlot0, trickSlot1, trickSlot2, trickSlot3, currentTrick]);
+
+  // ###########################################
+
+  const fetchMatchData = useCallback(async () => {
     try {
       console.log("📡 Fetching match data");
 
@@ -108,7 +226,7 @@ const MatchPage: React.FC = () => {
       const slot = response.playerSlot ?? 0;
       const trickLeaderSlot = response.currentTrickLeaderPlayerSlot ?? 1;
 
-      if(response.resultHtml) {
+      if (response.resultHtml) {
         setHtmlContent(response.resultHtml);
       }
 
@@ -151,8 +269,6 @@ const MatchPage: React.FC = () => {
         pointsArray[(3 + slot) % 4],
       ]);
 
-      
-
       if (response.playerCards) {
         response.playerCards.forEach((item) => {
           setCardsInHand((prev) =>
@@ -164,10 +280,11 @@ const MatchPage: React.FC = () => {
       }
 
       if (response.playableCards) {
-        const playableCardCodes = response.playableCards.map((item) => item.card.code);
+        const playableCardCodes = response.playableCards.map((item) =>
+          item.card.code
+        );
         setPlayableCards(playableCardCodes);
       }
-      
 
       if (!firstCardPlayed && (response.currentTrick?.length ?? 0) > 0) {
         setFirstCardPlayed(true);
@@ -201,10 +318,17 @@ const MatchPage: React.FC = () => {
         );
       }
     } catch (error) {
-      console.error("Error during match data fetch:", error);
+      handleApiError(error, "Failed to fetch match data.");
     }
     console.log("Finished fetchMatchData for", matchId);
-  };
+  }, [
+    matchId,
+    firstCardPlayed,
+    generateCard,
+    handleTrickFromLogic,
+    apiService,
+    generateEnemyCard,
+  ]);
 
   useEffect(() => {
     if (USE_AUTOMATIC_POLLING) {
@@ -224,72 +348,16 @@ const MatchPage: React.FC = () => {
         }
       };
 
-      window.addEventListener("keydown", handleKeyPress);
+      globalThis.addEventListener("keydown", handleKeyPress);
       return () => {
-        window.removeEventListener("keydown", handleKeyPress);
+        globalThis.removeEventListener("keydown", handleKeyPress);
       };
     }
-  }, [matchId]);
-
-  const generateCard = (code: string) => {
-    const rank = code[0];
-    const suit = code[1];
-
-    const rankToValue: { [key: string]: bigint } = {
-      "2": BigInt(2),
-      "3": BigInt(3),
-      "4": BigInt(4),
-      "5": BigInt(5),
-      "6": BigInt(6),
-      "7": BigInt(7),
-      "8": BigInt(8),
-      "9": BigInt(9),
-      "0": BigInt(10),
-      J: BigInt(11),
-      Q: BigInt(12),
-      K: BigInt(13),
-      A: BigInt(14),
-    };
-
-    const suitToName: { [key: string]: string } = {
-      H: "Hearts",
-      S: "Spades",
-      D: "Diamonds",
-      C: "Clubs",
-    };
-
-    const card: cardProps = {
-      code,
-      suit: suitToName[suit] || suit, // Use the full name if available
-      value: rankToValue[rank],
-      image: `https://deckofcardsapi.com/static/img/${code}.png`, // Example image URL
-      flipped: false,
-      backimage: cardback, // Use the current cardback
-      onClick: (code: string) => {
-        console.log(`Card clicked: ${code}`);
-      },
-    };
-
-    console.log("Generated card:", card);
-    return card;
-  };
+  }, [matchId, USE_AUTOMATIC_POLLING, fetchMatchData]);
 
   useEffect(() => {
     console.log("PlayableCards updated:", playableCards);
-  }, [playableCards]);
-
-  const generateEnemyCard = () => {
-    const card: cardProps = {
-      code: "XX",
-      suit: "XX",
-      value: BigInt(0),
-      image: "",
-      backimage: cardback,
-      flipped: false,
-      onClick: () => {},
-    };
-    return card;
-  };
+  }, [cardback, playableCards]);
 
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
@@ -342,70 +410,64 @@ const MatchPage: React.FC = () => {
         });
         console.log("You may not pass more than 3 cards.");
       }
+    } else {
+      if (
+        currentGamePhase !== "NORMALTRICK" &&
+        currentGamePhase !== "FIRSTTRICK" &&
+        currentGamePhase !== "FINALTRICK"
+      ) {
+        message.open({
+          type: "warning",
+          content: "You cannot play a card in this phase.",
+        });
+        console.log(" Not in a playable phase.");
+        return;
+      }
+
+      if (!myTurn) {
+        message.open({
+          type: "warning",
+          content: "It's not your turn.",
+        });
+        console.log("Not your turn.");
+        return;
+      }
+
+      const trickOk = verifyTrick(card);
+      console.log("verifyTrick =", trickOk);
+      if (!trickOk) {
+        message.open({
+          type: "error",
+          content: "This card is not valid for the current trick.",
+        });
+        console.log("Trick verification failed.");
+        return;
+      }
+
+      try {
+        const payload = {
+          gameId: matchId,
+          card: card.code,
+        };
+        console.log("Sending card play request:", payload);
+
+        const response = await apiService.post(
+          `/matches/${matchId}/play`,
+          payload,
+        );
+        console.log("Card play response:", response);
+
+        const updatedCardsInHand = cardsInHand.filter((c) =>
+          c.code !== card.code
+        );
+        setCardsInHand(updatedCardsInHand);
+        setTrickSlot0([card]);
+        setCurrentPlayer(players[1] || "");
+        console.log("currentPlayer:", currentPlayer);
+      } catch (error) {
+        handleApiError(error);
+      }
     }
-
-    else{ 
-    if (
-      currentGamePhase !== "NORMALTRICK" &&
-      currentGamePhase !== "FIRSTTRICK" &&
-      currentGamePhase !== "FINALTRICK"
-    ) {
-      message.open({
-        type: "warning",
-        content: "You cannot play a card in this phase.",
-      });
-      console.log(" Not in a playable phase.");
-      return;
-    }
-
-    if (!myTurn) {
-      message.open({
-        type: "warning",
-        content: "It's not your turn.",
-      });
-      console.log("Not your turn.");
-      return;
-    }
-
-    const trickOk = verifyTrick(card);
-    console.log("verifyTrick =", trickOk);
-    if (!trickOk) {
-      message.open({
-        type: "error",
-        content: "This card is not valid for the current trick.",
-      });
-      console.log("Trick verification failed.");
-      return;
-    }
-
-    try {
-      const payload = {
-        gameId: matchId,
-        card: card.code,
-      };
-      console.log("Sending card play request:", payload);
-
-      const response = await apiService.post(
-        `/matches/${matchId}/play`,
-        payload,
-      );
-      console.log("Card play response:", response);
-
-      const updatedCardsInHand = cardsInHand.filter((c) =>
-        c.code !== card.code
-      );
-      setCardsInHand(updatedCardsInHand);
-      setTrickSlot0([card]);
-      setCurrentPlayer(players[1] || "");
-      console.log("currentPlayer:", currentPlayer);
-    } catch (error) {
-      console.error("Error sending card play request:", error);
-      message.open({
-        type: "error",
-        content: "Failed to play the card. Please try again.",
-      });
-    }
-  }
   };
 
   // Checks if the played card is a valid play in the current trick.
@@ -482,11 +544,7 @@ const MatchPage: React.FC = () => {
       setCardsToPass([]);
       setCurrentGamePhase("playing");
     } catch (error) {
-      console.error("Error passing cards:", error);
-      message.open({
-        type: "error",
-        content: "An error occurred while passing cards.",
-      });
+      handleApiError(error, "An error occurred while passing cards.");
     }
   };
 
@@ -496,44 +554,6 @@ const MatchPage: React.FC = () => {
     setTrickSlot2([]);
     setTrickSlot3([]);
     setCurrentTrick("");
-  };
-
-  const calculateTrickWinner = () => {
-    console.log("Calculating trick winner...");
-    const allCards = [
-      ...trickSlot0,
-      ...trickSlot1,
-      ...trickSlot2,
-      ...trickSlot3,
-    ];
-
-    if (allCards.length < 4) {
-      console.log(
-        "Trick may only be calulated if all players have played a card.",
-      );
-      return;
-    }
-
-    const matchingCards = allCards.filter((card) => card.suit === currentTrick);
-
-    if (matchingCards.length === 0) {
-      console.log("No cards match the current trick's suit.");
-      return;
-    }
-
-    // Initialize the highest card and its index
-    let highestCardIndex = 0;
-    let highestCard = matchingCards[0];
-
-    // Iterate through matching cards to find the highest card
-    matchingCards.forEach((card) => {
-      const cardIndex = allCards.indexOf(card);
-      if (card.value > highestCard.value) {
-        highestCard = card;
-        highestCardIndex = cardIndex;
-      }
-    });
-    return highestCardIndex;
   };
 
   useEffect(() => {
@@ -564,20 +584,15 @@ const MatchPage: React.FC = () => {
     };
 
     checkAndHandleTrick();
-  }, [trickSlot0, trickSlot1, trickSlot2, trickSlot3]);
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.code === "Space") {
-        console.log("⏵ Spacebar pressed — fetching match data");
-        fetchMatchData();
-      }
-    };
+  }, [
+    trickSlot0,
+    trickSlot1,
+    trickSlot2,
+    trickSlot3,
+    calculateTrickWinner,
+    players,
+  ]);
 
-    window.addEventListener("keydown", handleKeyPress);
-    return () => {
-      window.removeEventListener("keydown", handleKeyPress);
-    };
-  }, []);
   const sortCards = (cards: cardProps[]) => {
     return cards.sort((a, b) => {
       console.log("Comparing cards:", a.code, " | ", b.code);
@@ -596,67 +611,6 @@ const MatchPage: React.FC = () => {
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
 
-  const handleTrickFromLogic = (
-    trick: innerCard[],
-    slot: number,
-    trickLeaderSlot: number,
-  ) => {
-    console.log("Received trick from logic:", trick);
-    const tempTrick: string[] = ["", "", "", ""];
-    const indexShift = (trickLeaderSlot - slot + 4) % 4;
-
-    trick.forEach((card, index) => {
-      if (card) {
-        const shiftedIndex = (index + indexShift) % 4;
-        tempTrick[shiftedIndex] = card.code;
-      }
-    });
-
-    console.log("Shifted trick array:", tempTrick);
-
-    // if trick is empty and shouldnt be or if trick is not what it should be, set it to the new trick for trick 0
-    if (
-      (tempTrick[0] || tempTrick[0] === "") &&
-      (trickSlot0.length === 0 || trickSlot0[0].code !== tempTrick[0])
-    ) {
-      if (tempTrick[0] === "") {
-        setTrickSlot0([]);
-      } else {
-        setTrickSlot0([generateCard(tempTrick[0])]);
-      }
-    }
-    if (
-      (tempTrick[1] || tempTrick[1] === "") &&
-      (trickSlot1.length === 0 || trickSlot1[0].code !== tempTrick[1])
-    ) {
-      if (tempTrick[1] === "") {
-        setTrickSlot1([]);
-      } else {
-        setTrickSlot1([generateCard(tempTrick[1])]);
-      }
-    }
-    if (
-      (tempTrick[2] || tempTrick[2] === "") &&
-      (trickSlot2.length === 0 || trickSlot2[0].code !== tempTrick[2])
-    ) {
-      if (tempTrick[2] === "") {
-        setTrickSlot2([]);
-      } else {
-        setTrickSlot2([generateCard(tempTrick[2])]);
-      }
-    }
-    if (
-      (tempTrick[3] || tempTrick[3] === "") &&
-      (trickSlot3.length === 0 || trickSlot3[0].code !== tempTrick[3])
-    ) {
-      if (tempTrick[3] === "") {
-        setTrickSlot3([]);
-      } else {
-        setTrickSlot3([generateCard(tempTrick[3])]);
-      }
-    }
-  };
-
   const handleConfirmNewGame = async () => {
     try {
       console.log("Confirming new game...");
@@ -664,14 +618,14 @@ const MatchPage: React.FC = () => {
       console.log("New game confirmed.");
       setIsWaitingForPlayers(true); // Update state to show "Waiting for other players"
     } catch (error) {
-      console.error("Error confirming new game:", error);
+      handleApiError(error, "Could not confirm the new game.");
     }
   };
-  
+
   const showLeaveGameModal = () => {
     setIsLeaveGameModalVisible(true);
   };
-  
+
   const hideLeaveGameModal = () => {
     setIsLeaveGameModalVisible(false);
   };
@@ -683,7 +637,7 @@ const MatchPage: React.FC = () => {
       router.push("/"); // Redirect to the home page after leaving the game
       console.log("Game left.");
     } catch (error) {
-      console.error("Error leaving game:", error);
+      handleApiError(error, "Could not leave the game.");
     } finally {
       hideLeaveGameModal(); // Hide the modal
     }
@@ -693,7 +647,6 @@ const MatchPage: React.FC = () => {
     if (!fullName) return "AI Player";
     return fullName.split(" (")[0]; // cuts off anything after ' ('
   };
-  
 
   /*
   const resetGame = () => {
@@ -719,24 +672,28 @@ const MatchPage: React.FC = () => {
     <div className={`${styles.page} matchPage`}>
       <div className="menu-dropdown">
         <Dropdown
-          menu = {{
+          menu={{
             items: [
-              { key: "1", label: "Settings", onClick: () => toggleSettings()},
-              { key: "2", label: "Rules", /*onClick: () => toggleSettings()*/},
-              { key: "3", label: "Leave Match", onClick: showLeaveGameModal},
+              { key: "1", label: "Settings", onClick: () => toggleSettings() },
+              { key: "2", label: "Rules" /*onClick: () => toggleSettings()*/ },
+              { key: "3", label: "Leave Match", onClick: showLeaveGameModal },
               { type: "divider" },
               { type: "divider" },
               ...(isFastForwardAvailable
-                ? [{ key: "4", label: "Fast Forward", onClick: handleFastForward }]
+                ? [{
+                  key: "4",
+                  label: "Fast Forward",
+                  onClick: handleFastForward,
+                }]
                 : []),
             ],
           }}
-        trigger={["click"]}
+          trigger={["click"]}
         >
-      <Button type= "default">
-        Menu <DownOutlined/>
-      </Button>
-      </Dropdown>
+          <Button type="default">
+            Menu <DownOutlined />
+          </Button>
+        </Dropdown>
       </div>
 
       <SettingsPopup
@@ -748,36 +705,35 @@ const MatchPage: React.FC = () => {
         setCardback={setCardback}
       />
 
-        <div className="score-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Player</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{players[0] ? players[0] : "AI Player"}</td>
-                <td>{matchScore[0]}</td>
-              </tr>
-              <tr>
-                <td>{players[1] ? players[1] : "AI Player"}</td>
-                <td>{matchScore[1]}</td>
-              </tr>
-              <tr>
-                <td>{players[2] ? players[2] : "AI Player"}</td>
-                <td>{matchScore[2]}</td>
-              </tr>
-              <tr>
-                <td>{players[3] ? players[3] : "AI Player"}</td>
-                <td>{matchScore[3]}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className = "gameboard">
-
+      <div className="score-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{players[0] ? players[0] : "AI Player"}</td>
+              <td>{matchScore[0]}</td>
+            </tr>
+            <tr>
+              <td>{players[1] ? players[1] : "AI Player"}</td>
+              <td>{matchScore[1]}</td>
+            </tr>
+            <tr>
+              <td>{players[2] ? players[2] : "AI Player"}</td>
+              <td>{matchScore[2]}</td>
+            </tr>
+            <tr>
+              <td>{players[3] ? players[3] : "AI Player"}</td>
+              <td>{matchScore[3]}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div className="gameboard">
         <div className="hand-0">
           {cardsInHand.map((card, index) => (
             <Card
@@ -918,7 +874,7 @@ const MatchPage: React.FC = () => {
             />
           </div>
           <div className="game-playername">
-          {getDisplayName(players[0])}
+            {getDisplayName(players[0])}
           </div>
           <div className="game-playerscore">Score: {roundScore[0]}</div>
         </div>
@@ -954,7 +910,7 @@ const MatchPage: React.FC = () => {
             />
           </div>
           <div className="game-playername">
-              {getDisplayName(players[2])}
+            {getDisplayName(players[2])}
           </div>
           <div className="game-playerscore">Score: {roundScore[2]}</div>
         </div>
@@ -1057,43 +1013,45 @@ const MatchPage: React.FC = () => {
             </div>
 
             {/* Confirm button or waiting message */}
-            {!isWaitingForPlayers ? (
-              <button
-                onClick={handleConfirmNewGame}
-                style={{
-                  marginTop: "20px",
-                  padding: "10px 20px",
-                  fontSize: "1rem",
-                  backgroundColor: "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  transition: "background-color 0.3s ease",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#45a049")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#4CAF50")
-                }
-              >
-                Confirm
-              </button>
-            ) : (
-              <div
-                style={{
-                  marginTop: "20px",
-                  padding: "10px 20px",
-                  fontSize: "1rem",
-                  backgroundColor: "#555",
-                  color: "white",
-                  borderRadius: "5px",
-                }}
-              >
-                Waiting for other players...
-              </div>
-            )}
+            {!isWaitingForPlayers
+              ? (
+                <button
+                  onClick={handleConfirmNewGame}
+                  style={{
+                    marginTop: "20px",
+                    padding: "10px 20px",
+                    fontSize: "1rem",
+                    backgroundColor: "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    transition: "background-color 0.3s ease",
+                  }}
+                  onMouseEnter={(
+                    e,
+                  ) => (e.currentTarget.style.backgroundColor = "#45a049")}
+                  onMouseLeave={(
+                    e,
+                  ) => (e.currentTarget.style.backgroundColor = "#4CAF50")}
+                >
+                  Confirm
+                </button>
+              )
+              : (
+                <div
+                  style={{
+                    marginTop: "20px",
+                    padding: "10px 20px",
+                    fontSize: "1rem",
+                    backgroundColor: "#555",
+                    color: "white",
+                    borderRadius: "5px",
+                  }}
+                >
+                  Waiting for other players...
+                </div>
+              )}
           </div>
         )}
 
@@ -1158,7 +1116,6 @@ const MatchPage: React.FC = () => {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

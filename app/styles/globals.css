@@ -250,10 +250,10 @@ a {
 }
 
 .gameboard {
-  position:fixed;
+  position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
   height: 95vmin;
   aspect-ratio: 1/1;
   display: flex;
@@ -264,7 +264,7 @@ a {
   overflow: hidden; /* Optional: Ensures content inside respects the rounded corners */
   min-height: 500px;
   max-height: 1000px;
-  z-index:1;
+  z-index: 1;
 }
 
 .hand {
@@ -365,7 +365,7 @@ a {
   z-index: 0;
   width: 50%;
   height: 20%;
-  background-color:lightgray;
+  background-color: lightgray;
   border-radius: 6px;
   right: 25%;
   top: 5%;
@@ -762,5 +762,5 @@ a {
   position: fixed;
   top: 20px;
   left: 20px;
-  z-index:1000;
+  z-index: 1000;
 }
