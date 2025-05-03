@@ -11,6 +11,7 @@ interface cardProps {
   flipped: boolean;
   onClick: (code: string) => void;
   isSelected?: boolean;
+  isPlayable?: boolean;
 }
 
 const Card: React.FC<cardProps> = (
@@ -23,6 +24,7 @@ const Card: React.FC<cardProps> = (
     backimage,
     onClick,
     isSelected = false,
+    isPlayable = false
   },
 ) => {
   const [flipped] = useState(initialFlipped);
@@ -33,13 +35,15 @@ const Card: React.FC<cardProps> = (
     console.log("Flipped:", !flipped);
  */ onClick(code); // Call the onClick handler passed as a prop
     console.log(suit, value); // This allows suit and value to be part of the object but be used for compilation with npm build
+    console.log("playble", isPlayable); // This allows suit and value to be part of the object but be used for compilation with npm build
   };
 
   return (
     <div
-      className={`${styles.cardContainer} ${flipped ? styles.scalable : ""} ${
-        isSelected ? styles.selected : ""
-      }`}
+      className={`${styles.cardContainer} ${flipped ? styles.scalable : ""} 
+      ${isSelected ? styles.selected : ""}
+      ${isPlayable ? styles.playableCard : ""}`
+    }
       onClick={handleCardClick}
     >
       {flipped

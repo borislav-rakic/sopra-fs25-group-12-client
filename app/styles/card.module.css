@@ -78,3 +78,13 @@
   z-index: 20;
   transition: transform 0.2s ease-in-out;
 }
+
+.cardContainer.playableCard {
+  box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.8); /* Yellow halo effect */
+  border-radius: 10px; /* Optional: Rounded corners for the halo */
+  transition: box-shadow 0.3s ease-in-out; /* Smooth transition */
+}
+
+.cardContainer.playableCard:hover {
+  box-shadow: 0 0 20px 10px rgba(255, 255, 0, 1); /* Stronger halo on hover */
+}

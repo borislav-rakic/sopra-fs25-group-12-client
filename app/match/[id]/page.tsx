@@ -393,7 +393,7 @@ const MatchPage: React.FC = () => {
   // We use the status of trickslot3 to determine if the player is playing the first card of the trick or not.
   const verifyTrick = (card: cardProps) => {
     console.log("Verifying trick for card: ", card.code);
-    console.log("playbleCards: ", playableCards);
+    console.log("playableCards: ", playableCards);
 
     if (playableCards.includes(card.code)) {
       console.log("Card is valid according to the backend.");
@@ -765,6 +765,7 @@ const MatchPage: React.FC = () => {
               flipped
               onClick={() => handlePlayCard(card)}
               isSelected={cardsToPass.some((c) => c.code === card.code)}
+              isPlayable={playableCards.includes(card.code)}
             />
           ))}
         </div>
