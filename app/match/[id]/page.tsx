@@ -2,7 +2,7 @@
 import "@ant-design/v5-patch-for-react-19";
 import { useParams , useRouter  } from "next/navigation";
 import Image from "next/image";
-import { Button, Dropdown} from "antd";
+import { Button, Dropdown, message} from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import modalStyles from "@/styles/modalMessage.module.css";
@@ -316,6 +316,10 @@ const MatchPage: React.FC = () => {
         console.log("added card to cardsToPass: ", card.code);
         console.log("cardsToPass: ", cardsToPass);
       } else {
+        message.open({
+          type: "warning",
+          content: "You may not pass more than 3 cards.",
+        });
         console.log("You may not pass more than 3 cards.");
       }
     }
@@ -326,11 +330,19 @@ const MatchPage: React.FC = () => {
       currentGamePhase !== "FIRSTTRICK" &&
       currentGamePhase !== "FINALTRICK"
     ) {
+      message.open({
+        type: "warning",
+        content: "You cannot play a card in this phase.",
+      });
       console.log(" Not in a playable phase.");
       return;
     }
 
     if (!myTurn) {
+      message.open({
+        type: "warning",
+        content: "It's not your turn.",
+      });
       console.log("Not your turn.");
       return;
     }
@@ -338,6 +350,10 @@ const MatchPage: React.FC = () => {
     const trickOk = verifyTrick(card);
     console.log("verifyTrick =", trickOk);
     if (!trickOk) {
+      message.open({
+        type: "error",
+        content: "This card is not valid for the current trick.",
+      });
       console.log("Trick verification failed.");
       return;
     }
@@ -364,6 +380,10 @@ const MatchPage: React.FC = () => {
       console.log("currentPlayer:", currentPlayer);
     } catch (error) {
       console.error("Error sending card play request:", error);
+      message.open({
+        type: "error",
+        content: "Failed to play the card. Please try again.",
+      });
     }
   }
   };
@@ -387,6 +407,10 @@ const MatchPage: React.FC = () => {
   const handlePassCards = async () => {
     if (cardsToPass.length < 3) {
       console.log("You must pass 3 cards.");
+      message.open({
+        type: "warning",
+        content: "You must select 3 cards to pass.",
+      });
       return;
     }
     try {
@@ -404,6 +428,10 @@ const MatchPage: React.FC = () => {
 
       // Check if the response indicates an error
       if (!response || typeof response !== "object") {
+        message.open({
+          type: "error",
+          content: "Failed to pass cards. Please try again.",
+        });
         console.error(
           "Error passing cards: Invalid or empty response from server.",
         );
@@ -435,6 +463,10 @@ const MatchPage: React.FC = () => {
       setCurrentGamePhase("playing");
     } catch (error) {
       console.error("Error passing cards:", error);
+      message.open({
+        type: "error",
+        content: "An error occurred while passing cards.",
+      });
     }
   };
 
