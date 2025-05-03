@@ -919,6 +919,29 @@ const MatchPage: React.FC = () => {
           <div className="game-playerscore">Score: {roundScore[3]}</div>
         </div>
 
+        {currentGamePhase === "PASSING" && cardsToPass.length < 3 && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 1000,
+              backgroundColor: "#555", // Dark grey background
+              color: "#fff", // White text color
+              padding: "20px",
+              borderRadius: "10px",
+              textAlign: "center",
+              width: "400px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)", // Add a shadow for better visibility
+            }}
+          >
+            <p style={{ fontSize: "1.2rem", margin: 0 }}>
+              Select three cards to pass to your opponent
+            </p>
+          </div>
+        )}
+
         {cardsToPass.length === 3 && (
           <button
             type="button"
@@ -932,7 +955,7 @@ const MatchPage: React.FC = () => {
               zIndex: 1000,
               padding: "20px 40px", // Increased padding for a bigger button
               fontSize: "1.5rem", // Larger font size
-              backgroundColor: "#d3d3d3", // Light grey background
+              backgroundColor: "#555", // Light grey background
               color: "#000", // Black text color
               border: "none",
               borderRadius: "10px", // Slightly rounded corners
@@ -944,7 +967,7 @@ const MatchPage: React.FC = () => {
             ) => (e.currentTarget.style.backgroundColor = "#1890ff")} // Blue on hover
             onMouseLeave={(
               e,
-            ) => (e.currentTarget.style.backgroundColor = "#d3d3d3")} // Back to grey
+            ) => (e.currentTarget.style.backgroundColor = "#555")} // Back to grey
           >
             Pass Cards
           </button>
