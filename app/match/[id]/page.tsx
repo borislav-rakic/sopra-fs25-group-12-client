@@ -71,6 +71,24 @@ const MatchPage: React.FC = () => {
   //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
 
   const [htmlContent, setHtmlContent] = useState<string>("");
+
+  // handleFastForward for testing, game transitions
+  const handleFastForward = async () => {
+    if (currentGamePhase !== "NORMALTRICK") {
+      message.warning("Fast forward is only available during a normal trick.");
+      return;
+    }
+  
+    try {
+      await apiService.post(`/matches/${matchId}/game/fastforward`, {});
+      message.success("Fast-forward complete");
+      fetchMatchData();
+    } catch (error) {
+      console.error("Fast-forward failed:", error);
+      message.error("Fast-forward failed");
+    }
+  };
+  const isFastForwardAvailable = currentGamePhase === "NORMALTRICK";
  
   const fetchMatchData = async () => {
     try {
@@ -132,6 +150,8 @@ const MatchPage: React.FC = () => {
         pointsArray[(2 + slot) % 4],
         pointsArray[(3 + slot) % 4],
       ]);
+
+      
 
       if (response.playerCards) {
         response.playerCards.forEach((item) => {
@@ -704,6 +724,11 @@ const MatchPage: React.FC = () => {
               { key: "1", label: "Settings", onClick: () => toggleSettings()},
               { key: "2", label: "Rules", /*onClick: () => toggleSettings()*/},
               { key: "3", label: "Leave Match", onClick: showLeaveGameModal},
+              { type: "divider" },
+              { type: "divider" },
+              ...(isFastForwardAvailable
+                ? [{ key: "4", label: "Fast Forward", onClick: handleFastForward }]
+                : []),
             ],
           }}
         trigger={["click"]}
