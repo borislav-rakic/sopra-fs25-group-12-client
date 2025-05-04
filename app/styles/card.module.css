@@ -3,7 +3,7 @@
   /* Fill the width of the container */
   height: 100%;
   /* Fill the height of the container */
-  object-fit: fill;
+  object-fit: cover;
   /* Ensure the image scales without distortion */
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
@@ -88,8 +88,8 @@
 /* PLAYABLE CARDS - trick phase */
 .cardContainer.playableCard {
   transform: translateY(-8px);
-  box-shadow: 0 0 6px 2px rgba(255, 255, 0, 0.3);
-  border-radius: 10px;
+  box-shadow: 0 0 10px 4px rgba(255, 255, 0, 0.75);
+  overflow: hidden;
   cursor: pointer;
   z-index: 30;
 }
@@ -97,7 +97,7 @@
 /* PLAYABLE hover */
 .cardContainer.playableCard:hover {
   transform: translateY(-12px);
-  box-shadow: 0 0 10px 4px rgba(255, 255, 0, 0.5);
+  box-shadow: 0 0 10px 4px rgba(255, 255, 0, 0.75);
   z-index: 40;
 }
 

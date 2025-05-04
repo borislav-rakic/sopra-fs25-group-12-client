@@ -52,7 +52,7 @@ const MatchPage: React.FC = () => {
   const [matchScore, setMatchScore] = useState([0, 0, 0, 0]);
   const [roundScore, setRoundScore] = useState([0, 0, 0, 0]);
 
-  const [currentTrick, setCurrentTrick] = useState("");
+  const [/*currentTrick*/, setCurrentTrick] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState("");
   const [currentGamePhase, setCurrentGamePhase] = useState("");
   const [lastTrickPhase, setLastTrickPhase] = useState<
@@ -188,32 +188,32 @@ const MatchPage: React.FC = () => {
     [generateCard, trickSlot0, trickSlot1, trickSlot2, trickSlot3],
   );
 
-  const calculateTrickWinner = useCallback(() => {
-    const allCards = [
-      ...trickSlot0,
-      ...trickSlot1,
-      ...trickSlot2,
-      ...trickSlot3,
-    ];
+  // const calculateTrickWinner = useCallback(() => {
+  //   const allCards = [
+  //     ...trickSlot0,
+  //     ...trickSlot1,
+  //     ...trickSlot2,
+  //     ...trickSlot3,
+  //   ];
 
-    if (allCards.length < 4) return;
+  //   if (allCards.length < 4) return;
 
-    const matchingCards = allCards.filter((card) => card.suit === currentTrick);
-    if (matchingCards.length === 0) return;
+  //   const matchingCards = allCards.filter((card) => card.suit === currentTrick);
+  //   if (matchingCards.length === 0) return;
 
-    let highestCardIndex = 0;
-    let highestCard = matchingCards[0];
+  //   let highestCardIndex = 0;
+  //   let highestCard = matchingCards[0];
 
-    matchingCards.forEach((card) => {
-      const cardIndex = allCards.indexOf(card);
-      if (card.value > highestCard.value) {
-        highestCard = card;
-        highestCardIndex = cardIndex;
-      }
-    });
+  //   matchingCards.forEach((card) => {
+  //     const cardIndex = allCards.indexOf(card);
+  //     if (card.value > highestCard.value) {
+  //       highestCard = card;
+  //       highestCardIndex = cardIndex;
+  //     }
+  //   });
 
-    return highestCardIndex;
-  }, [trickSlot0, trickSlot1, trickSlot2, trickSlot3, currentTrick]);
+  //   return highestCardIndex;
+  // }, [trickSlot0, trickSlot1, trickSlot2, trickSlot3, currentTrick]);
 
   // ###########################################
 
@@ -949,8 +949,9 @@ const MatchPage: React.FC = () => {
               left: "50%",
               transform: "translate(-50%, -50%)",
               zIndex: 1000,
-              backgroundColor: "#555", // Dark grey background
-              color: "#fff", // White text color
+              backgroundColor: "darkgreen", // Dark green background
+              color: "white", // White text color
+              border: "2px solid white",
               padding: "20px",
               borderRadius: "10px",
               textAlign: "center",
@@ -959,7 +960,7 @@ const MatchPage: React.FC = () => {
             }}
           >
             <p style={{ fontSize: "1.2rem", margin: 0 }}>
-              Select three cards to pass to your opponent
+              Select 3 cards to pass to your opponent
             </p>
           </div>
         )}
@@ -977,9 +978,9 @@ const MatchPage: React.FC = () => {
               zIndex: 1000,
               padding: "20px 40px", // Increased padding for a bigger button
               fontSize: "1.5rem", // Larger font size
-              backgroundColor: "#555", // Light grey background
-              color: "#000", // Black text color
-              border: "none",
+              backgroundColor: "darkgreen", // Light grey background
+              color: "white", // Black text color
+              border: "2px solid white",
               borderRadius: "10px", // Slightly rounded corners
               cursor: "pointer",
               transition: "background-color 0.3s ease", // Smooth transition for hover effect
@@ -989,7 +990,7 @@ const MatchPage: React.FC = () => {
             ) => (e.currentTarget.style.backgroundColor = "#1890ff")} // Blue on hover
             onMouseLeave={(
               e,
-            ) => (e.currentTarget.style.backgroundColor = "#555")} // Back to grey
+            ) => (e.currentTarget.style.backgroundColor = "darkgreen")} // Back to grey
           >
             Pass Cards
           </button>
@@ -1003,9 +1004,10 @@ const MatchPage: React.FC = () => {
               left: "50%",
               transform: "translate(-50%, -50%)",
               zIndex: 1000,
-              backgroundColor: "#333", // Dark background for the box
-              color: "#fff", // Light text color for contrast
+              backgroundColor: "darkgreen", // Dark background for the box
+              color: "white", // Light text color for contrast
               padding: "20px",
+              border: "2px solid white",
               borderRadius: "10px",
               textAlign: "center",
               width: "400px",
@@ -1023,28 +1025,12 @@ const MatchPage: React.FC = () => {
             {/* Confirm button or waiting message */}
             {!isWaitingForPlayers
               ? (
-                <button
+                <Button
                   onClick={handleConfirmNewGame}
-                  style={{
-                    marginTop: "20px",
-                    padding: "10px 20px",
-                    fontSize: "1rem",
-                    backgroundColor: "#4CAF50",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                  }}
-                  onMouseEnter={(
-                    e,
-                  ) => (e.currentTarget.style.backgroundColor = "#45a049")}
-                  onMouseLeave={(
-                    e,
-                  ) => (e.currentTarget.style.backgroundColor = "#4CAF50")}
+                  className={styles.whiteButton}
                 >
                   Confirm
-                </button>
+                </Button>
               )
               : (
                 <div
@@ -1052,7 +1038,7 @@ const MatchPage: React.FC = () => {
                     marginTop: "20px",
                     padding: "10px 20px",
                     fontSize: "1rem",
-                    backgroundColor: "#555",
+                    backgroundColor: "darkgreen",
                     color: "white",
                     borderRadius: "5px",
                   }}
@@ -1080,46 +1066,35 @@ const MatchPage: React.FC = () => {
           >
             <div
               style={{
-                backgroundColor: "#333", // Dark background for the modal
+                backgroundColor: "darkgreen", // Dark background for the modal
                 padding: "20px",
+                border: "2px solid white",
                 borderRadius: "10px",
                 textAlign: "center",
                 width: "300px",
-                color: "#fff", // Light text color for contrast
+                color: "white", // Light text color for contrast
               }}
             >
               <p style={{ fontSize: "1.2rem", marginBottom: "20px" }}>
                 Are you sure you want to leave the game?
               </p>
               <div style={{ display: "flex", justifyContent: "space-around" }}>
-                <button
+                <Button
                   onClick={handleLeaveGame}
+                  className={styles.whiteButton}
                   style={{
-                    padding: "10px 20px",
-                    fontSize: "1rem",
                     backgroundColor: "#f44336",
                     color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
                   }}
                 >
-                  Confirm
-                </button>
-                <button
+                  Leave
+                </Button>
+                <Button
                   onClick={hideLeaveGameModal}
-                  style={{
-                    padding: "10px 20px",
-                    fontSize: "1rem",
-                    backgroundColor: "#555", // Darker grey for the cancel button
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                  }}
+                  className={styles.whiteButton}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           </div>
