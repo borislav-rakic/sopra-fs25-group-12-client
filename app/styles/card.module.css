@@ -1,43 +1,10 @@
-.cardContainer {
-  position: relative;
-  height: 75%;
-  max-height: 75%;
-  aspect-ratio: 2/3;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.0);
-  border: 1px solid rgba(0, 0, 0, 0);
-  font-size: 30px;
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  overflow: hidden;
-  z-index: 10;
-}
-
-.cardContainer.scalable:hover {
-  transform: scale(1.1); /* Scale up the image on hover */
-  z-index: 50; /* Bring the image to the front on hover */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Add a shadow */
-}
-
-.cardContainer.selected {
-  transform: translateY(-20px); /* Move the card up if selected */
-  z-index: 40;
-}
-
-.cardContainer.selected.scalable:hover {
-  transform: translateY(-20px) scale(1.1); /* Combine translateY and scale */
-  z-index: 50; /* Bring the image to the front on hover */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Add a shadow */
-}
-
 .cardFront {
-  width: 100%; /* Fill the width of the container */
-  height: 100%; /* Fill the height of the container */
-  object-fit: fill; /* Ensure the image scales without distortion */
+  width: 100%;
+  /* Fill the width of the container */
+  height: 100%;
+  /* Fill the height of the container */
+  object-fit: fill;
+  /* Ensure the image scales without distortion */
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
   z-index: 20;
@@ -45,10 +12,14 @@
 }
 
 .imageWrapper {
-  position: relative; /* Required for layout="fill" */
-  width: 100%; /* Ensure the wrapper fills the card container */
-  height: 100%; /* Ensure the wrapper fills the card container */
-  overflow: hidden; /* Ensure the image respects the rounded corners */
+  position: relative;
+  /* Required for layout="fill" */
+  width: 100%;
+  /* Ensure the wrapper fills the card container */
+  height: 100%;
+  /* Ensure the wrapper fills the card container */
+  overflow: hidden;
+  /* Ensure the image respects the rounded corners */
 }
 
 .cardBackContainer {
@@ -70,21 +41,68 @@
 }
 
 .cardBack {
-  width: 100%; /* Fill the width of the container */
-  height: 100%; /* Fill the height of the container */
-  object-fit: fill; /* Ensure the image scales without distortion */
+  width: 100%;
+  /* Fill the width of the container */
+  height: 100%;
+  /* Fill the height of the container */
+  object-fit: fill;
+  /* Ensure the image scales without distortion */
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
   z-index: 20;
   transition: transform 0.2s ease-in-out;
 }
 
-.cardContainer.playableCard {
-  box-shadow: 0 0 15px 5px rgba(255, 255, 0, 0.8); /* Yellow halo effect */
-  border-radius: 10px; /* Optional: Rounded corners for the halo */
-  transition: box-shadow 0.3s ease-in-out; /* Smooth transition */
+.cardContainer {
+  /* Base state for all cards */
+  position: relative;
+  height: 75%;
+  aspect-ratio: 2/3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  border: 1px solid transparent;
+  font-size: 30px;
+  text-align: center;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  z-index: 10;
+  cursor: default;
 }
 
+/* PASSING PHASE - lifted cards */
+.cardContainer.selected {
+  transform: translateY(-20px);
+  z-index: 40;
+  cursor: pointer;
+}
+
+/* PASSING PHASE + hover */
+.cardContainer.selected.scalable:hover {
+  transform: translateY(-20px) scale(1.1);
+  z-index: 50;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* PLAYABLE CARDS - trick phase */
+.cardContainer.playableCard {
+  transform: translateY(-8px);
+  box-shadow: 0 0 6px 2px rgba(255, 255, 0, 0.3);
+  border-radius: 10px;
+  cursor: pointer;
+  z-index: 30;
+}
+
+/* PLAYABLE hover */
 .cardContainer.playableCard:hover {
-  box-shadow: 0 0 20px 10px rgba(255, 255, 0, 1); /* Stronger halo on hover */
+  transform: translateY(-12px);
+  box-shadow: 0 0 10px 4px rgba(255, 255, 0, 0.5);
+  z-index: 40;
+}
+
+/* Prevent hover scaling on non-scalable/non-playable cards */
+.cardContainer:not(.scalable):not(.playableCard):hover {
+  transform: none;
+  box-shadow: none;
 }

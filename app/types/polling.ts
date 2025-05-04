@@ -1,16 +1,18 @@
 import { PlayerCard } from "../types/playerCard";
 import { innerCard } from "../types/playerCard"; // assuming Card = innerCard in TS
 
+export type TrickPhase = "READY" | "RUNNING" | "JUSTCOMPLETED";
+
 export interface PollingDTO {
   // Match context
   matchId: number | null; // Long in Java
   matchGoal: number | null;
   hostId: number | null;
   matchPhase: string | null; // MatchPhase enum
+  trickPhase: TrickPhase; // TrickPhase enum
 
   // Game state
   gamePhase: string | null; // GamePhase enum
-  trickInProgress: boolean | null;
   heartsBroken: boolean | null;
 
   currentTrick: Array<innerCard> | null;

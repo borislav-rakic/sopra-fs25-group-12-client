@@ -19,7 +19,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { useCallback } from "react";
 
 const MatchPage: React.FC = () => {
-  const USE_AUTOMATIC_POLLING = false; // switch to true for auto every 2000ms
+  const USE_AUTOMATIC_POLLING = true; // switch to true for auto every 2000ms
 
   //const router = useRouter();
   const params = useParams();
@@ -55,6 +55,12 @@ const MatchPage: React.FC = () => {
   const [currentTrick, setCurrentTrick] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState("");
   const [currentGamePhase, setCurrentGamePhase] = useState("");
+  const [lastTrickPhase, setLastTrickPhase] = useState<
+    "READY" | "JUSTCOMPLETED" | "RUNNING"
+  >("RUNNING");
+  const [trickPhase, setTrickPhase] = useState<
+    "READY" | "JUSTCOMPLETED" | "RUNNING"
+  >("RUNNING");
   const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
   const [opponentToPassTo /*setOpponentToPassTo*/] = useState("");
   const [/*heartsBroken*/, setHeartsBroken] = useState(false);
@@ -62,6 +68,9 @@ const MatchPage: React.FC = () => {
   //const [isFirstRound, setIsFirstRound] = useState(true);
   const [myTurn, setMyTurn] = useState(false);
   const [playableCards, setPlayableCards] = useState<Array<string | null>>([]);
+  const [pollingPausedUntil, setPollingPausedUntil] = useState<number | null>(
+    null,
+  );
   const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false);
   const [isLeaveGameModalVisible, setIsLeaveGameModalVisible] = useState(false);
   //const [currentMatchPhase, setCurrentMatchPhase] = useState("");
@@ -210,7 +219,7 @@ const MatchPage: React.FC = () => {
 
   const fetchMatchData = useCallback(async () => {
     try {
-      console.log("📡 Fetching match data");
+      console.log("Fetching match data");
 
       const response = await apiService.post<PollingDTO>(
         `/matches/${matchId}/logic`,
@@ -218,6 +227,8 @@ const MatchPage: React.FC = () => {
       );
       console.log("Match data response:", response);
       setHeartsBroken(response.heartsBroken ?? false);
+      setLastTrickPhase(trickPhase);
+      setTrickPhase(response.trickPhase);
       setCurrentGamePhase(response.gamePhase ?? "");
       console.log("Backend says myTurn:", response.myTurn);
       setMyTurn(response.myTurn ?? false);
@@ -270,13 +281,10 @@ const MatchPage: React.FC = () => {
       ]);
 
       if (response.playerCards) {
-        response.playerCards.forEach((item) => {
-          setCardsInHand((prev) =>
-            prev.some((card) => card.code === item.card?.code)
-              ? prev
-              : [...prev, generateCard(item.card?.code)]
-          );
-        });
+        const newHand = response.playerCards.map((item) =>
+          generateCard(item.card.code)
+        );
+        setCardsInHand(newHand);
       }
 
       if (response.playableCards) {
@@ -333,8 +341,17 @@ const MatchPage: React.FC = () => {
   useEffect(() => {
     if (USE_AUTOMATIC_POLLING) {
       const intervalId = setInterval(() => {
-        fetchMatchData();
-      }, 2000);
+        const now = Date.now();
+        if (!pollingPausedUntil || now > pollingPausedUntil) {
+          fetchMatchData();
+        } else {
+          console.log(
+            "⏸ Polling paused until",
+            new Date(pollingPausedUntil).toLocaleTimeString(),
+          );
+        }
+      }, 1000);
+
       return () => {
         clearInterval(intervalId);
         console.log("Automatic polling stopped");
@@ -353,7 +370,27 @@ const MatchPage: React.FC = () => {
         globalThis.removeEventListener("keydown", handleKeyPress);
       };
     }
-  }, [matchId, USE_AUTOMATIC_POLLING, fetchMatchData]);
+  }, [matchId, USE_AUTOMATIC_POLLING, fetchMatchData, pollingPausedUntil]);
+
+  useEffect(() => {
+    if (trickPhase === "JUSTCOMPLETED") {
+      // lock UI / show animation / highlight cards
+      setPlayableCards([]);
+      setMyTurn(false);
+    }
+  }, [trickPhase]);
+
+  useEffect(() => {
+    if (lastTrickPhase === "JUSTCOMPLETED" && trickPhase === "READY") {
+      // Delay the clearing to let the user see the trick
+      const timeoutId = setTimeout(() => {
+        handleClearTrick();
+      }, 1500); // 1.5 seconds delay
+
+      // Cleanup in case the component unmounts before timeout
+      return () => clearTimeout(timeoutId);
+    }
+  }, [lastTrickPhase, trickPhase]);
 
   useEffect(() => {
     console.log("PlayableCards updated:", playableCards);
@@ -443,7 +480,6 @@ const MatchPage: React.FC = () => {
         console.log("Trick verification failed.");
         return;
       }
-
       try {
         const payload = {
           gameId: matchId,
@@ -451,6 +487,11 @@ const MatchPage: React.FC = () => {
         };
         console.log("Sending card play request:", payload);
 
+        // Immediately lock UI so the player can't double-click
+        setPlayableCards([]);
+        setMyTurn(false);
+
+        // Send the request to play the card
         const response = await apiService.post(
           `/matches/${matchId}/play`,
           payload,
@@ -464,6 +505,10 @@ const MatchPage: React.FC = () => {
         setTrickSlot0([card]);
         setCurrentPlayer(players[1] || "");
         console.log("currentPlayer:", currentPlayer);
+
+        // Then fetch the updated game state
+        setPollingPausedUntil(Date.now() + 1500); // pause for 1.5s
+        await fetchMatchData();
       } catch (error) {
         handleApiError(error);
       }
@@ -555,43 +600,6 @@ const MatchPage: React.FC = () => {
     setTrickSlot3([]);
     setCurrentTrick("");
   };
-
-  useEffect(() => {
-    // Function to check if all trick slots contain a card
-    const checkAndHandleTrick = () => {
-      if (
-        trickSlot0.length > 0 &&
-        trickSlot1.length > 0 &&
-        trickSlot2.length > 0 &&
-        trickSlot3.length > 0
-      ) {
-        console.log("All trick slots are filled. Calculating trick winner...");
-
-        const winningPlayer = calculateTrickWinner();
-        console.log("Winning player index:", winningPlayer);
-
-        if (winningPlayer !== undefined) {
-          console.log("winning player: ", players[winningPlayer]);
-        } else {
-          console.log("No winning player could be determined.");
-        }
-
-        setTimeout(() => {
-          console.log("Clearing trick slots...");
-          handleClearTrick();
-        }, 2500);
-      }
-    };
-
-    checkAndHandleTrick();
-  }, [
-    trickSlot0,
-    trickSlot1,
-    trickSlot2,
-    trickSlot3,
-    calculateTrickWinner,
-    players,
-  ]);
 
   const sortCards = (cards: cardProps[]) => {
     return cards.sort((a, b) => {
