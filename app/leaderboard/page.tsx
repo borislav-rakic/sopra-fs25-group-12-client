@@ -67,6 +67,11 @@ const LeaderboardPage: React.FC = () => {
   ];
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/");
+      return;
+    }
     const fetchLeaderboard = async () => {
       setLoading(true);
       try {
@@ -106,7 +111,7 @@ const LeaderboardPage: React.FC = () => {
   );
 
   const handleSearch = (value: string) => {
-    setSearchValue(value);
+    setSearchValue(value.trim());
   };
 
   return (

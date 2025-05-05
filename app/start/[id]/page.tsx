@@ -76,6 +76,11 @@ const StartPage: React.FC = () => {
   const usersRef = useRef<User[]>([]);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/"); // No token = send back to home
+        return;
+      }
     if (!gameId) {
       message.open({
         type: "error",

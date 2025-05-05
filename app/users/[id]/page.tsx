@@ -38,6 +38,11 @@ const UserProfileView: React.FC = () => {
   const [loadingAction, setLoadingAction] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/"); // No token = send back to home
+        return;
+      }
     if (!id) return;
 
     const fetchData = async () => {
@@ -130,7 +135,7 @@ const UserProfileView: React.FC = () => {
       case "ACCEPTED":
         return (
           <div>
-            <p>✅ You are friends</p>
+            <p>✅ You are friends!</p>
             <Button
               danger
               onClick={() => handleFriendAction("remove")}
@@ -151,7 +156,7 @@ const UserProfileView: React.FC = () => {
                 onClick={() => handleFriendAction("remove")}
                 loading={loadingAction}
               >
-                Cancel Request
+                Cancel
               </Button>
             </div>
           )
@@ -180,11 +185,11 @@ const UserProfileView: React.FC = () => {
           <div>
             <p>❌ Friend request was declined</p>
             <Button
-              type="primary"
+              type="default"
               onClick={() => handleFriendAction("add")}
               loading={loadingAction}
             >
-              Reconnect
+              Add Friend
             </Button>
           </div>
         );
@@ -193,7 +198,7 @@ const UserProfileView: React.FC = () => {
       default:
         return (
           <Button
-            type="primary"
+            type="default"
             onClick={() => handleFriendAction("add")}
             loading={loadingAction}
           >
@@ -225,10 +230,10 @@ const UserProfileView: React.FC = () => {
         height={80}
         className="user-avatar"
       />
-      <h2>{user.username}</h2>
+      <h2 style = {{color: "white"}}>{user.username}</h2>
       <p>Status: {user.status}</p>
-      <p>Birthday: {formattedBirthday}</p>
-      <p>Rating: {user.rating}</p>
+      <p>Birthday: {formattedBirthday || "Unknown"}</p>
+      <p>Rating: {user.rating != null ? user.rating : "Unknown"}</p>
 
       <div className="friend-action-block" style={{ marginTop: "1.5rem" }}>
         {renderFriendActions()}
@@ -239,7 +244,7 @@ const UserProfileView: React.FC = () => {
         onClick={() => router.back()}
         style={{ marginTop: "2rem" }}
       >
-        Go Back
+        Back
       </Button>
     </div>
   );

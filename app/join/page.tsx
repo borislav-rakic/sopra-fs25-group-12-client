@@ -26,6 +26,11 @@ const JoinPage: React.FC = () => {
   const [modal, contextHolder] = useModal();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/"); // No token = send back to home
+        return;
+      }
     const fetchMatches = async () => {
       try {
         const fetchedMatches = await apiService.get<Match[]>("/matches");
@@ -58,26 +63,12 @@ const JoinPage: React.FC = () => {
 
   const checkJoinRequestStatus = async (matchId: number, userId: number) => {
     try {
-      message.open({
-        type: "info",
-        content: `Polling: matchId=${matchId}, userId=${userId}`,
-      });
 
       const joinRequestsObject: JoinRequest[] = await apiService.get(
         `/matches/${matchId}/joinRequests`,
       );
 
-      message.open({
-        type: "info",
-        content: `All join requests: ${JSON.stringify(joinRequestsObject)}`,
-      });
-
       const myRequest = joinRequestsObject.find((req) => req.userId === userId);
-
-      message.open({
-        type: "info",
-        content: `Filtered join request: ${JSON.stringify(myRequest)}`,
-      });
 
       if (!myRequest) {
         return;
