@@ -110,8 +110,8 @@ reason).
 |                      | 05.05.2025  | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/a443a53e9bd76c9a2e1289bc27e18ef688ac117d | styling for UI (client: #16) & defensive coding (client:#22) | more userfriendly |
 | **@diderot5038**     | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **@borislav-rakic**  | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@borislav-rakic**  | 04.05.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/d0a8ac00063547c1abeb440823e3756ef761e275 | The task was to implement correct scorekeeping by updating the score after each trick and game. | This is important information, which is going to be shown to players during a match, and the information will be used to determine the winner of the match. |
+|                      | 05.05.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/1a00f6a09a7a47661934a9bacf6beaf7dc03e940 | The task was to generate an html element containing statistics from the match. | This html element is going to be used in the frontend to show a summary of the match. |
 | **@dominiqueheller** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 
