@@ -101,12 +101,13 @@ reason).
 
 ---
 
-## Contributions Week 5 - [Begin Date] to [End Date]
+## Contributions Week 5 - 26.04.2025 to 07.05.2025
 
 | **Student**          | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | -------------------- | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **@stevaniaeilyn**   | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@stevaniaeilyn**   | 02.05.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/4a56f3468fe36272a16f18a4f7d3dba21279d6f7) | styling for UI (client: #16) | more userfriendly |
+|                      | 04.05.2025  | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/803f87e1a3d6fc951bfa5e55c8041e61208d2166 | styling for UI (client: #16) | more userfriendly |
+|                      | 05.05.2025  | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/a443a53e9bd76c9a2e1289bc27e18ef688ac117d | styling for UI (client: #16) & defensive coding (client:#22) | more userfriendly |
 | **@diderot5038**     | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **@borislav-rakic**  | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
