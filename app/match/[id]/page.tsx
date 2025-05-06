@@ -62,7 +62,6 @@ const MatchPage: React.FC = () => {
     "READY" | "JUSTCOMPLETED" | "RUNNING"
   >("RUNNING");
   const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
-  const [opponentToPassTo /*setOpponentToPassTo*/] = useState("");
   const [/*heartsBroken*/, setHeartsBroken] = useState(false);
   const [firstCardPlayed, setFirstCardPlayed] = useState(false);
   //const [isFirstRound, setIsFirstRound] = useState(true);
