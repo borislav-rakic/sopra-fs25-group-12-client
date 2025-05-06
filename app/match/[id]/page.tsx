@@ -73,6 +73,7 @@ const MatchPage: React.FC = () => {
   );
   const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false);
   const [isLeaveGameModalVisible, setIsLeaveGameModalVisible] = useState(false);
+  const [hasPassedCards, setHasPassedCards] = useState(false);
   //const [currentMatchPhase, setCurrentMatchPhase] = useState("");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -570,29 +571,8 @@ const MatchPage: React.FC = () => {
         return;
       }
 
-      // If the response is valid, proceed with the success logic
-      console.log("Response from server:", response);
+      setHasPassedCards(true);
 
-      const updatedCardsInHand = cardsInHand.filter(
-        (c) => !cardsToPass.some((card) => card.code === c.code),
-      );
-
-      // Update the opponent's hand based on the selected opponent
-      if (opponentToPassTo === "Opponent1") {
-        const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
-        setOpponent1Cards(updatedEnemyHand);
-      } else if (opponentToPassTo === "Opponent2") {
-        const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
-        setOpponent2Cards(updatedEnemyHand);
-      } else if (opponentToPassTo === "Opponent3") {
-        const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
-        setOpponent3Cards(updatedEnemyHand);
-      }
-
-      // Update the state
-      setCardsInHand(updatedCardsInHand);
-      setCardsToPass([]);
-      setCurrentGamePhase("playing");
     } catch (error) {
       handleApiError(error, "An error occurred while passing cards.");
     }
@@ -980,7 +960,7 @@ const MatchPage: React.FC = () => {
           </div>
         )}
 
-        {cardsToPass.length === 3 && (
+        {currentGamePhase === "PASSING" && cardsToPass.length === 3 && (
           <button
             type="button"
             onClick={handlePassCards}
@@ -1010,6 +990,29 @@ const MatchPage: React.FC = () => {
             Pass Cards
           </button>
         )}
+
+        {currentGamePhase === "PASSING" && hasPassedCards && (
+          <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 1000,
+            backgroundColor: "darkgreen",
+            color: "white",
+            border: "2px solid white",
+            padding: "20px",
+            borderRadius: "10px",
+            textAlign: "center",
+            width: "400px",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+          }}
+        >
+          <p style={{ fontSize: "1.2rem", margin: 0 }}>
+            Waiting for other players...
+          </p>
+        </div>)}
 
         {currentGamePhase === "RESULT" && (
           <div
