@@ -26,10 +26,10 @@ const FriendsPage: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/"); // No token = send back to home
-        return;
-      }
+    if (!token) {
+      router.push("/"); // No token = send back to home
+      return;
+    }
     const fetchFriends = async () => {
       try {
         const friendList = await apiService.get<UserSummary[]>(

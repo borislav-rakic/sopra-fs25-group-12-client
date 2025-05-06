@@ -39,10 +39,10 @@ const UserProfileView: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/"); // No token = send back to home
-        return;
-      }
+    if (!token) {
+      router.push("/"); // No token = send back to home
+      return;
+    }
     if (!id) return;
 
     const fetchData = async () => {
@@ -230,7 +230,7 @@ const UserProfileView: React.FC = () => {
         height={80}
         className="user-avatar"
       />
-      <h2 style = {{color: "white"}}>{user.username}</h2>
+      <h2 style={{ color: "white" }}>{user.username}</h2>
       <p>Status: {user.status}</p>
       <p>Birthday: {formattedBirthday || "Unknown"}</p>
       <p>Rating: {user.rating != null ? user.rating : "Unknown"}</p>

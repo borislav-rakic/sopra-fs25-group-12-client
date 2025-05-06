@@ -65,28 +65,31 @@ const Register: React.FC = () => {
             },
           ]}
         >
-          <Input placeholder="Enter new username" maxLength={37}
-          onChange={(e) => {
-            const noSpaces = e.target.value.replace(/\s/g, "");
-            form.setFieldsValue({ username: noSpaces });
-          }}/>
+          <Input
+            placeholder="Enter new username"
+            maxLength={37}
+            onChange={(e) => {
+              const noSpaces = e.target.value.replace(/\s/g, "");
+              form.setFieldsValue({ username: noSpaces });
+            }}
+          />
         </Form.Item>
 
         <Form.Item
           name="password"
           label="Password:"
-          rules={[{ required: true, message: "Create a password!" },
-            {
-              pattern: /^\S+$/,
-              message: "Password must not contain spaces.",
-            },
-          ]}
+          rules={[{ required: true, message: "Create a password!" }, {
+            pattern: /^\S+$/,
+            message: "Password must not contain spaces.",
+          }]}
         >
-          <Input placeholder="Enter new Password" 
-          onChange={(e) => {
-            const noSpaces = e.target.value.replace(/\s/g, "");
-            form.setFieldsValue({ password: noSpaces });
-          }}/>
+          <Input
+            placeholder="Enter new Password"
+            onChange={(e) => {
+              const noSpaces = e.target.value.replace(/\s/g, "");
+              form.setFieldsValue({ password: noSpaces });
+            }}
+          />
         </Form.Item>
 
         <div

@@ -77,10 +77,10 @@ const StartPage: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/"); // No token = send back to home
-        return;
-      }
+    if (!token) {
+      router.push("/"); // No token = send back to home
+      return;
+    }
     if (!gameId) {
       message.open({
         type: "error",

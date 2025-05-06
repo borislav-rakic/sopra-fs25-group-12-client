@@ -27,10 +27,10 @@ const JoinPage: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/"); // No token = send back to home
-        return;
-      }
+    if (!token) {
+      router.push("/"); // No token = send back to home
+      return;
+    }
     const fetchMatches = async () => {
       try {
         const fetchedMatches = await apiService.get<Match[]>("/matches");
@@ -63,7 +63,6 @@ const JoinPage: React.FC = () => {
 
   const checkJoinRequestStatus = async (matchId: number, userId: number) => {
     try {
-
       const joinRequestsObject: JoinRequest[] = await apiService.get(
         `/matches/${matchId}/joinRequests`,
       );

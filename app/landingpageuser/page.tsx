@@ -33,7 +33,7 @@ const LandingPageUser: React.FC = () => {
     //     logoutOnly();
     //   }
     // };
-  
+
     // document.addEventListener("visibilitychange", handleVisibilityChange);
     // return () => {
     //   document.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -67,19 +67,19 @@ const LandingPageUser: React.FC = () => {
     fetchUser();
   }, [router, apiService]);
 
-// this should be enforced when in Userservice authenticateuseratlogin() is modified
-//   const logoutOnly = async () => {
-//     const token = localStorage.getItem("token");
-//   if (!token) return;
+  // this should be enforced when in Userservice authenticateuseratlogin() is modified
+  //   const logoutOnly = async () => {
+  //     const token = localStorage.getItem("token");
+  //   if (!token) return;
 
-//   try {
-//     await apiService.post("/logout", {});
-//   } catch (error) {
-//     console.warn("Logout failed silently:", error);
-//   }
-//   localStorage.removeItem("token");
-// };
-  
+  //   try {
+  //     await apiService.post("/logout", {});
+  //   } catch (error) {
+  //     console.warn("Logout failed silently:", error);
+  //   }
+  //   localStorage.removeItem("token");
+  // };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     router.push("/");
