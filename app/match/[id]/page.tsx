@@ -1022,6 +1022,8 @@ const MatchPage: React.FC = () => {
               />
             </div>
 
+            <div style={{ marginBottom: "15px" }} />
+
             {/* Confirm button or waiting message */}
             {!isWaitingForPlayers
               ? (
