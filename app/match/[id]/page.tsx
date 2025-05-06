@@ -302,10 +302,10 @@ const MatchPage: React.FC = () => {
 
       if (response.cardsInHandPerPlayer) {
         const hand = [
+          response.cardsInHandPerPlayer["0"] ?? 0,
           response.cardsInHandPerPlayer["1"] ?? 0,
           response.cardsInHandPerPlayer["2"] ?? 0,
           response.cardsInHandPerPlayer["3"] ?? 0,
-          response.cardsInHandPerPlayer["4"] ?? 0,
         ];
 
         const shifted = [
