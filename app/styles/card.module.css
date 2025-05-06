@@ -116,3 +116,9 @@
   transform: scale(1.1); /* Add scaling effect */
   z-index: 40;
 }
+
+.cardContainer.disabledCard {
+  cursor: not-allowed; /* Change the cursor to indicate no interaction */
+  pointer-events: none; /* Prevent hover and click interactions */
+  box-shadow: none; /* Remove any hover effects */
+}

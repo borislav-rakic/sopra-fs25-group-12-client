@@ -736,6 +736,7 @@ const MatchPage: React.FC = () => {
         </table>
       </div>
       <div className="gameboard">
+      
         <div className="hand-0">
           {cardsInHand.map((card, index) => (
             <Card
@@ -746,13 +747,19 @@ const MatchPage: React.FC = () => {
               image={card.image}
               backimage={cardback}
               flipped
-              onClick={() => handlePlayCard(card)}
+              onClick={
+                currentGamePhase === "PASSING" && hasPassedCards
+                ? () => {}
+                : () => handlePlayCard(card)
+              }
               isSelected={cardsToPass.some((c) => c.code === card.code)}
               isPlayable={playableCards.includes(card.code)}
-              isPassable={currentGamePhase === "PASSING"} 
+              isPassable={currentGamePhase === "PASSING"}
+              isDisabled={currentGamePhase === "PASSING" && hasPassedCards}
             />
           ))}
         </div>
+      
 
         <div className="hand-1">
           {opponent1Cards.map((card, index) => (

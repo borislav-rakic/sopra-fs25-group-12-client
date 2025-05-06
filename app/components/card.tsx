@@ -13,6 +13,7 @@ interface cardProps {
   isSelected?: boolean;
   isPlayable?: boolean;
   isPassable?: boolean;
+  isDisabled?: boolean;
 }
 
 const Card: React.FC<cardProps> = (
@@ -27,6 +28,7 @@ const Card: React.FC<cardProps> = (
     isSelected = false,
     isPlayable = false,
     isPassable = false,
+    isDisabled = false,
   },
 ) => {
   const [flipped] = useState(initialFlipped);
@@ -45,7 +47,8 @@ const Card: React.FC<cardProps> = (
       className={`${styles.cardContainer} ${flipped ? styles.scalable : ""} 
       ${isSelected ? styles.selected : ""}
       ${isPlayable ? styles.playableCard : ""}
-      ${isPassable ? styles.passableCard : ""}`}
+      ${isPassable ? styles.passableCard : ""}
+      ${isDisabled ? styles.disabledCard : ""}`}
       onClick={handleCardClick}
     >
       {flipped
