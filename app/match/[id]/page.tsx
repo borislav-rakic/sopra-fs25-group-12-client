@@ -73,7 +73,7 @@ const MatchPage: React.FC = () => {
   const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false);
   const [isLeaveGameModalVisible, setIsLeaveGameModalVisible] = useState(false);
   const [hasPassedCards, setHasPassedCards] = useState(false);
-  //const [currentMatchPhase, setCurrentMatchPhase] = useState("");
+  const [timer, setTimer] = useState<number | null>(null);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
@@ -217,6 +217,10 @@ const MatchPage: React.FC = () => {
       if (response.gamePhase !== "PASSING") {
         setCardsToPass([]);
         setHasPassedCards(false);
+      }
+
+      if (response.gamePhase !== "RESULT") {
+        setIsWaitingForPlayers(false);
       }
 
       if (response.matchPlayers) {
@@ -628,6 +632,108 @@ const MatchPage: React.FC = () => {
     console.log("Has passed cards:", hasPassedCards);
   }, [cardsToPass, hasPassedCards]);
 
+  useEffect(() => {
+    console.log("Waiting for players:", isWaitingForPlayers);
+  }, [isWaitingForPlayers]);
+
+  useEffect(() => {
+    if (myTurn) {
+      if (currentGamePhase === "PASSING") {
+        console.log("It's my turn to pass cards! Starting 60-second timer...");
+        setTimer(60); // Start the timer at 60 seconds
+  
+        const intervalId = setInterval(() => {
+          setTimer((prev) => {
+            if (prev === null || prev <= 1) {
+              clearInterval(intervalId); // Stop the timer when it reaches 0
+              passRandomCards(); // Pass three random cards
+              return null;
+            }
+            return prev - 1; // Decrement the timer
+          });
+        }, 1000);
+  
+        return () => clearInterval(intervalId); // Cleanup on unmount or when `myTurn` changes
+      } else if (
+        currentGamePhase === "FIRSTTRICK" ||
+        currentGamePhase === "NORMALTRICK" ||
+        currentGamePhase === "FINALTRICK"
+      ) {
+        console.log("It's my turn to play a card! Starting 20-second timer...");
+        setTimer(20); // Start the timer at 20 seconds
+  
+        const intervalId = setInterval(() => {
+          setTimer((prev) => {
+            if (prev === null || prev <= 1) {
+              clearInterval(intervalId); // Stop the timer when it reaches 0
+              playRandomCard(); // Play a random card
+              return null;
+            }
+            return prev - 1; // Decrement the timer
+          });
+        }, 1000);
+  
+        return () => clearInterval(intervalId); // Cleanup on unmount or when `myTurn` changes
+      }
+    } else {
+      setTimer(null); // Reset the timer when it's no longer the player's turn
+    }
+  }, [myTurn, currentGamePhase]);
+
+  const playRandomCard = async () => {
+    if (playableCards.length === 0) {
+      console.log("No playable cards available.");
+      return;
+    }
+  
+    const randomIndex = Math.floor(Math.random() * playableCards.length);
+    const randomCardCode = playableCards[randomIndex];
+    const randomCard = cardsInHand.find((card) => card.code === randomCardCode);
+  
+    if (!randomCard) {
+      console.log("Random card not found in hand.");
+      return;
+    }
+  
+    console.log("Playing random card:", randomCard.code);
+    await handlePlayCard(randomCard); // Use the existing `handlePlayCard` function
+  };
+
+  const passRandomCards = async () => {
+    if (cardsInHand.length < 3) {
+      console.log("Not enough cards to pass.");
+      return;
+    }
+  
+    const shuffledCards = [...cardsInHand].sort(() => Math.random() - 0.5); // Shuffle the cards
+    const randomCardsToPass = shuffledCards.slice(0, 3); // Select the first 3 cards
+  
+    try {
+      const payload = {
+        gameId: matchId,
+        cards: randomCardsToPass.map((card) => card.code), // Send only the card codes
+      };
+      console.log("Passing random cards:", payload);
+  
+      // Make the API request
+      const response = await apiService.post(`/matches/${matchId}/passing`, payload);
+  
+      if (!response || typeof response !== "object") {
+        message.open({
+          type: "error",
+          content: "Failed to pass cards. Please try again.",
+        });
+        console.error("Error passing cards: Invalid or empty response from server.");
+        return;
+      }
+  
+      setHasPassedCards(true);
+      setCardsToPass(randomCardsToPass); // Update the state with the passed cards
+      console.log("Random cards passed successfully.");
+    } catch (error) {
+      handleApiError(error, "An error occurred while passing cards.");
+    }
+  };
 
   return (
     <div className={`${styles.page} matchPage`}>
@@ -1094,6 +1200,26 @@ const MatchPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {myTurn && timer !== null && (currentGamePhase === "FIRSTTRICK" || currentGamePhase === "NORMALTRICK" || currentGamePhase === "FINALTRICK" || currentGamePhase === "PASSING") && (
+        <div
+          style={{
+            position: "absolute",
+            top: "10%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor: "darkgreen",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "10px",
+            fontSize: "1.5rem",
+            zIndex: 1000,
+          }}
+        >
+          Time Remaining: {timer}s
+        </div>
+      )}
+      
     </div>
   );
 };
