@@ -242,6 +242,11 @@ const MatchPage: React.FC = () => {
         setHtmlContent(response.resultHtml);
       }
 
+      if (response.gamePhase !== "PASSING") {
+        setCardsToPass([]);
+        setHasPassedCards(false);
+      }
+
       if (response.matchPlayers) {
         setPlayers([
           response.matchPlayers[(0 + slot) % 4] ?? null,
