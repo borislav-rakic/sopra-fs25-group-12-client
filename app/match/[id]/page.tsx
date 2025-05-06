@@ -73,6 +73,7 @@ const MatchPage: React.FC = () => {
   );
   const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false);
   const [isLeaveGameModalVisible, setIsLeaveGameModalVisible] = useState(false);
+  const [hasPassedCards, setHasPassedCards] = useState(false);
   //const [currentMatchPhase, setCurrentMatchPhase] = useState("");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -284,7 +285,12 @@ const MatchPage: React.FC = () => {
         const newHand = response.playerCards.map((item) =>
           generateCard(item.card.code)
         );
+
+        if(!areHandsEqual(cardsInHand, newHand)) {
         setCardsInHand(newHand);
+        } else {
+          console.log("No change in hand, not updating state.");
+        }
       }
 
       if (response.playableCards) {
@@ -565,29 +571,8 @@ const MatchPage: React.FC = () => {
         return;
       }
 
-      // If the response is valid, proceed with the success logic
-      console.log("Response from server:", response);
+      setHasPassedCards(true);
 
-      const updatedCardsInHand = cardsInHand.filter(
-        (c) => !cardsToPass.some((card) => card.code === c.code),
-      );
-
-      // Update the opponent's hand based on the selected opponent
-      if (opponentToPassTo === "Opponent1") {
-        const updatedEnemyHand = opponent1Cards.concat(cardsToPass);
-        setOpponent1Cards(updatedEnemyHand);
-      } else if (opponentToPassTo === "Opponent2") {
-        const updatedEnemyHand = opponent2Cards.concat(cardsToPass);
-        setOpponent2Cards(updatedEnemyHand);
-      } else if (opponentToPassTo === "Opponent3") {
-        const updatedEnemyHand = opponent3Cards.concat(cardsToPass);
-        setOpponent3Cards(updatedEnemyHand);
-      }
-
-      // Update the state
-      setCardsInHand(updatedCardsInHand);
-      setCardsToPass([]);
-      setCurrentGamePhase("playing");
     } catch (error) {
       handleApiError(error, "An error occurred while passing cards.");
     }
@@ -618,6 +603,15 @@ const MatchPage: React.FC = () => {
     const sortedCards = sortCards(cardsInHand);
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
+
+  const areHandsEqual = (hand1: cardProps[], hand2: cardProps[]) => {
+    if (hand1.length !== hand2.length) return false;
+  
+    const hand1Codes = hand1.map((card) => card.code).sort();
+    const hand2Codes = hand2.map((card) => card.code).sort();
+  
+    return hand1Codes.every((code, index) => code === hand2Codes[index]);
+  };
 
   const handleConfirmNewGame = async () => {
     try {
@@ -742,6 +736,7 @@ const MatchPage: React.FC = () => {
         </table>
       </div>
       <div className="gameboard">
+      
         <div className="hand-0">
           {cardsInHand.map((card, index) => (
             <Card
@@ -752,12 +747,19 @@ const MatchPage: React.FC = () => {
               image={card.image}
               backimage={cardback}
               flipped
-              onClick={() => handlePlayCard(card)}
+              onClick={
+                currentGamePhase === "PASSING" && hasPassedCards
+                ? () => {}
+                : () => handlePlayCard(card)
+              }
               isSelected={cardsToPass.some((c) => c.code === card.code)}
               isPlayable={playableCards.includes(card.code)}
+              isPassable={currentGamePhase === "PASSING"}
+              isDisabled={currentGamePhase === "PASSING" && hasPassedCards}
             />
           ))}
         </div>
+      
 
         <div className="hand-1">
           {opponent1Cards.map((card, index) => (
@@ -965,7 +967,7 @@ const MatchPage: React.FC = () => {
           </div>
         )}
 
-        {cardsToPass.length === 3 && (
+        {currentGamePhase === "PASSING" && cardsToPass.length === 3 && (
           <button
             type="button"
             onClick={handlePassCards}
@@ -995,6 +997,29 @@ const MatchPage: React.FC = () => {
             Pass Cards
           </button>
         )}
+
+        {currentGamePhase === "PASSING" && hasPassedCards && (
+          <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 1000,
+            backgroundColor: "darkgreen",
+            color: "white",
+            border: "2px solid white",
+            padding: "20px",
+            borderRadius: "10px",
+            textAlign: "center",
+            width: "400px",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+          }}
+        >
+          <p style={{ fontSize: "1.2rem", margin: 0 }}>
+            Waiting for other players...
+          </p>
+        </div>)}
 
         {currentGamePhase === "RESULT" && (
           <div

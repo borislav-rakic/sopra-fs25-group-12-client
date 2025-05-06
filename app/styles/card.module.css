@@ -106,3 +106,19 @@
   transform: none;
   box-shadow: none;
 }
+
+.cardContainer.passableCard {
+  cursor: pointer; /* Indicate the card is clickable */
+  z-index: 30;
+}
+
+.cardContainer.passableCard:hover {
+  transform: scale(1.1); /* Add scaling effect */
+  z-index: 40;
+}
+
+.cardContainer.disabledCard {
+  cursor: not-allowed; /* Change the cursor to indicate no interaction */
+  pointer-events: none; /* Prevent hover and click interactions */
+  box-shadow: none; /* Remove any hover effects */
+}
