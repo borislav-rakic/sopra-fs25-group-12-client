@@ -110,13 +110,14 @@ const MatchPage: React.FC = () => {
     code: "XX",
     suit: "XX",
     value: BigInt(0),
+    cardOrder: 0,
     image: "",
     backimage: cardback,
     flipped: false,
     onClick: () => {},
   }), [cardback]);
 
-  const generateCard = useCallback((code: string): cardProps => {
+  const generateCard = useCallback((code: string, order: number): cardProps => {
     const rank = code[0];
     const suit = code[1];
 
@@ -147,6 +148,7 @@ const MatchPage: React.FC = () => {
       code,
       suit: suitToName[suit] || suit,
       value: rankToValue[rank],
+      cardOrder: order,
       image: `https://deckofcardsapi.com/static/img/${code}.png`,
       flipped: false,
       backimage: cardback,
@@ -176,7 +178,7 @@ const MatchPage: React.FC = () => {
           (code || code === "") &&
           (current.length === 0 || current[0].code !== code)
         ) {
-          setSlot(code === "" ? [] : [generateCard(code)]);
+          setSlot(code === "" ? [] : [generateCard(code, 0)]);
         }
       };
 
@@ -187,35 +189,6 @@ const MatchPage: React.FC = () => {
     },
     [generateCard, trickSlot0, trickSlot1, trickSlot2, trickSlot3],
   );
-
-  // const calculateTrickWinner = useCallback(() => {
-  //   const allCards = [
-  //     ...trickSlot0,
-  //     ...trickSlot1,
-  //     ...trickSlot2,
-  //     ...trickSlot3,
-  //   ];
-
-  //   if (allCards.length < 4) return;
-
-  //   const matchingCards = allCards.filter((card) => card.suit === currentTrick);
-  //   if (matchingCards.length === 0) return;
-
-  //   let highestCardIndex = 0;
-  //   let highestCard = matchingCards[0];
-
-  //   matchingCards.forEach((card) => {
-  //     const cardIndex = allCards.indexOf(card);
-  //     if (card.value > highestCard.value) {
-  //       highestCard = card;
-  //       highestCardIndex = cardIndex;
-  //     }
-  //   });
-
-  //   return highestCardIndex;
-  // }, [trickSlot0, trickSlot1, trickSlot2, trickSlot3, currentTrick]);
-
-  // ###########################################
 
   const fetchMatchData = useCallback(async () => {
     try {
@@ -287,7 +260,7 @@ const MatchPage: React.FC = () => {
 
       if (response.playerCards) {
         const newHand = response.playerCards.map((item) =>
-          generateCard(item.card.code)
+          generateCard(item.card.code, item.card.cardOrder)
         );
 
         if(!areHandsEqual(cardsInHand, newHand)) {
@@ -593,12 +566,8 @@ const MatchPage: React.FC = () => {
   const sortCards = (cards: cardProps[]) => {
     return cards.sort((a, b) => {
       console.log("Comparing cards:", a.code, " | ", b.code);
-      if (a.suit < b.suit) return -1;
-      if (a.suit > b.suit) return 1;
-
-      if (a.value < b.value) return -1;
-      if (a.value > b.value) return 1;
-
+      if (a.cardOrder < b.cardOrder) return -1;
+      if (a.cardOrder > b.cardOrder) return 1;
       return 0;
     });
   };
@@ -654,26 +623,12 @@ const MatchPage: React.FC = () => {
     return fullName.split(" (")[0]; // cuts off anything after ' ('
   };
 
-  /*
-  const resetGame = () => {
-    setCardsInHand([]);
-    setOpponent1Cards([]);
-    setOpponent2Cards([]);
-    setOpponent3Cards([]);
-    setTrickSlot0([]);
-    setTrickSlot1([]);
-    setTrickSlot2([]);
-    setTrickSlot3([]);
-    setCurrentTrick("");
-    setCurrentPlayer("");
-    setCurrentGamePhase("");
-    setCardsToPass([]);
-    setOpponentToPassTo("");
-    setHeartsBroken(false);
-    setFirstCardPlayed(false);
-    setIsFirstRound(true);
-  }
- */
+  useEffect(() => {
+    console.log("Cards to pass:", cardsToPass);
+    console.log("Has passed cards:", hasPassedCards);
+  }, [cardsToPass, hasPassedCards]);
+
+
   return (
     <div className={`${styles.page} matchPage`}>
       <div className="menu-dropdown">
@@ -748,6 +703,7 @@ const MatchPage: React.FC = () => {
               code={card.code}
               suit={card.suit}
               value={card.value}
+              cardOrder={card.cardOrder}
               image={card.image}
               backimage={cardback}
               flipped
@@ -772,6 +728,7 @@ const MatchPage: React.FC = () => {
               code={card.code}
               suit={card.suit}
               value={card.value}
+              cardOrder={card.cardOrder}
               image={card.image}
               backimage={cardback}
               flipped={false}
@@ -787,6 +744,7 @@ const MatchPage: React.FC = () => {
               code={card.code}
               suit={card.suit}
               value={card.value}
+              cardOrder={card.cardOrder}
               image={card.image}
               backimage={cardback}
               flipped={false}
@@ -802,6 +760,7 @@ const MatchPage: React.FC = () => {
               code={card.code}
               suit={card.suit}
               value={card.value}
+              cardOrder={card.cardOrder}
               image={card.image}
               backimage={cardback}
               flipped={false}
@@ -823,6 +782,7 @@ const MatchPage: React.FC = () => {
                 code={card.code}
                 suit={card.suit}
                 value={card.value}
+                cardOrder={card.cardOrder}
                 image={card.image}
                 backimage={cardback}
                 flipped
@@ -838,6 +798,7 @@ const MatchPage: React.FC = () => {
                 code={card.code}
                 suit={card.suit}
                 value={card.value}
+                cardOrder={card.cardOrder}
                 image={card.image}
                 backimage={cardback}
                 flipped
@@ -852,6 +813,7 @@ const MatchPage: React.FC = () => {
                 code={card.code}
                 suit={card.suit}
                 value={card.value}
+                cardOrder={card.cardOrder}
                 image={card.image}
                 backimage={cardback}
                 flipped
@@ -866,6 +828,7 @@ const MatchPage: React.FC = () => {
                 code={card.code}
                 suit={card.suit}
                 value={card.value}
+                cardOrder={card.cardOrder}
                 image={card.image}
                 backimage={cardback}
                 flipped

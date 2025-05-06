@@ -7,6 +7,6 @@ export interface PlayerCard {
 }
 
 export interface innerCard {
-  cardOrder: number | null;
+  cardOrder: number;
   code: string;
 }
