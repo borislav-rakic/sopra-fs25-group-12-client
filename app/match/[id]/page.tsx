@@ -284,7 +284,12 @@ const MatchPage: React.FC = () => {
         const newHand = response.playerCards.map((item) =>
           generateCard(item.card.code)
         );
+
+        if(!areHandsEqual(cardsInHand, newHand)) {
         setCardsInHand(newHand);
+        } else {
+          console.log("No change in hand, not updating state.");
+        }
       }
 
       if (response.playableCards) {
@@ -619,6 +624,15 @@ const MatchPage: React.FC = () => {
     setCardsInHand(sortedCards);
   }, [cardsInHand]);
 
+  const areHandsEqual = (hand1: cardProps[], hand2: cardProps[]) => {
+    if (hand1.length !== hand2.length) return false;
+  
+    const hand1Codes = hand1.map((card) => card.code).sort();
+    const hand2Codes = hand2.map((card) => card.code).sort();
+  
+    return hand1Codes.every((code, index) => code === hand2Codes[index]);
+  };
+
   const handleConfirmNewGame = async () => {
     try {
       console.log("Confirming new game...");
@@ -755,6 +769,7 @@ const MatchPage: React.FC = () => {
               onClick={() => handlePlayCard(card)}
               isSelected={cardsToPass.some((c) => c.code === card.code)}
               isPlayable={playableCards.includes(card.code)}
+              isPassable={currentGamePhase === "PASSING"} 
             />
           ))}
         </div>
