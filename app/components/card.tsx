@@ -22,7 +22,7 @@ const Card: React.FC<cardProps> = (
     code,
     suit,
     value,
-    cardOrder,
+    //cardOrder,
     image,
     flipped: initialFlipped,
     backimage,
