@@ -38,17 +38,36 @@ export class ApiService {
       const contentType = res.headers.get("Content-Type");
       let errorDetail = "";
 
-      if (contentType && contentType.includes("application/json")) {
+      if (contentType?.includes("application/json")) {
         const errorJson = await res.json();
-        errorDetail = errorJson.message || JSON.stringify(errorJson);
+        errorDetail =
+          errorJson.message ||
+          errorJson.error || // <- pick Spring Boot's "error" field if present
+          "An unknown error occurred.";
       } else {
         errorDetail = await res.text();
       }
 
-      const fullMessage =
-        `[${method}] ${url}: ${status} ${statusText}\n${contextMessage}${errorDetail}`;
-      const error = new Error(fullMessage) as Error & { status?: number };
+      // Build full and user-facing messages
+      const fullMessage = `[${method}] ${url}: ${status} ${statusText} - ${errorDetail}`;
+      const isClientError = status >= 400 && status < 500;
+      const userMessage = isClientError && errorDetail
+        ? `${contextMessage.trim()} ${errorDetail}`
+        : `${contextMessage.trim()} (${status})`;
+
+      // Create and enrich the error object
+      const error = new Error(userMessage) as Error & {
+        status?: number;
+        detail?: string;
+        fullMessage?: string;
+      };
       error.status = status;
+      error.detail = errorDetail;
+      error.fullMessage = fullMessage;
+
+      // Log full detail, if needed
+      console.warn(fullMessage);
+
       throw error;
     }
 
@@ -67,6 +86,7 @@ export class ApiService {
       throw new Error(`[${method}] ${url}: Invalid JSON response`);
     }
   }
+
 
   public async get<T>(
     endpoint: string,
