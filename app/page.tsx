@@ -7,7 +7,7 @@ import { Button } from "antd";
 import styles from "@/styles/page.module.css";
 import { useEffect } from "react";
 import { useApi } from "@/hooks/useApi";
-import { User, UserAuthDTO } from "./types/user";
+import { User, /* UserAuthDTO */ } from "./types/user";
 
 export default function Home() {
   const router = useRouter();
