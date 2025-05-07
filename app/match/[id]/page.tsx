@@ -285,11 +285,24 @@ const MatchPage: React.FC = () => {
       if (Array.isArray(response.matchMessages)) {
         const newMessages = response.matchMessages.filter(
           (msg): msg is MatchMessage =>
-            typeof msg.content === "string" && msg.content.trim() !== "",
+            typeof msg.content === "string" && msg.content.trim() !== ""
         );
-
+      
         if (newMessages.length > 0) {
-          setServerMessages((prev) => [...newMessages, ...prev]);
+          setServerMessages((prev) => {
+            const combined = [...newMessages, ...prev];
+      
+            // Schedule each new message for removal in 10s
+            newMessages.forEach((msg) => {
+              setTimeout(() => {
+                setServerMessages((curr) =>
+                  curr.filter((m) => m.id !== msg.id)
+                );
+              }, 20000);
+            });
+      
+            return combined;
+          });
         }
       }
 
