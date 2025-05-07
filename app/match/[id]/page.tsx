@@ -1237,6 +1237,7 @@ const MatchPage: React.FC = () => {
             color: "white",
             padding: "10px 20px",
             borderRadius: "10px",
+            border: "2px solid white",
             fontSize: "1.5rem",
             zIndex: 1000,
           }}
