@@ -21,42 +21,21 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const checkLoginAndPopulate = async () => {
-      const token = localStorage.getItem("token");
-
-      if (token) {
-        try {
-          const user = await apiService.get<UserAuthDTO>("/users/me");
-          if (user?.id) {
-            router.push("/landingpageuser");
-            return;
-          }
-        } catch (error: unknown) {
-          const err = error as { status?: number };
-
-          if (err.status !== 404 && err.status !== 401) {
-            console.error("Unexpected error checking login:", error);
-          }
-        }
-      }
-
-      const developmentPhaseIsOver = false;
-      if (
-        !developmentPhaseIsOver ||
-        !sessionStorage.getItem("populateCalled")
-      ) {
-        try {
-          await apiService.post<void>("/leaderboard/populate", null);
-          console.log("Leaderboard populated (if needed).");
-          sessionStorage.setItem("populateCalled", "true");
-        } catch (err) {
-          console.error("Failed to populate leaderboard:", err);
-        }
+    const resetAndPopulate = async () => {
+      // Always clear tokens
+      localStorage.removeItem("token");
+  
+      // Always call /populate
+      try {
+        await apiService.post<void>("/leaderboard/populate", null);
+      } catch (err) {
+        console.error("Failed to populate leaderboard:", err);
       }
     };
-
-    checkLoginAndPopulate();
-  }, [apiService, router]);
+  
+    resetAndPopulate();
+  }, [apiService]);
+  
 
   const handleGuestLogin = async () => {
     try {
