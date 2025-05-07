@@ -624,6 +624,9 @@ a {
   padding-top: 3px;
   font-size: 1vw;
   border-radius: 5%;
+  overflow: hidden; /* Prevent text overflow */
+  text-overflow: ellipsis; /* Display ellipsis if content overflows */
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
 .game-playerscore {
