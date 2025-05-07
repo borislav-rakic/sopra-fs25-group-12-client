@@ -22,6 +22,7 @@ export interface PollingDTO {
   previousTrick: Array<innerCard> | null;
   previousTrickWinnerMatchPlayerSlot: number | null;
   previousTrickWinnerPlayerSlot: number | null;
+  previousTrickLeaderPlayerSlot: number | null;
   previousTrickPoints: number | null;
   resultHtml: string | null; // HTML string
   message: string | null; // Message string

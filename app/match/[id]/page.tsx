@@ -214,6 +214,45 @@ const MatchPage: React.FC = () => {
     [generateCard, trickSlot0, trickSlot1, trickSlot2, trickSlot3],
   );
 
+  const handleFullTrick = useCallback(
+    (trick: innerCard[], slot: number, trickLeaderSlot: number) => {
+      const tempTrick: string[] = ["", "", "", ""];
+      const indexShift = (trickLeaderSlot - slot + 4) % 4;
+  
+      // Map the trick cards to their respective slots
+      trick.forEach((card, index) => {
+        if (card) {
+          const shiftedIndex = (index + indexShift) % 4;
+          tempTrick[shiftedIndex] = card.code;
+        }
+      });
+  
+      // Update each slot if it is not already filled
+      const updateSlotIfEmpty = (
+        __index: number,
+        code: string,
+        setSlot: (val: cardProps[]) => void,
+        current: cardProps[],
+      ) => {
+        if (current.length === 0 && code !== "") {
+          setSlot([generateCard(code, 0)]);
+          console.log(`Slot ${__index} updated with card:`, code);
+        } else {
+          console.log(`Slot ${__index} already filled or no card to set.`);
+        }
+      };
+  
+      updateSlotIfEmpty(0, tempTrick[0], setTrickSlot0, trickSlot0);
+      updateSlotIfEmpty(1, tempTrick[1], setTrickSlot1, trickSlot1);
+      updateSlotIfEmpty(2, tempTrick[2], setTrickSlot2, trickSlot2);
+      updateSlotIfEmpty(3, tempTrick[3], setTrickSlot3, trickSlot3);
+  
+      // Disable polling for 3 seconds
+      setPollingPausedUntil(Date.now() + 3000);
+    },
+    [generateCard, setPollingPausedUntil, trickSlot0, trickSlot1, trickSlot2, trickSlot3],
+  );
+
   const fetchMatchData = useCallback(async () => {
     try {
       console.log("Fetching match data");
@@ -314,7 +353,12 @@ const MatchPage: React.FC = () => {
         setFirstCardPlayed(true);
       }
 
-      handleTrickFromLogic(response.currentTrick || [], slot, trickLeaderSlot);
+      if(response.trickPhase === "JUSTCOMPLETED") {
+        handleFullTrick(response.previousTrick || [], slot, response.previousTrickLeaderPlayerSlot || 0);
+      } else {
+        handleTrickFromLogic(response.currentTrick || [], slot, trickLeaderSlot);
+      }
+
 
       if (response.cardsInHandPerPlayer) {
         const hand = [
