@@ -84,8 +84,8 @@ const MatchPage: React.FC = () => {
 
   const [htmlContent, setHtmlContent] = useState<string>("");
 
-  // handleFastForward for testing, game transitions
-  const handleFastForward = async () => {
+   // handleFastForward for testing, game transitions
+   const handleFastForwardGame = async () => {
     if (currentGamePhase !== "NORMALTRICK") {
       message.warning("Fast forward is only available during a normal trick.");
       return;
@@ -93,7 +93,26 @@ const MatchPage: React.FC = () => {
 
     try {
       console.log("Fast forwarding game...");
-      await apiService.post(`/matches/${matchId}/game/fastforward`, {});
+      await apiService.post(`/matches/${matchId}/game/sim/game`, {});
+      message.open({
+        type: "success",
+        content: "Fast-forward complete",
+      });
+      await fetchMatchData(); // refresh cards, trick, scores
+    } catch (error) {
+      handleApiError(error, "Fast-forward failed.");
+    }
+  };
+  // handleFastForward for testing match end
+  const handleFastForwardMatch = async () => {
+    if (currentGamePhase !== "NORMALTRICK") {
+      message.warning("Fast forward is only available during a normal trick.");
+      return;
+    }
+
+    try {
+      console.log("Fast forwarding match...");
+      await apiService.post(`/matches/${matchId}/game/sim/match`, {});
       message.open({
         type: "success",
         content: "Fast-forward complete",
@@ -684,13 +703,19 @@ const MatchPage: React.FC = () => {
               { key: "2", label: "Rules" /*onClick: () => toggleSettings()*/ },
               { key: "3", label: "Leave Match", onClick: showLeaveGameModal },
               { type: "divider" },
-              { type: "divider" },
               ...(isFastForwardAvailable
-                ? [{
-                  key: "4",
-                  label: "Fast Forward",
-                  onClick: handleFastForward,
-                }]
+                ? [
+                    {
+                      key: "4",
+                      label: "FF near game end",
+                      onClick: handleFastForwardGame,
+                    },
+                    {
+                      key: "5",
+                      label: "FF near match end",
+                      onClick: handleFastForwardMatch,
+                    },
+                  ]
                 : []),
             ],
           }}
