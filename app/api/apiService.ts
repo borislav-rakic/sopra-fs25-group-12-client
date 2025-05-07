@@ -40,8 +40,7 @@ export class ApiService {
 
       if (contentType?.includes("application/json")) {
         const errorJson = await res.json();
-        errorDetail =
-          errorJson.message ||
+        errorDetail = errorJson.message ||
           errorJson.error || // <- pick Spring Boot's "error" field if present
           "An unknown error occurred.";
       } else {
@@ -49,7 +48,8 @@ export class ApiService {
       }
 
       // Build full and user-facing messages
-      const fullMessage = `[${method}] ${url}: ${status} ${statusText} - ${errorDetail}`;
+      const fullMessage =
+        `[${method}] ${url}: ${status} ${statusText} - ${errorDetail}`;
       const isClientError = status >= 400 && status < 500;
       const userMessage = isClientError && errorDetail
         ? `${contextMessage.trim()} ${errorDetail}`
@@ -86,7 +86,6 @@ export class ApiService {
       throw new Error(`[${method}] ${url}: Invalid JSON response`);
     }
   }
-
 
   public async get<T>(
     endpoint: string,

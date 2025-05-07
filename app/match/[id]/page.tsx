@@ -8,6 +8,7 @@ import styles from "@/styles/page.module.css";
 import modalStyles from "@/styles/modalMessage.module.css";
 import { useApi } from "@/hooks/useApi";
 import { handleApiError } from "@/utils/errorHandlers";
+import { MatchMessage } from "@/types/MatchMessage"; // adjust path as needed
 
 // import { Match } from "@/types/match";
 import { useEffect, useState } from "react";
@@ -83,10 +84,10 @@ const MatchPage: React.FC = () => {
   //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
 
   const [htmlContent, setHtmlContent] = useState<string>("");
-  const [serverMessages, setServerMessages] = useState<string[]>([]);
+  const [serverMessages, setServerMessages] = useState<MatchMessage[]>([]);
 
-   // handleFastForward for testing, game transitions
-   const handleFastForwardGame = async () => {
+  // handleFastForward for testing, game transitions
+  const handleFastForwardGame = async () => {
     if (currentGamePhase !== "NORMALTRICK") {
       message.warning("Fast forward is only available during a normal trick.");
       return;
@@ -202,9 +203,12 @@ const MatchPage: React.FC = () => {
           setSlot(code === "" ? [] : [generateCard(code, 0)]);
           console.log(`Slot ${__index} updated:`, code);
         } else {
-          console.log(`Slot ${__index} unchanged:`, current[0]?.code || "empty");
+          console.log(
+            `Slot ${__index} unchanged:`,
+            current[0]?.code || "empty",
+          );
+        }
       };
-      }
 
       updateSlot(0, tempTrick[0], setTrickSlot0, trickSlot0);
       updateSlot(1, tempTrick[1], setTrickSlot1, trickSlot1);
@@ -218,7 +222,7 @@ const MatchPage: React.FC = () => {
     (trick: innerCard[], slot: number, trickLeaderSlot: number) => {
       const tempTrick: string[] = ["", "", "", ""];
       const indexShift = (trickLeaderSlot - slot + 4) % 4;
-  
+
       // Map the trick cards to their respective slots
       trick.forEach((card, index) => {
         if (card) {
@@ -226,7 +230,7 @@ const MatchPage: React.FC = () => {
           tempTrick[shiftedIndex] = card.code;
         }
       });
-  
+
       // Update each slot if it is not already filled
       const updateSlotIfEmpty = (
         __index: number,
@@ -241,16 +245,23 @@ const MatchPage: React.FC = () => {
           console.log(`Slot ${__index} already filled or no card to set.`);
         }
       };
-  
+
       updateSlotIfEmpty(0, tempTrick[0], setTrickSlot0, trickSlot0);
       updateSlotIfEmpty(1, tempTrick[1], setTrickSlot1, trickSlot1);
       updateSlotIfEmpty(2, tempTrick[2], setTrickSlot2, trickSlot2);
       updateSlotIfEmpty(3, tempTrick[3], setTrickSlot3, trickSlot3);
-  
+
       // Disable polling for 3 seconds
       setPollingPausedUntil(Date.now() + 3000);
     },
-    [generateCard, setPollingPausedUntil, trickSlot0, trickSlot1, trickSlot2, trickSlot3],
+    [
+      generateCard,
+      setPollingPausedUntil,
+      trickSlot0,
+      trickSlot1,
+      trickSlot2,
+      trickSlot3,
+    ],
   );
 
   const fetchMatchData = useCallback(async () => {
@@ -271,8 +282,15 @@ const MatchPage: React.FC = () => {
       setMyTurn(response.myTurn ?? false);
       console.log("myTurn (just set):", response.myTurn ?? false);
 
-      if (response.message && response.message !== "" && response.message !== null) {
-        setServerMessages((prevMessages) => response.message ? [response.message, ...prevMessages] : prevMessages);
+      if (Array.isArray(response.matchMessages)) {
+        const newMessages = response.matchMessages.filter(
+          (msg): msg is MatchMessage =>
+            typeof msg.content === "string" && msg.content.trim() !== "",
+        );
+
+        if (newMessages.length > 0) {
+          setServerMessages((prev) => [...newMessages, ...prev]);
+        }
       }
 
       const slot = response.playerSlot ?? 0;
@@ -335,8 +353,8 @@ const MatchPage: React.FC = () => {
           generateCard(item.card.code, item.card.cardOrder)
         );
 
-        if(!areHandsEqual(cardsInHand, newHand)) {
-        setCardsInHand(newHand);
+        if (!areHandsEqual(cardsInHand, newHand)) {
+          setCardsInHand(newHand);
         } else {
           console.log("No change in hand, not updating state.");
         }
@@ -353,12 +371,19 @@ const MatchPage: React.FC = () => {
         setFirstCardPlayed(true);
       }
 
-      if(response.trickPhase === "JUSTCOMPLETED") {
-        handleFullTrick(response.previousTrick || [], slot, response.previousTrickLeaderPlayerSlot || 0);
+      if (response.trickPhase === "JUSTCOMPLETED") {
+        handleFullTrick(
+          response.previousTrick || [],
+          slot,
+          response.previousTrickLeaderPlayerSlot || 0,
+        );
       } else {
-        handleTrickFromLogic(response.currentTrick || [], slot, trickLeaderSlot);
+        handleTrickFromLogic(
+          response.currentTrick || [],
+          slot,
+          trickLeaderSlot,
+        );
       }
-
 
       if (response.cardsInHandPerPlayer) {
         const hand = [
@@ -387,18 +412,24 @@ const MatchPage: React.FC = () => {
       }
     } catch (error) {
       console.log("Error caught:", error); // Inspect the error structure
-    
+
       // Check if the error has a `response` property (e.g., Axios errors)
-      if (typeof error === "object" && error !== null && "status" in error && error.status === 403) {
+      if (
+        typeof error === "object" && error !== null && "status" in error &&
+        error.status === 403
+      ) {
         message.open({
           type: "error",
-          content: "You are not authorized to view this match."
+          content: "You are not authorized to view this match.",
         });
         router.push("/landingpageuser");
-      } else if (typeof error === "object" && error !== null && "status" in error && error.status === 409) {
+      } else if (
+        typeof error === "object" && error !== null && "status" in error &&
+        error.status === 409
+      ) {
         message.open({
           type: "error",
-          content: "You are not authorized to view this match."
+          content: "You are not authorized to view this match.",
         });
         router.push("/landingpageuser");
       } else if (error instanceof Error) {
@@ -651,7 +682,6 @@ const MatchPage: React.FC = () => {
       }
 
       setHasPassedCards(true);
-
     } catch (error) {
       handleApiError(error, "An error occurred while passing cards.");
     }
@@ -681,10 +711,10 @@ const MatchPage: React.FC = () => {
 
   const areHandsEqual = (hand1: cardProps[], hand2: cardProps[]) => {
     if (hand1.length !== hand2.length) return false;
-  
+
     const hand1Codes = hand1.map((card) => card.code).sort();
     const hand2Codes = hand2.map((card) => card.code).sort();
-  
+
     return hand1Codes.every((code, index) => code === hand2Codes[index]);
   };
 
@@ -739,7 +769,7 @@ const MatchPage: React.FC = () => {
       if (currentGamePhase === "PASSING") {
         console.log("It's my turn to pass cards! Starting 60-second timer...");
         setTimer(60); // Start the timer at 60 seconds
-  
+
         const intervalId = setInterval(() => {
           setTimer((prev) => {
             if (prev === null || prev <= 1) {
@@ -750,7 +780,7 @@ const MatchPage: React.FC = () => {
             return prev - 1; // Decrement the timer
           });
         }, 1000);
-  
+
         return () => clearInterval(intervalId); // Cleanup on unmount or when `myTurn` changes
       } else if (
         currentGamePhase === "FIRSTTRICK" ||
@@ -759,7 +789,7 @@ const MatchPage: React.FC = () => {
       ) {
         console.log("It's my turn to play a card! Starting 20-second timer...");
         setTimer(20); // Start the timer at 20 seconds
-  
+
         const intervalId = setInterval(() => {
           setTimer((prev) => {
             if (prev === null || prev <= 1) {
@@ -770,7 +800,7 @@ const MatchPage: React.FC = () => {
             return prev - 1; // Decrement the timer
           });
         }, 1000);
-  
+
         return () => clearInterval(intervalId); // Cleanup on unmount or when `myTurn` changes
       }
     } else {
@@ -783,16 +813,16 @@ const MatchPage: React.FC = () => {
       console.log("No playable cards available.");
       return;
     }
-  
+
     const randomIndex = Math.floor(Math.random() * playableCards.length);
     const randomCardCode = playableCards[randomIndex];
     const randomCard = cardsInHand.find((card) => card.code === randomCardCode);
-  
+
     if (!randomCard) {
       console.log("Random card not found in hand.");
       return;
     }
-  
+
     console.log("Playing random card:", randomCard.code);
     await handlePlayCard(randomCard); // Use the existing `handlePlayCard` function
   };
@@ -802,29 +832,34 @@ const MatchPage: React.FC = () => {
       console.log("Not enough cards to pass.");
       return;
     }
-  
+
     const shuffledCards = [...cardsInHand].sort(() => Math.random() - 0.5); // Shuffle the cards
     const randomCardsToPass = shuffledCards.slice(0, 3); // Select the first 3 cards
-  
+
     try {
       const payload = {
         gameId: matchId,
         cards: randomCardsToPass.map((card) => card.code), // Send only the card codes
       };
       console.log("Passing random cards:", payload);
-  
+
       // Make the API request
-      const response = await apiService.post(`/matches/${matchId}/passing`, payload);
-  
+      const response = await apiService.post(
+        `/matches/${matchId}/passing`,
+        payload,
+      );
+
       if (!response || typeof response !== "object") {
         message.open({
           type: "error",
           content: "Failed to pass cards. Please try again.",
         });
-        console.error("Error passing cards: Invalid or empty response from server.");
+        console.error(
+          "Error passing cards: Invalid or empty response from server.",
+        );
         return;
       }
-  
+
       setHasPassedCards(true);
       setCardsToPass(randomCardsToPass); // Update the state with the passed cards
       console.log("Random cards passed successfully.");
@@ -835,11 +870,13 @@ const MatchPage: React.FC = () => {
 
   return (
     <div className={`${styles.page} matchPage`}>
-
       <div className="message-box">
-        {serverMessages.map((message, index) => (
-          <div key={index} className="message">
-            {message}
+        {serverMessages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`message message-${msg.type.toLowerCase()}`}
+          >
+            {msg.content}
           </div>
         ))}
       </div>
@@ -854,17 +891,17 @@ const MatchPage: React.FC = () => {
               { type: "divider" },
               ...(isFastForwardAvailable
                 ? [
-                    {
-                      key: "4",
-                      label: "FF near game end",
-                      onClick: handleFastForwardGame,
-                    },
-                    {
-                      key: "5",
-                      label: "FF near match end",
-                      onClick: handleFastForwardMatch,
-                    },
-                  ]
+                  {
+                    key: "4",
+                    label: "FF near game end",
+                    onClick: handleFastForwardGame,
+                  },
+                  {
+                    key: "5",
+                    label: "FF near match end",
+                    onClick: handleFastForwardMatch,
+                  },
+                ]
                 : []),
             ],
           }}
@@ -914,7 +951,6 @@ const MatchPage: React.FC = () => {
         </table>
       </div>
       <div className="gameboard">
-      
         <div className="hand-0">
           {cardsInHand.map((card, index) => (
             <Card
@@ -926,11 +962,9 @@ const MatchPage: React.FC = () => {
               image={card.image}
               backimage={cardback}
               flipped
-              onClick={
-                currentGamePhase === "PASSING" && hasPassedCards
+              onClick={currentGamePhase === "PASSING" && hasPassedCards
                 ? () => {}
-                : () => handlePlayCard(card)
-              }
+                : () => handlePlayCard(card)}
               isSelected={cardsToPass.some((c) => c.code === card.code)}
               isPlayable={playableCards.includes(card.code)}
               isPassable={currentGamePhase === "PASSING"}
@@ -938,7 +972,6 @@ const MatchPage: React.FC = () => {
             />
           ))}
         </div>
-      
 
         <div className="hand-1">
           {opponent1Cards.map((card, index) => (
@@ -1186,26 +1219,27 @@ const MatchPage: React.FC = () => {
 
         {currentGamePhase === "PASSING" && hasPassedCards && (
           <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            zIndex: 1000,
-            backgroundColor: "darkgreen",
-            color: "white",
-            border: "2px solid white",
-            padding: "20px",
-            borderRadius: "10px",
-            textAlign: "center",
-            width: "400px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          <p style={{ fontSize: "1.2rem", margin: 0 }}>
-            Waiting for other players...
-          </p>
-        </div>)}
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 1000,
+              backgroundColor: "darkgreen",
+              color: "white",
+              border: "2px solid white",
+              padding: "20px",
+              borderRadius: "10px",
+              textAlign: "center",
+              width: "400px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+            }}
+          >
+            <p style={{ fontSize: "1.2rem", margin: 0 }}>
+              Waiting for other players...
+            </p>
+          </div>
+        )}
 
         {currentGamePhase === "RESULT" && (
           <div
@@ -1314,25 +1348,29 @@ const MatchPage: React.FC = () => {
         )}
       </div>
 
-      {myTurn && timer !== null && (currentGamePhase === "FIRSTTRICK" || currentGamePhase === "NORMALTRICK" || currentGamePhase === "FINALTRICK" || currentGamePhase === "PASSING") && (
-        <div
-          style={{
-            position: "absolute",
-            top: "10%",
-            left: "50%",
-            transform: "translateX(-50%)",
-            backgroundColor: "darkgreen",
-            color: "white",
-            padding: "10px 20px",
-            borderRadius: "10px",
-            fontSize: "1.5rem",
-            zIndex: 1000,
-          }}
-        >
-          Time Remaining: {timer}s
-        </div>
-      )}
-      
+      {myTurn && timer !== null &&
+        (currentGamePhase === "FIRSTTRICK" ||
+          currentGamePhase === "NORMALTRICK" ||
+          currentGamePhase === "FINALTRICK" ||
+          currentGamePhase === "PASSING") &&
+        (
+          <div
+            style={{
+              position: "absolute",
+              top: "10%",
+              left: "50%",
+              transform: "translateX(-50%)",
+              backgroundColor: "darkgreen",
+              color: "white",
+              padding: "10px 20px",
+              borderRadius: "10px",
+              fontSize: "1.5rem",
+              zIndex: 1000,
+            }}
+          >
+            Time Remaining: {timer}s
+          </div>
+        )}
     </div>
   );
 };
