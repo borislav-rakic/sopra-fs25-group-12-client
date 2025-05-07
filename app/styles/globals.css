@@ -264,7 +264,7 @@ a {
   overflow: hidden; /* Optional: Ensures content inside respects the rounded corners */
   min-height: 500px;
   max-height: 1000px;
-  z-index: auto;
+  z-index: 1;
 }
 
 .hand {

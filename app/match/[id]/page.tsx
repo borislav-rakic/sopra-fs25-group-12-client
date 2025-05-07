@@ -79,17 +79,13 @@ const MatchPage: React.FC = () => {
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
 
-  const [animatedCards, setAnimatedCards] = useState<
-    { code: string; startX: number; startY: number; endX: number; endY: number }[]
-  >([]);
-
   //const [slot, setSlot] = useState(1);
   //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
 
   const [htmlContent, setHtmlContent] = useState<string>("");
 
-  // handleFastForward for testing, game transitions
-  const handleFastForward = async () => {
+   // handleFastForward for testing, game transitions
+   const handleFastForwardGame = async () => {
     if (currentGamePhase !== "NORMALTRICK") {
       message.warning("Fast forward is only available during a normal trick.");
       return;
@@ -97,7 +93,26 @@ const MatchPage: React.FC = () => {
 
     try {
       console.log("Fast forwarding game...");
-      await apiService.post(`/matches/${matchId}/game/fastforward`, {});
+      await apiService.post(`/matches/${matchId}/game/sim/game`, {});
+      message.open({
+        type: "success",
+        content: "Fast-forward complete",
+      });
+      await fetchMatchData(); // refresh cards, trick, scores
+    } catch (error) {
+      handleApiError(error, "Fast-forward failed.");
+    }
+  };
+  // handleFastForward for testing match end
+  const handleFastForwardMatch = async () => {
+    if (currentGamePhase !== "NORMALTRICK") {
+      message.warning("Fast forward is only available during a normal trick.");
+      return;
+    }
+
+    try {
+      console.log("Fast forwarding match...");
+      await apiService.post(`/matches/${matchId}/game/sim/match`, {});
       message.open({
         type: "success",
         content: "Fast-forward complete",
@@ -183,33 +198,12 @@ const MatchPage: React.FC = () => {
           (current.length === 0 && code !== "") || // Update the slot if it is empty but should have data
           (current.length > 0 && current[0].code !== code) // Update the slot if the code has changed
         ) {
-          // Animation logic: Only trigger animation if the slot is being updated
-          if (code !== "") {
-            const startX = calculateHandPosition(__index).x;
-            const startY = calculateHandPosition(__index).y;
-            const endX = calculateTrickSlotPosition(__index).x;
-            const endY = calculateTrickSlotPosition(__index).y;
-      
-            setAnimatedCards((prev) => [
-              ...prev,
-              { code, startX, startY, endX, endY },
-            ]);
-      
-            // Remove the animated card after the animation is complete
-            setTimeout(() => {
-              setAnimatedCards((prev) =>
-                prev.filter((animatedCard) => animatedCard.code !== code),
-              );
-            }, 1000); // Match the animation duration
-          }
-      
-          // Update the slot
           setSlot(code === "" ? [] : [generateCard(code, 0)]);
           console.log(`Slot ${__index} updated:`, code);
         } else {
           console.log(`Slot ${__index} unchanged:`, current[0]?.code || "empty");
-        }
       };
+      }
 
       updateSlot(0, tempTrick[0], setTrickSlot0, trickSlot0);
       updateSlot(1, tempTrick[1], setTrickSlot1, trickSlot1);
@@ -764,26 +758,6 @@ const MatchPage: React.FC = () => {
     }
   };
 
-  const calculateHandPosition = (playerIndex: number) => {
-    const positions = [
-      { x: 100, y: 500 }, // Player 0 (bottom)
-      { x: 800, y: 100 }, // Player 1 (right)
-      { x: 100, y: 50 },  // Player 2 (top)
-      { x: 50, y: 100 },  // Player 3 (left)
-    ];
-    return positions[playerIndex];
-  };
-  
-  const calculateTrickSlotPosition = (slotIndex: number) => {
-    const positions = [
-      { x: 400, y: 300 }, // Trick slot 0
-      { x: 500, y: 300 }, // Trick slot 1
-      { x: 400, y: 200 }, // Trick slot 2
-      { x: 300, y: 300 }, // Trick slot 3
-    ];
-    return positions[slotIndex];
-  };
-
   return (
     <div className={`${styles.page} matchPage`}>
       <div className="menu-dropdown">
@@ -794,13 +768,19 @@ const MatchPage: React.FC = () => {
               { key: "2", label: "Rules" /*onClick: () => toggleSettings()*/ },
               { key: "3", label: "Leave Match", onClick: showLeaveGameModal },
               { type: "divider" },
-              { type: "divider" },
               ...(isFastForwardAvailable
-                ? [{
-                  key: "4",
-                  label: "Fast Forward",
-                  onClick: handleFastForward,
-                }]
+                ? [
+                    {
+                      key: "4",
+                      label: "FF near game end",
+                      onClick: handleFastForwardGame,
+                    },
+                    {
+                      key: "5",
+                      label: "FF near match end",
+                      onClick: handleFastForwardMatch,
+                    },
+                  ]
                 : []),
             ],
           }}
@@ -1248,37 +1228,6 @@ const MatchPage: React.FC = () => {
             </div>
           </div>
         )}
-
-        <div className="animated-cards-container">
-          {animatedCards.map((card) => (
-            <div
-              key={"animated-" + card.code}
-              className="animated-card"
-              style={{
-                position: "absolute",
-                left: `${card.startX}px`,
-                top: `${card.startY}px`,
-                transition: "all 1s ease-in-out",
-                transform: `translate(${card.endX - card.startX}px, ${
-                  card.endY - card.startY
-                }px)`,
-              }}
-            >
-              <Card
-                code={card.code}
-                suit=""
-                value={BigInt(0)}
-                cardOrder={0}
-                image={`https://deckofcardsapi.com/static/img/${card.code}.png`}
-                backimage={cardback}
-                flipped
-                onClick={() => {}}
-              />
-            </div>
-          ))}
-        </div>
-
-
       </div>
 
       {myTurn && timer !== null && (currentGamePhase === "FIRSTTRICK" || currentGamePhase === "NORMALTRICK" || currentGamePhase === "FINALTRICK" || currentGamePhase === "PASSING") && (
@@ -1292,7 +1241,6 @@ const MatchPage: React.FC = () => {
             color: "white",
             padding: "10px 20px",
             borderRadius: "10px",
-            border: "2px solid white",
             fontSize: "1.5rem",
             zIndex: 1000,
           }}
