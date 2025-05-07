@@ -336,7 +336,32 @@ const MatchPage: React.FC = () => {
         );
       }
     } catch (error) {
-      handleApiError(error, "Failed to fetch match data.");
+      console.log("Error caught:", error); // Inspect the error structure
+    
+      // Check if the error has a `response` property (e.g., Axios errors)
+      if (typeof error === "object" && error !== null && "status" in error && error.status === 403) {
+        message.open({
+          type: "error",
+          content: "You are not authorized to view this match."
+        });
+        router.push("/landingpageuser");
+      } else if (typeof error === "object" && error !== null && "status" in error && error.status === 409) {
+        message.open({
+          type: "error",
+          content: "You are not authorized to view this match."
+        });
+        router.push("/landingpageuser");
+      } else if (error instanceof Error) {
+        // Handle standard Error objects
+        handleApiError(error, "Failed to fetch match data.");
+      } else {
+        // Fallback for unexpected error structures
+        console.error("Unexpected error structure:", error);
+        message.open({
+          type: "error",
+          content: "An unexpected error occurred. Please try again.",
+        });
+      }
     }
     console.log("Finished fetchMatchData for", matchId);
   }, [
@@ -646,7 +671,7 @@ const MatchPage: React.FC = () => {
   };
 
   const getDisplayName = (fullName: string | null) => {
-    if (!fullName) return "AI Player";
+    if (!fullName) return "";
     return fullName.split(" (")[0]; // cuts off anything after ' ('
   };
 
