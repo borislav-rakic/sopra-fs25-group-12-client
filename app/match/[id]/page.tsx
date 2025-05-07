@@ -83,6 +83,7 @@ const MatchPage: React.FC = () => {
   //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
 
   const [htmlContent, setHtmlContent] = useState<string>("");
+  const [serverMessages, setServerMessages] = useState<string[]>([]);
 
    // handleFastForward for testing, game transitions
    const handleFastForwardGame = async () => {
@@ -221,6 +222,7 @@ const MatchPage: React.FC = () => {
         `/matches/${matchId}/logic`,
         {},
       );
+
       console.log("Match data response:", response);
       setHeartsBroken(response.heartsBroken ?? false);
       setLastTrickPhase(trickPhase);
@@ -229,6 +231,10 @@ const MatchPage: React.FC = () => {
       console.log("Backend says myTurn:", response.myTurn);
       setMyTurn(response.myTurn ?? false);
       console.log("myTurn (just set):", response.myTurn ?? false);
+
+      if (response.message && response.message !== "" && response.message !== null) {
+        setServerMessages((prevMessages) => response.message ? [response.message, ...prevMessages] : prevMessages);
+      }
 
       const slot = response.playerSlot ?? 0;
       const trickLeaderSlot = response.currentTrickLeaderPlayerSlot ?? 1;
@@ -785,6 +791,15 @@ const MatchPage: React.FC = () => {
 
   return (
     <div className={`${styles.page} matchPage`}>
+
+      <div className="message-box">
+        {serverMessages.map((message, index) => (
+          <div key={index} className="message">
+            {message}
+          </div>
+        ))}
+      </div>
+
       <div className="menu-dropdown">
         <Dropdown
           menu={{

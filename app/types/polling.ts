@@ -24,6 +24,7 @@ export interface PollingDTO {
   previousTrickWinnerPlayerSlot: number | null;
   previousTrickPoints: number | null;
   resultHtml: string | null; // HTML string
+  message: string | null; // Message string
 
   // Other players
   matchPlayers: Array<string> | null;
