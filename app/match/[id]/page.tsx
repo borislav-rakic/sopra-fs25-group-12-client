@@ -73,7 +73,7 @@ const MatchPage: React.FC = () => {
   const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false);
   const [isLeaveGameModalVisible, setIsLeaveGameModalVisible] = useState(false);
   const [hasPassedCards, setHasPassedCards] = useState(false);
-  //const [currentMatchPhase, setCurrentMatchPhase] = useState("");
+  const [timer, setTimer] = useState<number | null>(null);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
@@ -129,13 +129,14 @@ const MatchPage: React.FC = () => {
     code: "XX",
     suit: "XX",
     value: BigInt(0),
+    cardOrder: 0,
     image: "",
     backimage: cardback,
     flipped: false,
     onClick: () => {},
   }), [cardback]);
 
-  const generateCard = useCallback((code: string): cardProps => {
+  const generateCard = useCallback((code: string, order: number): cardProps => {
     const rank = code[0];
     const suit = code[1];
 
@@ -166,6 +167,7 @@ const MatchPage: React.FC = () => {
       code,
       suit: suitToName[suit] || suit,
       value: rankToValue[rank],
+      cardOrder: order,
       image: `https://deckofcardsapi.com/static/img/${code}.png`,
       flipped: false,
       backimage: cardback,
@@ -195,7 +197,7 @@ const MatchPage: React.FC = () => {
           (code || code === "") &&
           (current.length === 0 || current[0].code !== code)
         ) {
-          setSlot(code === "" ? [] : [generateCard(code)]);
+          setSlot(code === "" ? [] : [generateCard(code, 0)]);
         }
       };
 
@@ -206,35 +208,6 @@ const MatchPage: React.FC = () => {
     },
     [generateCard, trickSlot0, trickSlot1, trickSlot2, trickSlot3],
   );
-
-  // const calculateTrickWinner = useCallback(() => {
-  //   const allCards = [
-  //     ...trickSlot0,
-  //     ...trickSlot1,
-  //     ...trickSlot2,
-  //     ...trickSlot3,
-  //   ];
-
-  //   if (allCards.length < 4) return;
-
-  //   const matchingCards = allCards.filter((card) => card.suit === currentTrick);
-  //   if (matchingCards.length === 0) return;
-
-  //   let highestCardIndex = 0;
-  //   let highestCard = matchingCards[0];
-
-  //   matchingCards.forEach((card) => {
-  //     const cardIndex = allCards.indexOf(card);
-  //     if (card.value > highestCard.value) {
-  //       highestCard = card;
-  //       highestCardIndex = cardIndex;
-  //     }
-  //   });
-
-  //   return highestCardIndex;
-  // }, [trickSlot0, trickSlot1, trickSlot2, trickSlot3, currentTrick]);
-
-  // ###########################################
 
   const fetchMatchData = useCallback(async () => {
     try {
@@ -263,6 +236,10 @@ const MatchPage: React.FC = () => {
       if (response.gamePhase !== "PASSING") {
         setCardsToPass([]);
         setHasPassedCards(false);
+      }
+
+      if (response.gamePhase !== "RESULT") {
+        setIsWaitingForPlayers(false);
       }
 
       if (response.matchPlayers) {
@@ -306,7 +283,7 @@ const MatchPage: React.FC = () => {
 
       if (response.playerCards) {
         const newHand = response.playerCards.map((item) =>
-          generateCard(item.card.code)
+          generateCard(item.card.code, item.card.cardOrder)
         );
 
         if(!areHandsEqual(cardsInHand, newHand)) {
@@ -612,12 +589,8 @@ const MatchPage: React.FC = () => {
   const sortCards = (cards: cardProps[]) => {
     return cards.sort((a, b) => {
       console.log("Comparing cards:", a.code, " | ", b.code);
-      if (a.suit < b.suit) return -1;
-      if (a.suit > b.suit) return 1;
-
-      if (a.value < b.value) return -1;
-      if (a.value > b.value) return 1;
-
+      if (a.cardOrder < b.cardOrder) return -1;
+      if (a.cardOrder > b.cardOrder) return 1;
       return 0;
     });
   };
@@ -673,26 +646,114 @@ const MatchPage: React.FC = () => {
     return fullName.split(" (")[0]; // cuts off anything after ' ('
   };
 
-  /*
-  const resetGame = () => {
-    setCardsInHand([]);
-    setOpponent1Cards([]);
-    setOpponent2Cards([]);
-    setOpponent3Cards([]);
-    setTrickSlot0([]);
-    setTrickSlot1([]);
-    setTrickSlot2([]);
-    setTrickSlot3([]);
-    setCurrentTrick("");
-    setCurrentPlayer("");
-    setCurrentGamePhase("");
-    setCardsToPass([]);
-    setOpponentToPassTo("");
-    setHeartsBroken(false);
-    setFirstCardPlayed(false);
-    setIsFirstRound(true);
-  }
- */
+  useEffect(() => {
+    console.log("Cards to pass:", cardsToPass);
+    console.log("Has passed cards:", hasPassedCards);
+  }, [cardsToPass, hasPassedCards]);
+
+  useEffect(() => {
+    console.log("Waiting for players:", isWaitingForPlayers);
+  }, [isWaitingForPlayers]);
+
+  useEffect(() => {
+    if (myTurn) {
+      if (currentGamePhase === "PASSING") {
+        console.log("It's my turn to pass cards! Starting 60-second timer...");
+        setTimer(60); // Start the timer at 60 seconds
+  
+        const intervalId = setInterval(() => {
+          setTimer((prev) => {
+            if (prev === null || prev <= 1) {
+              clearInterval(intervalId); // Stop the timer when it reaches 0
+              passRandomCards(); // Pass three random cards
+              return null;
+            }
+            return prev - 1; // Decrement the timer
+          });
+        }, 1000);
+  
+        return () => clearInterval(intervalId); // Cleanup on unmount or when `myTurn` changes
+      } else if (
+        currentGamePhase === "FIRSTTRICK" ||
+        currentGamePhase === "NORMALTRICK" ||
+        currentGamePhase === "FINALTRICK"
+      ) {
+        console.log("It's my turn to play a card! Starting 20-second timer...");
+        setTimer(20); // Start the timer at 20 seconds
+  
+        const intervalId = setInterval(() => {
+          setTimer((prev) => {
+            if (prev === null || prev <= 1) {
+              clearInterval(intervalId); // Stop the timer when it reaches 0
+              playRandomCard(); // Play a random card
+              return null;
+            }
+            return prev - 1; // Decrement the timer
+          });
+        }, 1000);
+  
+        return () => clearInterval(intervalId); // Cleanup on unmount or when `myTurn` changes
+      }
+    } else {
+      setTimer(null); // Reset the timer when it's no longer the player's turn
+    }
+  }, [myTurn, currentGamePhase]);
+
+  const playRandomCard = async () => {
+    if (playableCards.length === 0) {
+      console.log("No playable cards available.");
+      return;
+    }
+  
+    const randomIndex = Math.floor(Math.random() * playableCards.length);
+    const randomCardCode = playableCards[randomIndex];
+    const randomCard = cardsInHand.find((card) => card.code === randomCardCode);
+  
+    if (!randomCard) {
+      console.log("Random card not found in hand.");
+      return;
+    }
+  
+    console.log("Playing random card:", randomCard.code);
+    await handlePlayCard(randomCard); // Use the existing `handlePlayCard` function
+  };
+
+  const passRandomCards = async () => {
+    if (cardsInHand.length < 3) {
+      console.log("Not enough cards to pass.");
+      return;
+    }
+  
+    const shuffledCards = [...cardsInHand].sort(() => Math.random() - 0.5); // Shuffle the cards
+    const randomCardsToPass = shuffledCards.slice(0, 3); // Select the first 3 cards
+  
+    try {
+      const payload = {
+        gameId: matchId,
+        cards: randomCardsToPass.map((card) => card.code), // Send only the card codes
+      };
+      console.log("Passing random cards:", payload);
+  
+      // Make the API request
+      const response = await apiService.post(`/matches/${matchId}/passing`, payload);
+  
+      if (!response || typeof response !== "object") {
+        message.open({
+          type: "error",
+          content: "Failed to pass cards. Please try again.",
+        });
+        console.error("Error passing cards: Invalid or empty response from server.");
+        return;
+      }
+  
+      setHasPassedCards(true);
+      setCardsToPass(randomCardsToPass); // Update the state with the passed cards
+      console.log("Random cards passed successfully.");
+    } catch (error) {
+      handleApiError(error, "An error occurred while passing cards.");
+    }
+  };
+
   return (
     <div className={`${styles.page} matchPage`}>
       <div className="menu-dropdown">
@@ -773,6 +834,7 @@ const MatchPage: React.FC = () => {
               code={card.code}
               suit={card.suit}
               value={card.value}
+              cardOrder={card.cardOrder}
               image={card.image}
               backimage={cardback}
               flipped
@@ -797,6 +859,7 @@ const MatchPage: React.FC = () => {
               code={card.code}
               suit={card.suit}
               value={card.value}
+              cardOrder={card.cardOrder}
               image={card.image}
               backimage={cardback}
               flipped={false}
@@ -812,6 +875,7 @@ const MatchPage: React.FC = () => {
               code={card.code}
               suit={card.suit}
               value={card.value}
+              cardOrder={card.cardOrder}
               image={card.image}
               backimage={cardback}
               flipped={false}
@@ -827,6 +891,7 @@ const MatchPage: React.FC = () => {
               code={card.code}
               suit={card.suit}
               value={card.value}
+              cardOrder={card.cardOrder}
               image={card.image}
               backimage={cardback}
               flipped={false}
@@ -848,6 +913,7 @@ const MatchPage: React.FC = () => {
                 code={card.code}
                 suit={card.suit}
                 value={card.value}
+                cardOrder={card.cardOrder}
                 image={card.image}
                 backimage={cardback}
                 flipped
@@ -863,6 +929,7 @@ const MatchPage: React.FC = () => {
                 code={card.code}
                 suit={card.suit}
                 value={card.value}
+                cardOrder={card.cardOrder}
                 image={card.image}
                 backimage={cardback}
                 flipped
@@ -877,6 +944,7 @@ const MatchPage: React.FC = () => {
                 code={card.code}
                 suit={card.suit}
                 value={card.value}
+                cardOrder={card.cardOrder}
                 image={card.image}
                 backimage={cardback}
                 flipped
@@ -891,6 +959,7 @@ const MatchPage: React.FC = () => {
                 code={card.code}
                 suit={card.suit}
                 value={card.value}
+                cardOrder={card.cardOrder}
                 image={card.image}
                 backimage={cardback}
                 flipped
@@ -1156,6 +1225,26 @@ const MatchPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {myTurn && timer !== null && (currentGamePhase === "FIRSTTRICK" || currentGamePhase === "NORMALTRICK" || currentGamePhase === "FINALTRICK" || currentGamePhase === "PASSING") && (
+        <div
+          style={{
+            position: "absolute",
+            top: "10%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor: "darkgreen",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "10px",
+            fontSize: "1.5rem",
+            zIndex: 1000,
+          }}
+        >
+          Time Remaining: {timer}s
+        </div>
+      )}
+      
     </div>
   );
 };

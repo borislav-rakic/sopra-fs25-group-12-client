@@ -6,6 +6,7 @@ interface cardProps {
   code: string;
   suit: string;
   value: bigint;
+  cardOrder: number;
   image: string;
   backimage: string;
   flipped: boolean;
@@ -21,6 +22,7 @@ const Card: React.FC<cardProps> = (
     code,
     suit,
     value,
+    cardOrder,
     image,
     flipped: initialFlipped,
     backimage,
