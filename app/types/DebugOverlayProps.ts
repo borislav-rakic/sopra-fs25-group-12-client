@@ -1,10 +1,11 @@
-type GameData = {
+export type GameData = {
   matchPhase: string;
   gamePhase: string;
   trickPhase: string;
   players: { gameScore: number }[];
+  playerPointsString: string;
 };
 
-type DebugOverlayProps = {
+export type DebugOverlayProps = {
   gameData: GameData;
 };

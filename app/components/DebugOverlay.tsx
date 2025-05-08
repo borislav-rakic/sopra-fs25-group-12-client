@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { DebugOverlayProps } from '@/types/DebugOverlayProps';
 const DebugOverlay: React.FC<DebugOverlayProps> = ({ gameData }) => {
   const [visible, setVisible] = useState(false);
 
@@ -55,11 +55,8 @@ const DebugOverlay: React.FC<DebugOverlayProps> = ({ gameData }) => {
           <div><strong>Trick Phase:</strong> {gameData.trickPhase}</div>
           <hr style={{ margin: '6px 0', borderColor: '#2e8b57' }} />
           <div><strong>Scores:</strong></div>
-          <ul style={{ paddingLeft: '1rem' }}>
-            {gameData.players.map((p, i) => (
-              <li key={i}>Player {i + 1}: {p.gameScore}</li>
-            ))}
-          </ul>
+          <div><strong>Scores:</strong> {gameData.playerPointsString}</div>
+          
         </div>
       )}
     </>
