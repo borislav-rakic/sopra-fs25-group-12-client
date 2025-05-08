@@ -30,7 +30,9 @@ const MatchPage: React.FC = () => {
     matchPhase: pollingResponse?.matchPhase ?? 'UNKNOWN',
     gamePhase: pollingResponse?.gamePhase ?? 'UNKNOWN',
     trickPhase: pollingResponse?.trickPhase ?? 'UNKNOWN',
-    playerPointsArray: Object.values(pollingResponse?.playerPoints ?? {}),
+    players: Object.values(pollingResponse?.playerPoints ?? {}).map(
+      (score) => ({ gameScore: score })
+    ),
     playerPointsString: Object.values(pollingResponse?.playerPoints ?? {}).join(', ')
   };
 
