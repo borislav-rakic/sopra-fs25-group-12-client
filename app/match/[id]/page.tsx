@@ -3,6 +3,7 @@ import "@ant-design/v5-patch-for-react-19";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button, Dropdown, message } from "antd";
+import DebugOverlay from "@/components/DebugOverlay";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import modalStyles from "@/styles/modalMessage.module.css";
@@ -21,6 +22,17 @@ import { useCallback } from "react";
 
 const MatchPage: React.FC = () => {
   const USE_AUTOMATIC_POLLING = true; // switch to true for auto every 2000ms
+
+  
+  const [pollingResponse, setPollingResponse] = useState<PollingDTO | null>(null);
+  
+  const debugData = {
+    matchPhase: pollingResponse?.matchPhase ?? 'UNKNOWN',
+    gamePhase: pollingResponse?.gamePhase ?? 'UNKNOWN',
+    trickPhase: pollingResponse?.trickPhase ?? 'UNKNOWN',
+    playerPointsArray: Object.values(pollingResponse?.playerPoints ?? {}),
+    playerPointsString: Object.values(pollingResponse?.playerPoints ?? {}).join(', ')
+  };
 
   //const router = useRouter();
   const params = useParams();
@@ -86,6 +98,10 @@ const MatchPage: React.FC = () => {
 
   const [htmlContent, setHtmlContent] = useState<string>("");
   const [serverMessages, setServerMessages] = useState<MatchMessage[]>([]);
+
+  ///////////////////////////
+
+  ///////////////////////////
 
   // handleFastForward for testing, game transitions
   const handleFastForwardGame = async () => {
@@ -229,6 +245,7 @@ const MatchPage: React.FC = () => {
         `/matches/${matchId}/logic`,
         {},
       );
+      setPollingResponse(response);
 
       console.log("Match data response:", response);
       setHeartsBroken(response.heartsBroken ?? false);
@@ -1395,7 +1412,7 @@ const MatchPage: React.FC = () => {
             Time Remaining: {timer}s
           </div>
         )}
-
+        <DebugOverlay gameData={debugData} />
     </div>
   );
 };
