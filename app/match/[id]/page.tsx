@@ -16,7 +16,7 @@ import { PollingDTO } from "@/types/polling";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
 import { innerCard } from "@/types/playerCard";
-import { TrickDTO, TrickCard } from "@/types/trick";
+import { TrickDTO } from "@/types/trick";
 import { DownOutlined } from "@ant-design/icons";
 import { useCallback } from "react";
 
@@ -309,7 +309,6 @@ const MatchPage: React.FC = () => {
       }
 
       const slot = response.playerSlot ?? 0;
-      const trickLeaderSlot = response.currentTrickLeaderPlayerSlot ?? 1;
 
       if (response.resultHtml) {
         setHtmlContent(response.resultHtml);
