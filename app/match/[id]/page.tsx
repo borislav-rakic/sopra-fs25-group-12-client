@@ -123,6 +123,24 @@ const MatchPage: React.FC = () => {
     } catch (error) {
       handleApiError(error, "Fast-forward failed.");
     }
+  };// handleFastForward for testing, game transitions
+  const handleFastForwardGameShootingTheMoon = async () => {
+    if (currentGamePhase !== "NORMALTRICK") {
+      message.warning("Fast forward is only available during a normal trick.");
+      return;
+    }
+
+    try {
+      console.log("Fast forwarding game...");
+      await apiService.post(`/matches/${matchId}/game/sim/moon`, {});
+      message.open({
+        type: "success",
+        content: "Fast-forward complete",
+      });
+      await fetchMatchData(); // refresh cards, trick, scores
+    } catch (error) {
+      handleApiError(error, "Fast-forward failed.");
+    }
   };
   // handleFastForward for testing match end
   const handleFastForwardMatch = async () => {
@@ -910,6 +928,11 @@ const MatchPage: React.FC = () => {
                   },
                   {
                     key: "5",
+                    label: "FF shooting the moon",
+                    onClick: handleFastForwardGameShootingTheMoon,
+                  },
+                  {
+                    key: "6",
                     label: "FF near match end",
                     onClick: handleFastForwardMatch,
                   },
