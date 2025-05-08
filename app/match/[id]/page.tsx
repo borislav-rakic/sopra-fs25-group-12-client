@@ -15,7 +15,6 @@ import { useEffect, useState } from "react";
 import { PollingDTO } from "@/types/polling";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
-import { innerCard } from "@/types/playerCard";
 import { TrickDTO } from "@/types/trick";
 import { DownOutlined } from "@ant-design/icons";
 import { useCallback } from "react";
@@ -75,6 +74,7 @@ const MatchPage: React.FC = () => {
   const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false);
   const [isLeaveGameModalVisible, setIsLeaveGameModalVisible] = useState(false);
   const [hasPassedCards, setHasPassedCards] = useState(false);
+  const [hasConfirmedSkipPassing, setHasConfirmedSkipPassing] = useState(false);
   const [timer, setTimer] = useState<number | null>(null);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -220,51 +220,6 @@ const MatchPage: React.FC = () => {
     
   }, [generateCard, trickSlot0, trickSlot1, trickSlot2, trickSlot3]);
 
-  const handleFullTrick = useCallback(
-    (trick: innerCard[], slot: number, trickLeaderSlot: number) => {
-      const tempTrick: string[] = ["", "", "", ""];
-      const indexShift = (trickLeaderSlot - slot + 4) % 4;
-
-      // Map the trick cards to their respective slots
-      trick.forEach((card, index) => {
-        if (card) {
-          const shiftedIndex = (index + indexShift) % 4;
-          tempTrick[shiftedIndex] = card.code;
-        }
-      });
-
-      // Update each slot if it is not already filled
-      const updateSlotIfEmpty = (
-        __index: number,
-        code: string,
-        setSlot: (val: cardProps[]) => void,
-        current: cardProps[],
-      ) => {
-        if (current.length === 0 && code !== "") {
-          setSlot([generateCard(code, 0)]);
-          console.log(`Slot ${__index} updated with card:`, code);
-        } else {
-          console.log(`Slot ${__index} already filled or no card to set.`);
-        }
-      };
-
-      updateSlotIfEmpty(0, tempTrick[0], setTrickSlot0, trickSlot0);
-      updateSlotIfEmpty(1, tempTrick[1], setTrickSlot1, trickSlot1);
-      updateSlotIfEmpty(2, tempTrick[2], setTrickSlot2, trickSlot2);
-      updateSlotIfEmpty(3, tempTrick[3], setTrickSlot3, trickSlot3);
-
-      // Disable polling for 3 seconds
-      setPollingPausedUntil(Date.now() + 3000);
-    },
-    [
-      generateCard,
-      setPollingPausedUntil,
-      trickSlot0,
-      trickSlot1,
-      trickSlot2,
-      trickSlot3,
-    ],
-  );
 
   const fetchMatchData = useCallback(async () => {
     try {
@@ -317,6 +272,10 @@ const MatchPage: React.FC = () => {
       if (response.gamePhase !== "PASSING") {
         setCardsToPass([]);
         setHasPassedCards(false);
+      }
+
+      if (response.gamePhase !== "SKIP_PASSING"){
+        setHasConfirmedSkipPassing(false);
       }
 
       if (response.gamePhase !== "RESULT") {
@@ -385,17 +344,17 @@ const MatchPage: React.FC = () => {
         setFirstCardPlayed(true);
       }
 
-      if (response.trickPhase === "JUSTCOMPLETED") {
+      /* if (response.trickPhase === "JUSTCOMPLETED") {
         handleFullTrick(
           response.previousTrick || [],
           slot,
           response.previousTrickLeaderPlayerSlot || 0,
         );
-      } else {
+      } else { */
         if (response.currentTrickDTO) {
           handleTrickFromLogic(response.currentTrickDTO);
         }
-      }
+      /* } */
 
       if (response.cardsInHandPerPlayer) {
         const hand = [
@@ -880,6 +839,28 @@ const MatchPage: React.FC = () => {
     }
   };
 
+  const handleSkipPassingConfirm = async () => {
+    try {
+      const payload = {
+        cards: [], // Empty array for SKIP_PASSING
+      };
+      console.log("Sending skip passing payload:", payload);
+  
+      // Send the request
+      await apiService.post(`/matches/${matchId}/passing`, payload);
+      setHasConfirmedSkipPassing(true); // Mark as confirmed
+      console.log("Skip passing confirmed.");
+
+    } catch (error) {
+      handleApiError(error, "An error occurred while confirming skip passing.");
+    }
+  };
+
+  useEffect(() => {
+    console.log("Has confirmed skip passing:", hasConfirmedSkipPassing);
+  }
+  , [hasConfirmedSkipPassing]);
+
   return (
     <div className={`${styles.page} matchPage`}>
       <div className="message-box">
@@ -1164,7 +1145,7 @@ const MatchPage: React.FC = () => {
           </div>
         )}
 
-        {currentGamePhase === "PASSING" && cardsToPass.length === 3 && (
+        {currentGamePhase === "PASSING" && cardsToPass.length === 3 && !hasPassedCards && (
           <button
             type="button"
             onClick={handlePassCards}
@@ -1196,6 +1177,71 @@ const MatchPage: React.FC = () => {
         )}
 
         {currentGamePhase === "PASSING" && hasPassedCards && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 1000,
+              backgroundColor: "darkgreen",
+              color: "white",
+              border: "2px solid white",
+              padding: "20px",
+              borderRadius: "10px",
+              textAlign: "center",
+              width: "400px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+            }}
+          >
+            <p style={{ fontSize: "1.2rem", margin: 0 }}>
+              Waiting for other players...
+            </p>
+          </div>
+        )}
+
+        {currentGamePhase === "SKIP_PASSING" && !hasConfirmedSkipPassing && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 1000,
+              backgroundColor: "darkgreen",
+              color: "white",
+              border: "2px solid white",
+              padding: "20px",
+              borderRadius: "10px",
+              textAlign: "center",
+              width: "400px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+            }}
+          >
+            <p style={{ fontSize: "1.2rem", marginBottom: "20px" }}>
+              Skipping phase is skipped every 4th round.
+            </p>
+            <button
+              type="button"
+              onClick={async () => {
+                await handleSkipPassingConfirm();
+              }}
+              style={{
+                padding: "10px 20px",
+                fontSize: "1rem",
+                backgroundColor: "white",
+                color: "darkgreen",
+                border: "2px solid darkgreen",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Confirm
+            </button>
+          </div>
+        )}
+
+        {currentGamePhase === "SKIP_PASSING" && hasConfirmedSkipPassing && (
           <div
             style={{
               position: "absolute",
@@ -1349,6 +1395,7 @@ const MatchPage: React.FC = () => {
             Time Remaining: {timer}s
           </div>
         )}
+
     </div>
   );
 };
