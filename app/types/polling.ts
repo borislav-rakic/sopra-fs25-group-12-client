@@ -1,5 +1,6 @@
 import { PlayerCard } from "../types/playerCard";
 import { innerCard } from "../types/playerCard"; // assuming Card = innerCard in TS
+import { TrickDTO } from "../types/trick"; // assuming Trick = trick in TS
 
 export type TrickPhase = "READY" | "RUNNING" | "JUSTCOMPLETED";
 import { MatchMessage } from "./matchMessage";
@@ -19,6 +20,7 @@ export interface PollingDTO {
   currentTrick: Array<innerCard> | null;
   currentTrickLeaderMatchPlayerSlot: number | null;
   currentTrickLeaderPlayerSlot: number | null;
+  currentTrickDTO: TrickDTO | null; // TrickDTO object
 
   previousTrick: Array<innerCard> | null;
   previousTrickWinnerMatchPlayerSlot: number | null;

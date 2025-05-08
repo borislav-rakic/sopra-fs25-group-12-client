@@ -8,7 +8,7 @@ import styles from "@/styles/page.module.css";
 import modalStyles from "@/styles/modalMessage.module.css";
 import { useApi } from "@/hooks/useApi";
 import { handleApiError } from "@/utils/errorHandlers";
-import { MatchMessage } from "@/types/MatchMessage"; // adjust path as needed
+import { MatchMessage } from "@/types/matchMessage"; // adjust path as needed
 
 // import { Match } from "@/types/match";
 import { useEffect, useState } from "react";
@@ -16,6 +16,7 @@ import { PollingDTO } from "@/types/polling";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
 import { innerCard } from "@/types/playerCard";
+import { TrickDTO, TrickCard } from "@/types/trick";
 import { DownOutlined } from "@ant-design/icons";
 import { useCallback } from "react";
 
@@ -138,7 +139,8 @@ const MatchPage: React.FC = () => {
     onClick: () => {},
   }), [cardback]);
 
-  const generateCard = useCallback((code: string, order: number): cardProps => {
+  const generateCard = useCallback((code: string, order: number, zIndex: number = 10): cardProps => {
+    console.log("Generating card:", code, order, zIndex);
     const rank = code[0];
     const suit = code[1];
 
@@ -174,49 +176,49 @@ const MatchPage: React.FC = () => {
       flipped: false,
       backimage: cardback,
       onClick: (code: string) => console.log(`Card clicked: ${code}`),
+      zIndex,
     };
   }, [cardback]);
 
-  const handleTrickFromLogic = useCallback(
-    (trick: innerCard[], slot: number, trickLeaderSlot: number) => {
-      const tempTrick: string[] = ["", "", "", ""];
-      const indexShift = (trickLeaderSlot - slot + 4) % 4;
+  const handleTrickFromLogic = useCallback((trick: TrickDTO) => {
 
-      trick.forEach((card, index) => {
-        if (card) {
-          const shiftedIndex = (index + indexShift) % 4;
-          tempTrick[shiftedIndex] = card.code;
-        }
-      });
+    const tempTrick: string[] = ["", "", "", ""];
+    const orders: number[] = [-1, -1, -1, -1];
+    
+    trick.cards.forEach(c => {
+      tempTrick[c.position] = c.code;
+      orders[c.position] = c.order;
+    });
 
-      const updateSlot = (
-        __index: number,
-        code: string,
-        setSlot: (val: cardProps[]) => void,
-        current: cardProps[],
-      ) => {
-        if (
-          (code === "" && current.length > 0) || // Clear the slot if it has data but should be empty
-          (current.length === 0 && code !== "") || // Update the slot if it is empty but should have data
-          (current.length > 0 && current[0].code !== code) // Update the slot if the code has changed
-        ) {
-          setSlot(code === "" ? [] : [generateCard(code, 0)]);
-          console.log(`Slot ${__index} updated:`, code);
-        } else {
-          console.log(
-            `Slot ${__index} unchanged:`,
-            current[0]?.code || "empty",
-          );
-        }
-      };
+    const updateSlot = (
+      position: number,
+      card: string,
+      setSlot: (val: cardProps[]) => void,
+      current: cardProps[],
+      zIndex: number,
+    ) => {
+      if (
+        (card === null && current.length > 0) || // Clear the slot if it has data but should be empty
+        (current.length === 0 && card !== null) || // Update the slot if it is empty but should have data
+        (current.length > 0 && current[0].code !== card) // Update the slot if the card code has changed
+      ) {
+        setSlot((card === null || card === "") ? [] : [generateCard(card, 0, zIndex)]);
+        console.log(`Slot ${position} updated:`, card || "empty");
+      } else {
+        console.log(
+          `Slot ${position} unchanged:`,
+          current[0]?.code || "empty",
+        );
+      }
+    };
 
-      updateSlot(0, tempTrick[0], setTrickSlot0, trickSlot0);
-      updateSlot(1, tempTrick[1], setTrickSlot1, trickSlot1);
-      updateSlot(2, tempTrick[2], setTrickSlot2, trickSlot2);
-      updateSlot(3, tempTrick[3], setTrickSlot3, trickSlot3);
-    },
-    [generateCard, trickSlot0, trickSlot1, trickSlot2, trickSlot3],
-  );
+    updateSlot(0, tempTrick[0], setTrickSlot0, trickSlot0, orders[0]);
+    updateSlot(1, tempTrick[1], setTrickSlot1, trickSlot1, orders[1]);
+    updateSlot(2, tempTrick[2], setTrickSlot2, trickSlot2, orders[2]);
+    updateSlot(3, tempTrick[3], setTrickSlot3, trickSlot3, orders[3]);
+  
+    
+  }, [generateCard, trickSlot0, trickSlot1, trickSlot2, trickSlot3]);
 
   const handleFullTrick = useCallback(
     (trick: innerCard[], slot: number, trickLeaderSlot: number) => {
@@ -391,11 +393,9 @@ const MatchPage: React.FC = () => {
           response.previousTrickLeaderPlayerSlot || 0,
         );
       } else {
-        handleTrickFromLogic(
-          response.currentTrick || [],
-          slot,
-          trickLeaderSlot,
-        );
+        if (response.currentTrickDTO) {
+          handleTrickFromLogic(response.currentTrickDTO);
+        }
       }
 
       if (response.cardsInHandPerPlayer) {
@@ -801,7 +801,7 @@ const MatchPage: React.FC = () => {
         currentGamePhase === "FINALTRICK"
       ) {
         console.log("It's my turn to play a card! Starting 20-second timer...");
-        setTimer(20); // Start the timer at 20 seconds
+        setTimer(2000); // Start the timer at 20 seconds
 
         const intervalId = setInterval(() => {
           setTimer((prev) => {
@@ -1040,67 +1040,33 @@ const MatchPage: React.FC = () => {
         <div className="hand-3-extension"></div>
 
         <div className="pile">
-          <div className="playingcard-pile-0">
-            {trickSlot0.map((card, index) => (
-              <Card
+          {[trickSlot0, trickSlot1, trickSlot2, trickSlot3].map((slot, index) => {
+            // Render the card if the slot is not empty
+            return slot.length > 0 ? (
+              <div
                 key={index}
-                code={card.code}
-                suit={card.suit}
-                value={card.value}
-                cardOrder={card.cardOrder}
-                image={card.image}
-                backimage={cardback}
-                flipped
-                onClick={card.onClick}
-              />
-            ))}
-          </div>
-
-          <div className="playingcard-pile-1">
-            {trickSlot1.map((card, index) => (
-              <Card
-                key={index}
-                code={card.code}
-                suit={card.suit}
-                value={card.value}
-                cardOrder={card.cardOrder}
-                image={card.image}
-                backimage={cardback}
-                flipped
-                onClick={card.onClick}
-              />
-            ))}
-          </div>
-          <div className="playingcard-pile-2">
-            {trickSlot2.map((card, index) => (
-              <Card
-                key={index}
-                code={card.code}
-                suit={card.suit}
-                value={card.value}
-                cardOrder={card.cardOrder}
-                image={card.image}
-                backimage={cardback}
-                flipped
-                onClick={card.onClick}
-              />
-            ))}
-          </div>
-          <div className="playingcard-pile-3">
-            {trickSlot3.map((card, index) => (
-              <Card
-                key={index}
-                code={card.code}
-                suit={card.suit}
-                value={card.value}
-                cardOrder={card.cardOrder}
-                image={card.image}
-                backimage={cardback}
-                flipped
-                onClick={card.onClick}
-              />
-            ))}
-          </div>
+                style={{
+                  position: "absolute",
+                  top: index === 0 ? "75%" : index === 1 ? "50%" : index === 2 ? "25%" : "50%",
+                  left: index === 0 ? "50%" : index === 1 ? "25%" : index === 2 ? "50%" : "75%",
+                  transform: `translate(-50%, -50%) rotate(${index * 90}deg) scale(1.5)`, // Rotate and scale
+                  zIndex: slot[0].zIndex, // Use the zIndex from the card object
+                }}
+              >
+                <Card
+                  code={slot[0].code}
+                  suit={slot[0].suit}
+                  value={slot[0].value}
+                  cardOrder={slot[0].cardOrder}
+                  image={slot[0].image}
+                  backimage={cardback}
+                  flipped
+                  onClick={slot[0].onClick}
+                  zIndex={slot[0].zIndex} // Pass zIndex to the Card component
+                />
+              </div>
+            ) : null; // Render nothing if the slot is empty
+          })}
         </div>
 
         <div className="game-playerscore0">

@@ -504,7 +504,7 @@ a {
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
-  z-index: 19;
+  z-index: 20;
   transition: transform 0.2s ease-in-out;
   /* Smooth transition for scaling */
   justify-content: center;
@@ -521,7 +521,7 @@ a {
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
-  z-index: 18;
+  z-index: 20;
   transition: transform 0.2s ease-in-out;
   /* Smooth transition for scaling */
   justify-content: center;
@@ -538,7 +538,7 @@ a {
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
-  z-index: 17;
+  z-index: 20;
   transition: transform 0.2s ease-in-out;
   /* Smooth transition for scaling */
   justify-content: center;
