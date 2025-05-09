@@ -1364,7 +1364,9 @@ const MatchPage: React.FC = () => {
           </div>
         )}
 
-        {pollingResponse?.matchPhase === "RESULT" && (
+        {((pollingResponse?.matchPhase === "IN_PROGRESS" && pollingResponse?.gamePhase === "RESULT") ||
+         (pollingResponse?.matchPhase === "RESULT" && pollingResponse?.gamePhase === "FINISHED"))
+        && (
           <div
             style={{
               position: "absolute",
