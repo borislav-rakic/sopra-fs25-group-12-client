@@ -783,8 +783,8 @@ const MatchPage: React.FC = () => {
   useEffect(() => {
     if (myTurn) {
       if (currentGamePhase === "PASSING") {
-        console.log("It's my turn to pass cards! Starting 60-second timer...");
-        setTimer(60); // Start the timer at 60 seconds
+        console.log("It's my turn to pass cards! Starting 45-second timer...");
+        setTimer(45); // Start the timer at 45 seconds
 
         const intervalId = setInterval(() => {
           setTimer((prev) => {
@@ -803,8 +803,8 @@ const MatchPage: React.FC = () => {
         currentGamePhase === "NORMALTRICK" ||
         currentGamePhase === "FINALTRICK"
       ) {
-        console.log("It's my turn to play a card! Starting 20-second timer...");
-        setTimer(2000); // Start the timer at 20 seconds
+        console.log("It's my turn to play a card! Starting 30-second timer...");
+        setTimer(30); // Start the timer at 30 seconds
 
         const intervalId = setInterval(() => {
           setTimer((prev) => {
@@ -830,6 +830,8 @@ const MatchPage: React.FC = () => {
       return;
     }
 
+    await apiService.post(`/matches/${matchId}/play/any`, {});
+/* 
     const randomIndex = Math.floor(Math.random() * playableCards.length);
     const randomCardCode = playableCards[randomIndex];
     const randomCard = cardsInHand.find((card) => card.code === randomCardCode);
@@ -840,7 +842,7 @@ const MatchPage: React.FC = () => {
     }
 
     console.log("Playing random card:", randomCard.code);
-    await handlePlayCard(randomCard); // Use the existing `handlePlayCard` function
+    await handlePlayCard(randomCard); // Use the existing `handlePlayCard` function */
   };
 
   const passRandomCards = async () => {
