@@ -32,4 +32,6 @@ export interface UserPrivateDTO {
   birthday: string;
   userSettings: string;
   isGuest: boolean;
+  participantOfActiveMatchId: number | 0;
+  participantOfActiveMatchPhase: string | null;
 }

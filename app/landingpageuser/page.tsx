@@ -2,7 +2,7 @@
 import "@ant-design/v5-patch-for-react-19";
 import { useRouter /*useParams*/ } from "next/navigation";
 import Image from "next/image";
-import { Button, Col, Row, Space } from "antd";
+import { Button, Col, Row, Space, message } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
 import { useApi } from "@/hooks/useApi";
@@ -50,7 +50,29 @@ const LandingPageUser: React.FC = () => {
 
       try {
         const userData = await apiService.get<UserPrivateDTO>("/users/me");
+        console.log("User data:", userData);
         setUser(userData);
+
+        console.log(userData.participantOfActiveMatchId != 0 && userData.participantOfActiveMatchId != null && userData.participantOfActiveMatchId != undefined)
+
+        if(userData.participantOfActiveMatchId != 0 && userData.participantOfActiveMatchId != null && userData.participantOfActiveMatchId != undefined) {
+          message.open({
+            type: "info",
+            content: `You are currently in a match with ID: ${userData.participantOfActiveMatchId}`,
+          });
+          if (userData.participantOfActiveMatchPhase === "START") {
+            router.push(`/start/${userData.participantOfActiveMatchId}`);
+          } else if (userData.participantOfActiveMatchPhase === "MATCH") {
+            router.push(`/match/${userData.participantOfActiveMatchId}`);
+          } else {
+            console.log("Unknown match phase:", userData.participantOfActiveMatchPhase);
+            message.open({
+              type: "error",
+              content: "Unknown match phase. Please contact support :)",
+            });
+          }
+        }
+
       } catch (err: unknown) {
         console.error("Failed to fetch user data:", err);
         setUser(null);
@@ -86,6 +108,7 @@ const LandingPageUser: React.FC = () => {
   };
 
   const handleNewMatch = async () => {
+    try {
     const response = await apiService.post<Match>("/matches", {
       "playerToken": localStorage.getItem("token"),
     });
@@ -96,7 +119,15 @@ const LandingPageUser: React.FC = () => {
       const matchId = response.matchId.toString(); // convert bigint if needed
       router.push(`/start/${matchId}`);
     }
-  };
+  } catch (error: unknown) {
+      console.log("Error creating new match:", error);
+
+      message.open({
+        type: "error",
+        content: "An unexpected error occurred while creating a new match.",
+      });
+    }
+};
 
   return (
     <div className={styles.page}>
