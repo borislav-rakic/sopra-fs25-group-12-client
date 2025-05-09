@@ -1315,13 +1315,17 @@ const MatchPage: React.FC = () => {
               left: "50%",
               transform: "translate(-50%, -50%)",
               zIndex: 1000,
-              backgroundColor: "darkgreen", // Dark background for the box
-              color: "white", // Light text color for contrast
+              backgroundColor: "darkgreen",
+              color: "white",
               padding: "20px",
               border: "2px solid white",
               borderRadius: "10px",
               textAlign: "center",
-              width: "400px",
+              width: "fit-content", // Automatically adjust width based on content
+              maxWidth: "90%", // Optional: Limit the maximum width for responsiveness
+              height: "auto", // Automatically adjust height based on content
+              maxHeight: "80%", // Optional: Limit the maximum height for responsiveness
+              overflowY: "auto", // Add scrolling if content overflows vertically
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)", // Add a shadow for better visibility
             }}
           >
