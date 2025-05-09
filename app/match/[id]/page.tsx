@@ -85,6 +85,7 @@ const MatchPage: React.FC = () => {
   const [pollingPausedUntil, setPollingPausedUntil] = useState<number | null>(
     null,
   );
+  
   const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false);
   const [isLeaveGameModalVisible, setIsLeaveGameModalVisible] = useState(false);
   const [hasPassedCards, setHasPassedCards] = useState(false);
@@ -266,8 +267,13 @@ const MatchPage: React.FC = () => {
         {},
       );
       setPollingResponse(response);
-
       console.log("Match data response:", response);
+
+      if (response.gamePhase === "FINISHED") {
+        console.log("Match is finished. Halting polling.");
+        setPollingPausedUntil(Infinity); // Halt polling permanently
+      }
+      
       setHeartsBroken(response.heartsBroken ?? false);
       setLastTrickPhase(trickPhase);
       setTrickPhase(response.trickPhase);
@@ -468,6 +474,8 @@ const MatchPage: React.FC = () => {
         const now = Date.now();
         if (!pollingPausedUntil || now > pollingPausedUntil) {
           fetchMatchData();
+        } else if (pollingPausedUntil === Infinity) {
+          return; // Stop polling permanently
         } else {
           console.log(
             "⏸ Polling paused until",
@@ -967,24 +975,25 @@ const MatchPage: React.FC = () => {
           </thead>
           <tbody>
             <tr>
-              <td>{players[0] ? players[0] : "AI Player"}</td>
-              <td>{matchScore[0]}</td>
+              <td>{players[0] ? players[0] : ""}</td>
+              <td>{players[0] ? matchScore[0] : ""}</td>
             </tr>
             <tr>
-              <td>{players[1] ? players[1] : "AI Player"}</td>
-              <td>{matchScore[1]}</td>
+              <td>{players[1] ? players[1] : ""}</td>
+              <td>{players[1] ? matchScore[1] : ""}</td>
             </tr>
             <tr>
-              <td>{players[2] ? players[2] : "AI Player"}</td>
-              <td>{matchScore[2]}</td>
+              <td>{players[2] ? players[2] : ""}</td>
+              <td>{players[2] ? matchScore[2] : ""}</td>
             </tr>
             <tr>
-              <td>{players[3] ? players[3] : "AI Player"}</td>
-              <td>{matchScore[3]}</td>
+              <td>{players[3] ? players[3] : ""}</td>
+              <td>{players[3] ? matchScore[3] : ""}</td>
             </tr>
           </tbody>
         </table>
       </div>
+
       <div className="gameboard">
         <div className="hand-0">
           {cardsInHand.map((card, index) => (
@@ -1441,6 +1450,42 @@ const MatchPage: React.FC = () => {
             Time Remaining: {timer}s
           </div>
         )}
+
+      {(currentGamePhase === "FINISHED" || pollingResponse?.matchPhase === "FINISHED") && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 1000,
+            backgroundColor: "darkgreen",
+            color: "white",
+            padding: "20px",
+            border: "2px solid white",
+            borderRadius: "10px",
+            textAlign: "center",
+            width: "fit-content", // Automatically adjust width based on content
+            maxWidth: "90%", // Optional: Limit the maximum width for responsiveness
+            height: "auto", // Automatically adjust height based on content
+            maxHeight: "80%", // Optional: Limit the maximum height for responsiveness
+            overflowY: "auto", // Add scrolling if content overflows vertically
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)", // Add a shadow for better visibility
+          }}
+        >
+          <div>
+            <h2>Match Finished</h2>
+            <div
+              className={`${modalStyles.modalMessage} ${                
+                  modalStyles.modalMessageMatchFinished
+                }`}
+              dangerouslySetInnerHTML={{ __html: htmlContent }}
+            />
+          </div>
+        </div>
+      )}
+
+
         <DebugOverlay gameData={debugData} />
     </div>
   );

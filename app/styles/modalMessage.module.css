@@ -42,3 +42,38 @@
   max-width: 500px;
   color: black; /* Ensure note text is black */
 }
+
+.modalMessageMatchFinished {
+  font-family: Arial, sans-serif;
+  background-color: #ffe6e6; /* Light red background */
+  padding: auto;
+  border-radius: 8px;
+  color: black; /* Ensure text is black */
+}
+
+.modalMessageMatchFinished table {
+  width: fit-content;
+  border-collapse: collapse;
+  border: 2px solid #773c3c; /* Dark red border */
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff; /* White background for the table */
+}
+
+.modalMessageMatchFinished th {
+  background-color: #5c1f1f; /* Dark red header background */
+  color: white; /* White text for contrast */
+  padding: 10px 15px;
+  text-align: center;
+}
+
+.modalMessageMatchFinished td {
+  border-top: 1px solid #cfcfcf; /* Light grey border for rows */
+  padding: 8px 12px;
+  text-align: center;
+  color: black; /* Ensure table cell text is black */
+}
+
+.modalMessageMatchFinished td:first-child {
+  text-align: left; /* Align player names to the left */
+}
