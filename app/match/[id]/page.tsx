@@ -554,13 +554,24 @@ const MatchPage: React.FC = () => {
 
   // sets default settings and sets them to local storage, unless they already exist
   useEffect(() => {
-    if (localStorage.getItem("playmat")) {
+
+    const playMatColors = [
+      "darkgreen",
+      "darkred",
+      "darkblue",
+      "rebeccapurple",
+      "orange",
+      "white",
+      "black",
+    ];
+
+    if (localStorage.getItem("playmat") && playMatColors.includes(localStorage.getItem("playmat") || "")) {
       setPlaymat(localStorage.getItem("playmat") || "");
     } else {
-      setPlaymat("#008000"); // Default playmat
-      localStorage.setItem("playmat", "#008000");
+      setPlaymat("#darkgreen"); // Default playmat
+      localStorage.setItem("playmat", "darkgreen");
     }
-    if (localStorage.getItem("cardback")) {
+    if (localStorage.getItem("cardback") && /^\/card_back\/b10[1-6]\.png$/.test(localStorage.getItem("cardback") || "")) {
       setCardback(localStorage.getItem("cardback") || "");
     } else {
       setCardback("/card_back/b101.png"); // Default cardback
