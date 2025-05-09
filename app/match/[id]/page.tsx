@@ -292,7 +292,7 @@ const MatchPage: React.FC = () => {
       setPollingResponse(response);
       console.log("Match data response:", response);
 
-      if (response.gamePhase === "FINISHED") {
+      if (response.matchPhase === "FINISHED") {
         console.log("Match is finished. Halting polling.");
         setPollingPausedUntil(Infinity); // Halt polling permanently
       }
@@ -1364,7 +1364,7 @@ const MatchPage: React.FC = () => {
           </div>
         )}
 
-        {currentGamePhase === "RESULT" && (
+        {pollingResponse?.matchPhase === "RESULT" && (
           <div
             style={{
               position: "absolute",
@@ -1499,7 +1499,7 @@ const MatchPage: React.FC = () => {
           </div>
         )}
 
-      {(currentGamePhase === "FINISHED" || pollingResponse?.matchPhase === "FINISHED") && (
+      {(pollingResponse?.matchPhase === "FINISHED") && (
         <div
           style={{
             position: "absolute",
