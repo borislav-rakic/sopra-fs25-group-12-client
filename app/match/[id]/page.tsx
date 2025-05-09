@@ -1482,6 +1482,22 @@ const MatchPage: React.FC = () => {
               dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
           </div>
+          <button
+            type="button"
+            onClick={() => router.push("/landingpageuser")} // Route to landing page
+            style={{
+              marginTop: "20px",
+              padding: "10px 20px",
+              fontSize: "1rem",
+              backgroundColor: "white",
+              color: "darkgreen",
+              border: "2px solid darkgreen",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Leave Match
+          </button>          
         </div>
       )}
 
