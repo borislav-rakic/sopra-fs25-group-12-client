@@ -118,13 +118,14 @@ const MatchPage: React.FC = () => {
       await apiService.post(`/matches/${matchId}/game/sim/game`, {});
       message.open({
         type: "success",
-        content: "Fast-forward complete",
+        content: "Fast-forward to end of game complete",
       });
       await fetchMatchData(); // refresh cards, trick, scores
     } catch (error) {
       handleApiError(error, "Fast-forward failed.");
     }
-  };// handleFastForward for testing, game transitions
+  };
+  // handleFastForward for testing, game transitions
   const handleFastForwardGameShootingTheMoon = async () => {
     if (currentGamePhase !== "NORMALTRICK") {
       message.warning("Fast forward is only available during a normal trick.");
@@ -136,7 +137,26 @@ const MatchPage: React.FC = () => {
       await apiService.post(`/matches/${matchId}/game/sim/moon`, {});
       message.open({
         type: "success",
-        content: "Fast-forward complete",
+        content: "Fast-forward to end of game with moon shot complete",
+      });
+      await fetchMatchData(); // refresh cards, trick, scores
+    } catch (error) {
+      handleApiError(error, "Fast-forward failed.");
+    }
+  };
+  // handleFastForward for testing, game transitions
+  const handleFastForwardToGameThree = async () => {
+    if (currentGamePhase !== "NORMALTRICK") {
+      message.warning("Fast forward is only available during a normal trick.");
+      return;
+    }
+
+    try {
+      console.log("Fast forwarding game...");
+      await apiService.post(`/matches/${matchId}/game/sim/endofmatchthree`, {});
+      message.open({
+        type: "success",
+        content: "Fast-forward to end of match 3 complete",
       });
       await fetchMatchData(); // refresh cards, trick, scores
     } catch (error) {
@@ -155,7 +175,7 @@ const MatchPage: React.FC = () => {
       await apiService.post(`/matches/${matchId}/game/sim/match`, {});
       message.open({
         type: "success",
-        content: "Fast-forward complete",
+        content: "Fast-forwarding match complete",
       });
       await fetchMatchData(); // refresh cards, trick, scores
     } catch (error) {
@@ -298,7 +318,7 @@ const MatchPage: React.FC = () => {
                 setServerMessages((curr) =>
                   curr.filter((m) => m.id !== msg.id)
                 );
-              }, 20000);
+              }, 5000);
             });
       
             return combined;
@@ -929,7 +949,7 @@ const MatchPage: React.FC = () => {
               { key: "2", label: "Rules" /*onClick: () => toggleSettings()*/ },
               { key: "3", label: "Leave Match", onClick: showLeaveGameModal },
               { type: "divider" },
-              ...(isFastForwardAvailable
+              ...(isFastForwardAvailable && myTurn
                 ? [
                   {
                     key: "4",
@@ -943,6 +963,11 @@ const MatchPage: React.FC = () => {
                   },
                   {
                     key: "6",
+                    label: "FF to end of third game",
+                    onClick: handleFastForwardToGameThree,
+                  },
+                  {
+                    key: "7",
                     label: "FF near match end",
                     onClick: handleFastForwardMatch,
                   },
