@@ -812,24 +812,25 @@ const MatchPage: React.FC = () => {
   }, [isWaitingForPlayers]);
 
   useEffect(() => {
-    if (myTurn) {
-      if (currentGamePhase === "PASSING") {
-        console.log("It's my turn to pass cards! Starting 45-second timer...");
-        setTimer(45); // Start the timer at 45 seconds
 
-        const intervalId = setInterval(() => {
-          setTimer((prev) => {
-            if (prev === null || prev <= 1) {
-              clearInterval(intervalId); // Stop the timer when it reaches 0
-              passRandomCards(); // Pass three random cards
-              return null;
-            }
-            return prev - 1; // Decrement the timer
-          });
-        }, 1000);
+    if (currentGamePhase === "PASSING") {
+      console.log("It's my turn to pass cards! Starting 45-second timer...");
+      setTimer(45); // Start the timer at 45 seconds
 
-        return () => clearInterval(intervalId); // Cleanup on unmount or when `myTurn` changes
-      } else if (
+      const intervalId = setInterval(() => {
+        setTimer((prev) => {
+          if (prev === null || prev <= 1) {
+            clearInterval(intervalId); // Stop the timer when it reaches 0
+            passRandomCards(); // Pass three random cards
+            return null;
+          }
+          return prev - 1; // Decrement the timer
+        });
+      }, 1000);
+
+      return () => clearInterval(intervalId); // Cleanup on unmount or when `myTurn` changes
+    } else if (myTurn){
+       if (
         currentGamePhase === "FIRSTTRICK" ||
         currentGamePhase === "NORMALTRICK" ||
         currentGamePhase === "FINALTRICK"
@@ -1465,11 +1466,11 @@ const MatchPage: React.FC = () => {
         )}
       </div>
 
-      {myTurn && timer !== null &&
+      {(myTurn && timer !== null &&
         (currentGamePhase === "FIRSTTRICK" ||
           currentGamePhase === "NORMALTRICK" ||
-          currentGamePhase === "FINALTRICK" ||
-          currentGamePhase === "PASSING") &&
+          currentGamePhase === "FINALTRICK") ||
+        (currentGamePhase === "PASSING" && timer !== null)) &&
         (
           <div
             style={{
