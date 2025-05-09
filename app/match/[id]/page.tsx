@@ -1133,7 +1133,7 @@ const MatchPage: React.FC = () => {
               className="player-avatar"
               src={playerAvatars[0]
                 ? playerAvatars[0]
-                : "/avatars_118x118/a104.png"}
+                : "/avatars_118x118/a000.png"}
               alt="avatar"
               width={72}
               height={72}
@@ -1151,7 +1151,7 @@ const MatchPage: React.FC = () => {
               className="player-avatar"
               src={playerAvatars[1]
                 ? playerAvatars[1]
-                : "/avatars_118x118/a104.png"}
+                : "/avatars_118x118/a000.png"}
               alt="avatar"
               width={72}
               height={72}
@@ -1169,7 +1169,7 @@ const MatchPage: React.FC = () => {
               className="player-avatar"
               src={playerAvatars[2]
                 ? playerAvatars[2]
-                : "/avatars_118x118/a104.png"}
+                : "/avatars_118x118/a000.png"}
               alt="avatar"
               width={72}
               height={72}
@@ -1187,7 +1187,7 @@ const MatchPage: React.FC = () => {
               className="player-avatar"
               src={playerAvatars[3]
                 ? playerAvatars[3]
-                : "/avatars_118x118/a104.png"}
+                : "/avatars_118x118/a000.png"}
               alt="avatar"
               width={72}
               height={72}
