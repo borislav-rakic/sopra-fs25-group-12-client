@@ -858,7 +858,7 @@ const MatchPage: React.FC = () => {
         return () => clearInterval(intervalId); // Cleanup on unmount or when `myTurn` changes
       }
     } else {
-      setTimer(null); // Reset the timer when it's no longer the player's turn
+      setTimer(Infinity); // Reset the timer when it's no longer the player's turn
     }
   }, [myTurn, currentGamePhase]);
 
@@ -1475,11 +1475,11 @@ const MatchPage: React.FC = () => {
         )}
       </div>
 
-      {(myTurn && timer !== null &&
+      {(myTurn && timer !== null && timer !== Infinity &&
         (currentGamePhase === "FIRSTTRICK" ||
           currentGamePhase === "NORMALTRICK" ||
           currentGamePhase === "FINALTRICK") ||
-        (currentGamePhase === "PASSING" && timer !== null)) &&
+        (currentGamePhase === "PASSING" && timer !== null && timer !== Infinity)) &&
         (
           <div
             style={{
