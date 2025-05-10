@@ -791,10 +791,12 @@ const MatchPage: React.FC = () => {
   const handleLeaveGame = async () => {
     try {
       console.log("Leaving game...");
+      setPollingPausedUntil(Infinity);
       await apiService.delete(`/matches/${matchId}/leave`);
       router.push("/landingpageuser"); // Redirect to the home page after leaving the game
       console.log("Game left.");
     } catch (error) {
+      setPollingPausedUntil(null);
       handleApiError(error, "Could not leave the game.");
     } finally {
       hideLeaveGameModal(); // Hide the modal
