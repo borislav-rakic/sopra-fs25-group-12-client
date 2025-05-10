@@ -85,6 +85,7 @@ const MatchPage: React.FC = () => {
   const [pollingPausedUntil, setPollingPausedUntil] = useState<number | null>(
     null,
   );
+  const [isHost, setIsHost] = useState(false);
   
   const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false);
   const [isLeaveGameModalVisible, setIsLeaveGameModalVisible] = useState(false);
@@ -295,6 +296,10 @@ const MatchPage: React.FC = () => {
       if (response.matchPhase === "FINISHED") {
         console.log("Match is finished. Halting polling.");
         setPollingPausedUntil(Infinity); // Halt polling permanently
+      }
+
+      if (response.playerSlot === 0) {
+        setIsHost(true);
       }
       
       setHeartsBroken(response.heartsBroken ?? false);
@@ -792,7 +797,7 @@ const MatchPage: React.FC = () => {
     try {
       console.log("Leaving game...");
       await apiService.delete(`/matches/${matchId}/leave`);
-      router.push("/"); // Redirect to the home page after leaving the game
+      router.push("/landingpageuser"); // Redirect to the home page after leaving the game
       console.log("Game left.");
     } catch (error) {
       handleApiError(error, "Could not leave the game.");
@@ -968,7 +973,15 @@ const MatchPage: React.FC = () => {
             items: [
               { key: "1", label: "Settings", onClick: () => toggleSettings() },
               { key: "2", label: "Rules" /*onClick: () => toggleSettings()*/ },
-              { key: "3", label: "Leave Match", onClick: showLeaveGameModal },
+              isHost ? {
+                key: "3",
+                label: "Abort Game",
+                onClick: showLeaveGameModal
+              } : {
+                key: "3",
+                label: "Leave Match",
+                onClick: showLeaveGameModal,
+              },
               { type: "divider" },
               ...(isFastForwardAvailable && myTurn
                 ? [
@@ -1451,9 +1464,16 @@ const MatchPage: React.FC = () => {
                 color: "white", // Light text color for contrast
               }}
             >
-              <p style={{ fontSize: "1.2rem", marginBottom: "20px" }}>
+              {isHost ? (
+                <p style={{ fontSize: "1.2rem", marginBottom: "20px" }}>
+                Are you sure you want to abort the game?
+              </p>
+              ):(
+                <p style={{ fontSize: "1.2rem", marginBottom: "20px" }}>
                 Are you sure you want to leave the game?
               </p>
+              )}
+              
               <div style={{ display: "flex", justifyContent: "space-around" }}>
                 <Button
                   onClick={handleLeaveGame}
