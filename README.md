@@ -102,15 +102,27 @@ Make sure you have the following installed:
 
 ### Running the Application Locally
 
-```
-example
-```
+### Clone The Repository
+```git clone https://github.com/borislav-rakic/sopra-fs25-group-12-client```
+### Navigate to the cloned directory in the terminal
+```cd sopra-fs25-student-client```
+### Inside the repository folder (with ```ls``` you can list files) there is a bash script _setup.sh_ that will install everything you need, according to the system you are using. Run the following command and follow the instructions
+   ```shell
+   source setup.sh
+   ```
+### Start Development Server
+```npm start```
+or 
+```npm run dev```
+
 
 ### Running Tests
+```npm test```
 
 ### External Dependencies
 
 ### Releases
+```npm run build```
 
 ## Illustrations
 
@@ -126,9 +138,8 @@ could add_
 Here are the top 2–3 features that new developers who want to contribute to the
 project could add:
 
-- ...
-- ...
-- ...
+- Add some background music 🎵
+- Add chat feature for users to interact during a match 💬
 
 ## Authors & Acknowledgment
 
