@@ -964,6 +964,33 @@ const MatchPage: React.FC = () => {
         ))}
       </div>
 
+      {(myTurn && timer !== null && timer !== Infinity &&
+        (currentGamePhase === "FIRSTTRICK" ||
+          currentGamePhase === "NORMALTRICK" ||
+          currentGamePhase === "FINALTRICK") ||
+        (currentGamePhase === "PASSING" && timer !== null && timer !== Infinity)) &&
+        (
+          <div
+            style={{
+            display: "flex",
+            justifyContent: "space-between", // Space out the elements
+            alignItems: "center", // Align the items vertically centered
+            position: "absolute",
+            top: "3%",
+            left: "17%",
+            transform: "translateX(-50%)",
+            backgroundColor: "white",
+            color: "black",
+            padding: "8px 15px",
+            borderRadius: "10px",
+            zIndex: 1000,
+            width: "auto", // Ensure the width adjusts based on content
+          }}
+          >
+            Time Remaining: {timer}s
+          </div>
+        )}
+
       <div className="menu-dropdown">
         <Dropdown
           menu={{
@@ -1481,29 +1508,6 @@ const MatchPage: React.FC = () => {
         )}
       </div>
 
-      {(myTurn && timer !== null && timer !== Infinity &&
-        (currentGamePhase === "FIRSTTRICK" ||
-          currentGamePhase === "NORMALTRICK" ||
-          currentGamePhase === "FINALTRICK") ||
-        (currentGamePhase === "PASSING" && timer !== null && timer !== Infinity)) &&
-        (
-          <div
-            style={{
-              position: "absolute",
-              top: "10%",
-              left: "50%",
-              transform: "translateX(-50%)",
-              backgroundColor: "darkgreen",
-              color: "white",
-              padding: "10px 20px",
-              borderRadius: "10px",
-              fontSize: "1.5rem",
-              zIndex: 1000,
-            }}
-          >
-            Time Remaining: {timer}s
-          </div>
-        )}
 
       {(pollingResponse?.matchPhase === "FINISHED") && (
         <div
@@ -1536,22 +1540,17 @@ const MatchPage: React.FC = () => {
               dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
           </div>
-          <button
-            type="button"
+          <Button
+            className={styles.whiteButton}
             onClick={() => router.push("/landingpageuser")} // Route to landing page
             style={{
-              marginTop: "20px",
-              padding: "10px 20px",
-              fontSize: "1rem",
-              backgroundColor: "white",
-              color: "darkgreen",
-              border: "2px solid darkgreen",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
+            marginTop: "20px",
+            marginBottom: "20px"
+
+          }}
           >
             Leave Match
-          </button>          
+          </Button>          
         </div>
       )}
 
