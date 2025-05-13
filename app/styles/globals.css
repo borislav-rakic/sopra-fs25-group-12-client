@@ -49,16 +49,20 @@ a {
 }
 
 .contentContainer {
-  background-color: rgba(8, 108, 1, 0.4); /* subtle dark overlay */
+  background-color: rgba(8, 108, 1, 0.4);
+  /* subtle dark overlay */
   border-radius: 16px;
   padding: 40px;
   max-width: 600px;
   width: 100%;
   text-align: center;
-  margin: 0 auto; /* center horizontally */
+  margin: 0 auto;
+  /* center horizontally */
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(1px); /* frosted glass effect */
-  -webkit-backdrop-filter: blur(4px); /* for Safari */
+  backdrop-filter: blur(1px);
+  /* frosted glass effect */
+  -webkit-backdrop-filter: blur(4px);
+  /* for Safari */
   margin: auto;
   position: absolute;
   top: 50%;
@@ -141,12 +145,14 @@ a {
 }
 
 .ant-form-item {
-  margin-bottom: 18px !important; /* adjusts space between inputs and buttons */
+  margin-bottom: 18px !important;
+  /* adjusts space between inputs and buttons */
 }
 
 .ant-input,
 .ant-input-password {
-  background-color: #f0f0f0 !important; /* light grey */
+  background-color: #f0f0f0 !important;
+  /* light grey */
   color: black !important;
   border-radius: 8px;
   border: 1px solid #d9d9d9;
@@ -185,53 +191,66 @@ a {
 }
 
 .white-bordered-table .ant-table-tbody > tr:hover > td {
-  background: white !important; /* disable hover effect */
+  background: white !important;
+  /* disable hover effect */
 }
 
 .gear-icon img {
   position: fixed;
-  top: 10px; /* Adjust to your preference */
-  left: 10px; /* Adjust to your preference */
-  width: 30px; /* Adjust the size of the icon */
-  height: 30px; /* Adjust the size of the icon */
+  top: 10px;
+  /* Adjust to your preference */
+  left: 10px;
+  /* Adjust to your preference */
+  width: 30px;
+  /* Adjust the size of the icon */
+  height: 30px;
+  /* Adjust the size of the icon */
   cursor: pointer;
-  z-index: 1000; /* Ensures it's above other content */
-  filter: invert(
-    1
-  ); /* Invert colors for better visibility on dark backgrounds */
+  z-index: 1000;
+  /* Ensures it's above other content */
+  filter: invert(1);
+  /* Invert colors for better visibility on dark backgrounds */
 }
 
 /* Optional hover effect */
 .gear-icon img:hover {
-  transform: scale(1.1); /* Slightly enlarge the icon on hover */
+  transform: scale(1.1);
+  /* Slightly enlarge the icon on hover */
   transition: transform 0.3s ease-in-out;
 }
 
 /* Score table styling */
 .score-table {
   position: fixed;
-  top: 20px; /* Adjust for your preference */
-  right: 20px; /* Position on the top-right corner */
+  top: 20px;
+  /* Adjust for your preference */
+  right: 20px;
+  /* Position on the top-right corner */
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   padding: 10px;
-  z-index: 1000; /* Ensure it's on top */
+  z-index: 1000;
+  /* Ensure it's on top */
 }
 
 /* Table styling */
 .score-table table {
-  width: 200px; /* Set the table width */
-  border-collapse: collapse; /* Removes space between table cells */
+  width: 200px;
+  /* Set the table width */
+  border-collapse: collapse;
+  /* Removes space between table cells */
   font-family: Arial, sans-serif;
-  font-size: 14px; /* Adjust font size */
+  font-size: 14px;
+  /* Adjust font size */
   text-align: left;
   background-color: white;
 }
 
 /* Table header styling */
 .score-table th {
-  background-color: darkgreen; /* Header background color */
+  background-color: darkgreen;
+  /* Header background color */
   color: rgb(255, 255, 255);
   padding: 8px;
   font-weight: bold;
@@ -240,13 +259,15 @@ a {
 /* Table row styling */
 .score-table td {
   padding: 8px;
-  border-bottom: 1px solid #ddd; /* Light gray border for rows */
+  border-bottom: 1px solid #ddd;
+  /* Light gray border for rows */
   color: rgb(0, 0, 0);
 }
 
 /* Hover effect for rows */
 .score-table tr:hover {
-  background-color: #f1f1f1; /* Light gray background on row hover */
+  background-color: #f1f1f1;
+  /* Light gray background on row hover */
 }
 
 .gameboard {
@@ -260,8 +281,10 @@ a {
   align-items: center;
   justify-content: center;
   background-color: rgb(4, 82, 10);
-  border-radius: 20px; /* Add rounded corners */
-  overflow: hidden; /* Optional: Ensures content inside respects the rounded corners */
+  border-radius: 20px;
+  /* Add rounded corners */
+  overflow: hidden;
+  /* Optional: Ensures content inside respects the rounded corners */
   min-height: 500px;
   max-height: 1000px;
   z-index: 1;
@@ -290,7 +313,8 @@ a {
 
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
-  align-items: center; /* Center child elements vertically */
+  align-items: center;
+  /* Center child elements vertically */
   justify-content: center;
 }
 
@@ -322,7 +346,8 @@ a {
 
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
-  align-items: center; /* Center child elements vertically */
+  align-items: center;
+  /* Center child elements vertically */
   justify-content: center;
 }
 
@@ -355,7 +380,8 @@ a {
 
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
-  align-items: center; /* Center child elements vertically */
+  align-items: center;
+  /* Center child elements vertically */
   justify-content: center;
 }
 
@@ -388,7 +414,8 @@ a {
 
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
-  align-items: center; /* Center child elements vertically */
+  align-items: center;
+  /* Center child elements vertically */
   justify-content: center;
 }
 
@@ -413,15 +440,18 @@ a {
   background-color: white;
   border: 1px solid black;
   z-index: 20;
-  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  transition: transform 0.2s ease-in-out;
+  /* Smooth transition for scaling */
   justify-content: center;
   flex: 0 0 50px;
 }
 
 .playingcard:hover {
-  transform: scale(1.1); /* Scale up on hover */
+  transform: scale(1.1);
+  /* Scale up on hover */
   cursor: pointer;
-  z-index: 30; /* Bring to front on hover */
+  z-index: 30;
+  /* Bring to front on hover */
 }
 
 .playingcard-back {
@@ -431,7 +461,8 @@ a {
   background-color: white;
   border: 1px solid black;
   z-index: 20;
-  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  transition: transform 0.2s ease-in-out;
+  /* Smooth transition for scaling */
   justify-content: center;
   flex: 0 0 50px;
 }
@@ -458,7 +489,8 @@ a {
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
   z-index: 20;
-  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  transition: transform 0.2s ease-in-out;
+  /* Smooth transition for scaling */
   justify-content: center;
   flex: 0 0 50px;
   left: 32.5%;
@@ -472,8 +504,9 @@ a {
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
-  z-index: 19;
-  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  z-index: 20;
+  transition: transform 0.2s ease-in-out;
+  /* Smooth transition for scaling */
   justify-content: center;
   flex: 0 0 50px;
   left: 0%;
@@ -488,8 +521,9 @@ a {
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
-  z-index: 18;
-  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  z-index: 20;
+  transition: transform 0.2s ease-in-out;
+  /* Smooth transition for scaling */
   justify-content: center;
   flex: 0 0 50px;
   left: 20%;
@@ -504,8 +538,9 @@ a {
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid rgba(0, 0, 0, 0);
-  z-index: 17;
-  transition: transform 0.2s ease-in-out; /* Smooth transition for scaling */
+  z-index: 20;
+  transition: transform 0.2s ease-in-out;
+  /* Smooth transition for scaling */
   justify-content: center;
   flex: 0 0 50px;
   right: 0%;
@@ -624,9 +659,12 @@ a {
   padding-top: 3px;
   font-size: 1vw;
   border-radius: 5%;
-  overflow: hidden; /* Prevent text overflow */
-  text-overflow: ellipsis; /* Display ellipsis if content overflows */
-  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden;
+  /* Prevent text overflow */
+  text-overflow: ellipsis;
+  /* Display ellipsis if content overflows */
+  white-space: nowrap;
+  /* Prevent text wrapping */
 }
 
 .game-playerscore {
@@ -766,4 +804,34 @@ a {
   top: 20px;
   left: 20px;
   z-index: 1000;
+}
+
+.message-box {
+  position: fixed;
+  top: 10%;
+  left: 10px;
+  width: 400px;
+  height: 80%;
+  background-color: transparent;
+  color: white;
+  border: 0px solid white;
+  border-radius: 10px;
+  padding: 10px;
+  overflow-y: auto;
+  /* Makes the box scrollable */
+  z-index: 1000;
+  /* Ensures it appears above other elements */
+}
+
+.message {
+  margin-bottom: 10px;
+  padding: 5px;
+  background-color: rgba(0, 128, 0, 0.8);
+  border-radius: 5px;
+  word-wrap: break-word;
+  font-weight: bold;
+  font-size: 200%;
+  border-radius: 10px;
+  font-family: var(--font-luckiest-guy);
+  /* Ensures long messages wrap */
 }

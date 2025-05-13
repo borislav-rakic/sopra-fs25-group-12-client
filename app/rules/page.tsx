@@ -10,7 +10,7 @@ const { Title, Paragraph } = Typography;
 const scoringData = [
   { key: "1", card: "Each Heart", points: "1 point" },
   { key: "2", card: "Queen of Spades", points: "13 points" },
-  { key: "3", card: "Other cards", points: "0 points" },
+  { key: "3", card: "All other cards", points: "0 points" },
 ];
 
 const scoringColumns = [

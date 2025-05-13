@@ -1,6 +1,6 @@
 .modalMessage {
   font-family: Arial, sans-serif;
-  background-color: #e6f2e6; /* Light green background */
+  background-color: white; /* Light green background */
   padding: auto;
   border-radius: 8px;
   color: black; /* Ensure text is black */
@@ -9,14 +9,15 @@
 .modalMessageGameResult table {
   width: fit-content;
   border-collapse: collapse;
-  border: 2px solid #4a773c; /* Dark green border */
+  border: 2px solid darkgreen; /* Dark green border */
   border-radius: 8px;
   overflow: hidden;
-  background-color: #ffffff; /* White background for the table */
+  background-color: white; /* White background for the table */
+  margin-top: 10px;
 }
 
 .modalMessageGameResult th {
-  background-color: #2e5c1f; /* Dark green header background */
+  background-color: darkgreen; /* Dark green header background */
   color: white; /* White text for contrast */
   padding: 10px 15px;
   text-align: center;
@@ -38,7 +39,43 @@
   font-style: italic;
   background-color: #f0f8f0; /* Light green background for the note */
   padding: 10px;
-  border-left: 4px solid #4a773c; /* Green border on the left */
+  border-left: 4px solid darkgreen; /* Green border on the left */
   max-width: 500px;
   color: black; /* Ensure note text is black */
+}
+
+.modalMessageMatchFinished {
+  font-family: Arial, sans-serif;
+  background-color: white; /* Light red background */
+  padding: auto;
+  border-radius: 8px;
+  color: black; /* Ensure text is black */
+}
+
+.modalMessageMatchFinished table {
+  width: fit-content;
+  border-collapse: collapse;
+  border: 2px solid darkgreen; /* Dark red border */
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white; /* White background for the table */
+  margin-top: 8px;
+}
+
+.modalMessageMatchFinished th {
+  background-color: darkgreen; /* Dark red header background */
+  color: white; /* White text for contrast */
+  padding: 10px 15px;
+  text-align: center;
+}
+
+.modalMessageMatchFinished td {
+  border-top: 1px solid lightgray; /* Light grey border for rows */
+  padding: 8px 12px;
+  text-align: center;
+  color: black; /* Ensure table cell text is black */
+}
+
+.modalMessageMatchFinished td:first-child {
+  text-align: left; /* Align player names to the left */
 }

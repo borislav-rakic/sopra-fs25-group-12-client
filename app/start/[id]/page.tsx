@@ -19,6 +19,7 @@ import { useApi } from "@/hooks/useApi";
 import { Match } from "@/types/match";
 import { User } from "@/types/user";
 import "@/styles/globals.css";
+import { handleApiError } from "@/utils/errorHandlers";
 
 const StartPage: React.FC = () => {
   const params = useParams();
@@ -160,7 +161,7 @@ const StartPage: React.FC = () => {
         }
 
         Object.entries(match.invites || {}).forEach(([slotStr, userId]) => {
-          const slot = Number(slotStr);
+          const slot = (Number(slotStr) - 1) % 4;
           const index = slot;
 
           const user = usersRef.current.find((u) => Number(u.id) === userId);
@@ -177,12 +178,39 @@ const StartPage: React.FC = () => {
         if (match.started) {
           router.push(`/match/${gameId}`);
         }
-      } catch {
-        message.open({
-          type: "error",
-          content: "Could not load match info.",
-        });
-        router.push("/landingpageuser");
+      } catch (error) {
+        console.log("Error caught:", error); // Inspect the error structure
+
+        // Check if the error has a `response` property (e.g., Axios errors)
+        if (
+          typeof error === "object" && error !== null && "status" in error &&
+          error.status === 403
+        ) {
+          message.open({
+            type: "error",
+            content: "You are not authorized to view this match.",
+          });
+          router.push("/landingpageuser");
+        } else if (
+          typeof error === "object" && error !== null && "status" in error &&
+          error.status === 409
+        ) {
+          message.open({
+            type: "error",
+            content: "You are not authorized to view this match.",
+          });
+          router.push("/landingpageuser");
+        } else if (error instanceof Error) {
+          // Handle standard Error objects
+          handleApiError(error, "Failed to fetch match data.");
+        } else {
+          // Fallback for unexpected error structures
+          console.error("Unexpected error structure:", error);
+          message.open({
+            type: "error",
+            content: "An unexpected error occurred. Please try again.",
+          });
+        }
       }
     };
 
@@ -229,7 +257,7 @@ const StartPage: React.FC = () => {
     const interval = setInterval(() => {
       loadMatch();
       fetchJoinRequests();
-    }, 5000);
+    }, 2000);
 
     return () => clearInterval(interval);
 
@@ -286,6 +314,10 @@ const StartPage: React.FC = () => {
       updatedPending[index] = Number(user.id);
       setPendingInvites(updatedPending);
 
+      const toggleInviteCopy = [...showInvite];
+      toggleInviteCopy[index] = false; // Close the invite window
+      setShowInvite(toggleInviteCopy);
+
       message.open({
         type: "success",
         content: `Invitation sent to ${username}`,
@@ -310,9 +342,10 @@ const StartPage: React.FC = () => {
 
   const handleCancelInvite = async (index: number) => {
     if (!gameId) return;
-
+    const shiftedIndex = (index + 1) % 4;
     try {
-      await apiService.delete(`/matches/${gameId}/invite/${index}`);
+      console.log("Cancelling invite for index:", shiftedIndex);
+      await apiService.delete(`/matches/${gameId}/invite/${shiftedIndex}`);
 
       const updatedPlayers = [...selectedPlayers];
       updatedPlayers[index] = "";
@@ -421,9 +454,9 @@ const StartPage: React.FC = () => {
       toggle[index] = true;
       setShowDifficulty(toggle);
 
-      const toggleInvite = [...showInvite];
-      toggleInvite[index] = false;
-      setShowInvite(toggleInvite);
+      const toggleInviteCopy = [...showInvite];
+      toggleInviteCopy[index] = false; // Close the invite window
+      setShowInvite(toggleInviteCopy);
 
       const difficulties = [...selectedDifficulties];
       difficulties[index] = difficulty;
@@ -683,18 +716,17 @@ const StartPage: React.FC = () => {
                   className={styles.whiteButton}
                   onClick={() => {
                     const updated = [...selectedPlayers];
-                    const toggleInvite = [...showInvite];
+                    const toggleInviteCopy = [...showInvite];
                     const toggleDiff = [...showDifficulty];
 
-                    const isOpen = updated[index] === "invite" &&
-                      toggleInvite[index];
+                    const isOpen = toggleInviteCopy[index]; // Check if the invite window is open
 
                     if (isOpen) {
-                      updated[index] = "";
-                      toggleInvite[index] = false;
+                      updated[index] = ""; // Clear the slot if the invite window is being closed
+                      toggleInviteCopy[index] = false;
                     } else {
-                      updated[index] = "invite";
-                      toggleInvite[index] = true;
+                      updated[index] = "invite"; // Mark the slot as "invite"
+                      toggleInviteCopy[index] = true;
 
                       setFilteredUsers(users.filter(
                         (u) =>
@@ -703,10 +735,10 @@ const StartPage: React.FC = () => {
                       ));
                     }
 
-                    toggleDiff[index] = false;
+                    toggleDiff[index] = false; // Ensure difficulty selection is closed
 
                     setSelectedPlayers(updated);
-                    setShowInvite(toggleInvite);
+                    setShowInvite(toggleInviteCopy);
                     setShowDifficulty(toggleDiff);
                   }}
                 >

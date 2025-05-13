@@ -21,12 +21,12 @@ type LeaderboardRow = {
 const filterOptions = [
   { key: "scoreTotal", label: "Score Total" },
   { key: "gamesPlayed", label: "Games Played" },
-  { key: "avgPlacement", label: "Avg. Placement" },
+  { key: "avgGameRanking", label: "Avg. Ranking" },
   { key: "moonShots", label: "Moon Shots" },
   { key: "perfectGames", label: "Perfect Games" },
   { key: "perfectMatches", label: "Perfect Matches" },
-  { key: "currentStreak", label: "Current Streak" },
-  { key: "longestStreak", label: "Longest Streak" },
+  { key: "currentGameStreak", label: "Current Streak" },
+  { key: "longestGameStreak", label: "Longest Streak" },
 ];
 
 const LeaderboardPage: React.FC = () => {
