@@ -125,8 +125,8 @@ reason).
 | **Student**          | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | -------------------- | -------- | ------------------ | ------------------------------- | ----------------------------------- |
 | **@stevaniaeilyn**   | 13.05.2025   | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/9721469a11388cac0c2cb999a850ab3a43189b87 | styling for UI (client: #16)                  | more userfriendly  |
-|                      | 13.05.2025  | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/47d691b8be70a671cb073e3eb815a43426716015 | write tests (server: #45) | ensure a working system |
-|                      | 13.05.2025  | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/f8014fb3b3975ec55c864136fdb145c98db2e069 | write tests (server: #45) | ensure a working system |
+|                      | 13.05.2025  | https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/47d691b8be70a671cb073e3eb815a43426716015<br/>https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/f8014fb3b3975ec55c864136fdb145c98db2e069<br/>https://github.com/borislav-rakic/sopra-fs25-group-12-server/commit/ab68f83ab2eea5b32c6a5e28358ba63c2925ecb0 | write tests (server: #45) | ensure a working system |
+
 | **@diderot5038**     | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **@borislav-rakic**  | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
