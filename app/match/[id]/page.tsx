@@ -12,7 +12,7 @@ import { handleApiError } from "@/utils/errorHandlers";
 import { MatchMessage } from "@/types/matchMessage"; // adjust path as needed
 
 // import { Match } from "@/types/match";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PollingDTO } from "@/types/polling";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
@@ -23,17 +23,20 @@ import { useCallback } from "react";
 const MatchPage: React.FC = () => {
   const USE_AUTOMATIC_POLLING = true; // switch to true for auto every 2000ms
 
-  
-  const [pollingResponse, setPollingResponse] = useState<PollingDTO | null>(null);
-  
+  const [pollingResponse, setPollingResponse] = useState<PollingDTO | null>(
+    null,
+  );
+
   const debugData = {
-    matchPhase: pollingResponse?.matchPhase ?? 'UNKNOWN',
-    gamePhase: pollingResponse?.gamePhase ?? 'UNKNOWN',
-    trickPhase: pollingResponse?.trickPhase ?? 'UNKNOWN',
+    matchPhase: pollingResponse?.matchPhase ?? "UNKNOWN",
+    gamePhase: pollingResponse?.gamePhase ?? "UNKNOWN",
+    trickPhase: pollingResponse?.trickPhase ?? "UNKNOWN",
     players: Object.values(pollingResponse?.playerPoints ?? {}).map(
-      (score) => ({ gameScore: score })
+      (score) => ({ gameScore: score }),
     ),
-    playerPointsString: Object.values(pollingResponse?.playerPoints ?? {}).join(', ')
+    playerPointsString: Object.values(pollingResponse?.playerPoints ?? {}).join(
+      ", ",
+    ),
   };
 
   //const router = useRouter();
@@ -85,7 +88,7 @@ const MatchPage: React.FC = () => {
   const [pollingPausedUntil, setPollingPausedUntil] = useState<number | null>(
     null,
   );
-  
+
   const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false);
   const [isLeaveGameModalVisible, setIsLeaveGameModalVisible] = useState(false);
   const [hasPassedCards, setHasPassedCards] = useState(false);
@@ -199,53 +202,55 @@ const MatchPage: React.FC = () => {
     onClick: () => {},
   }), [cardback]);
 
-  const generateCard = useCallback((code: string, order: number, zIndex: number = 10): cardProps => {
-    console.log("Generating card:", code, order, zIndex);
-    const rank = code[0];
-    const suit = code[1];
+  const generateCard = useCallback(
+    (code: string, order: number, zIndex: number = 10): cardProps => {
+      console.log("Generating card:", code, order, zIndex);
+      const rank = code[0];
+      const suit = code[1];
 
-    const rankToValue: { [key: string]: bigint } = {
-      "2": BigInt(2),
-      "3": BigInt(3),
-      "4": BigInt(4),
-      "5": BigInt(5),
-      "6": BigInt(6),
-      "7": BigInt(7),
-      "8": BigInt(8),
-      "9": BigInt(9),
-      "0": BigInt(10),
-      J: BigInt(11),
-      Q: BigInt(12),
-      K: BigInt(13),
-      A: BigInt(14),
-    };
+      const rankToValue: { [key: string]: bigint } = {
+        "2": BigInt(2),
+        "3": BigInt(3),
+        "4": BigInt(4),
+        "5": BigInt(5),
+        "6": BigInt(6),
+        "7": BigInt(7),
+        "8": BigInt(8),
+        "9": BigInt(9),
+        "0": BigInt(10),
+        J: BigInt(11),
+        Q: BigInt(12),
+        K: BigInt(13),
+        A: BigInt(14),
+      };
 
-    const suitToName: { [key: string]: string } = {
-      H: "Hearts",
-      S: "Spades",
-      D: "Diamonds",
-      C: "Clubs",
-    };
+      const suitToName: { [key: string]: string } = {
+        H: "Hearts",
+        S: "Spades",
+        D: "Diamonds",
+        C: "Clubs",
+      };
 
-    return {
-      code,
-      suit: suitToName[suit] || suit,
-      value: rankToValue[rank],
-      cardOrder: order,
-      image: `https://deckofcardsapi.com/static/img/${code}.png`,
-      flipped: false,
-      backimage: cardback,
-      onClick: (code: string) => console.log(`Card clicked: ${code}`),
-      zIndex,
-    };
-  }, [cardback]);
+      return {
+        code,
+        suit: suitToName[suit] || suit,
+        value: rankToValue[rank],
+        cardOrder: order,
+        image: `https://deckofcardsapi.com/static/img/${code}.png`,
+        flipped: false,
+        backimage: cardback,
+        onClick: (code: string) => console.log(`Card clicked: ${code}`),
+        zIndex,
+      };
+    },
+    [cardback],
+  );
 
   const handleTrickFromLogic = useCallback((trick: TrickDTO) => {
-
     const tempTrick: string[] = ["", "", "", ""];
     const orders: number[] = [-1, -1, -1, -1];
-    
-    trick.cards.forEach(c => {
+
+    trick.cards.forEach((c) => {
       tempTrick[c.position] = c.code;
       orders[c.position] = c.order;
     });
@@ -262,7 +267,9 @@ const MatchPage: React.FC = () => {
         (current.length === 0 && card !== null) || // Update the slot if it is empty but should have data
         (current.length > 0 && current[0].code !== card) // Update the slot if the card code has changed
       ) {
-        setSlot((card === null || card === "") ? [] : [generateCard(card, 0, zIndex)]);
+        setSlot(
+          (card === null || card === "") ? [] : [generateCard(card, 0, zIndex)],
+        );
         console.log(`Slot ${position} updated:`, card || "empty");
       } else {
         console.log(
@@ -276,10 +283,7 @@ const MatchPage: React.FC = () => {
     updateSlot(1, tempTrick[1], setTrickSlot1, trickSlot1, orders[1]);
     updateSlot(2, tempTrick[2], setTrickSlot2, trickSlot2, orders[2]);
     updateSlot(3, tempTrick[3], setTrickSlot3, trickSlot3, orders[3]);
-  
-    
   }, [generateCard, trickSlot0, trickSlot1, trickSlot2, trickSlot3]);
-
 
   const fetchMatchData = useCallback(async () => {
     try {
@@ -296,7 +300,7 @@ const MatchPage: React.FC = () => {
         console.log("Match is finished. Halting polling.");
         setPollingPausedUntil(Infinity); // Halt polling permanently
       }
-      
+
       setHeartsBroken(response.heartsBroken ?? false);
       setLastTrickPhase(trickPhase);
       setTrickPhase(response.trickPhase);
@@ -308,13 +312,13 @@ const MatchPage: React.FC = () => {
       if (Array.isArray(response.matchMessages)) {
         const newMessages = response.matchMessages.filter(
           (msg): msg is MatchMessage =>
-            typeof msg.content === "string" && msg.content.trim() !== ""
+            typeof msg.content === "string" && msg.content.trim() !== "",
         );
-      
+
         if (newMessages.length > 0) {
           setServerMessages((prev) => {
             const combined = [...newMessages, ...prev];
-      
+
             // Schedule each new message for removal in 10s
             newMessages.forEach((msg) => {
               setTimeout(() => {
@@ -323,7 +327,7 @@ const MatchPage: React.FC = () => {
                 );
               }, 5000);
             });
-      
+
             return combined;
           });
         }
@@ -340,7 +344,7 @@ const MatchPage: React.FC = () => {
         setHasPassedCards(false);
       }
 
-      if (response.gamePhase !== "SKIP_PASSING"){
+      if (response.gamePhase !== "SKIP_PASSING") {
         setHasConfirmedSkipPassing(false);
       }
 
@@ -417,9 +421,9 @@ const MatchPage: React.FC = () => {
           response.previousTrickLeaderPlayerSlot || 0,
         );
       } else { */
-        if (response.currentTrickDTO) {
-          handleTrickFromLogic(response.currentTrickDTO);
-        }
+      if (response.currentTrickDTO) {
+        handleTrickFromLogic(response.currentTrickDTO);
+      }
       /* } */
 
       if (response.cardsInHandPerPlayer) {
@@ -557,7 +561,6 @@ const MatchPage: React.FC = () => {
 
   // sets default settings and sets them to local storage, unless they already exist
   useEffect(() => {
-
     const playMatColors = [
       "darkgreen",
       "darkred",
@@ -568,13 +571,21 @@ const MatchPage: React.FC = () => {
       "black",
     ];
 
-    if (localStorage.getItem("playmat") && playMatColors.includes(localStorage.getItem("playmat") || "")) {
+    if (
+      localStorage.getItem("playmat") &&
+      playMatColors.includes(localStorage.getItem("playmat") || "")
+    ) {
       setPlaymat(localStorage.getItem("playmat") || "");
     } else {
       setPlaymat("#darkgreen"); // Default playmat
       localStorage.setItem("playmat", "darkgreen");
     }
-    if (localStorage.getItem("cardback") && /^\/card_back\/b10[1-6]\.png$/.test(localStorage.getItem("cardback") || "")) {
+    if (
+      localStorage.getItem("cardback") &&
+      /^\/card_back\/b10[1-6]\.png$/.test(
+        localStorage.getItem("cardback") || "",
+      )
+    ) {
       setCardback(localStorage.getItem("cardback") || "");
     } else {
       setCardback("/card_back/b101.png"); // Default cardback
@@ -818,7 +829,6 @@ const MatchPage: React.FC = () => {
   }, [isWaitingForPlayers]);
 
   useEffect(() => {
-
     if (currentGamePhase === "PASSING") {
       console.log("It's my turn to pass cards! Starting 45-second timer...");
       setTimer(45); // Start the timer at 45 seconds
@@ -836,8 +846,8 @@ const MatchPage: React.FC = () => {
       }, 1000);
 
       return () => clearInterval(intervalId); // Cleanup on unmount or when `myTurn` changes
-    } else if (myTurn){
-       if (
+    } else if (myTurn) {
+      if (
         currentGamePhase === "FIRSTTRICK" ||
         currentGamePhase === "NORMALTRICK" ||
         currentGamePhase === "FINALTRICK"
@@ -869,14 +879,14 @@ const MatchPage: React.FC = () => {
       console.log("playRandomCard already called. Skipping...");
       return;
     }
-  
+
     playRandomCardCalled.current = true; // Mark as called
-  
+
     if (playableCards.length === 0) {
       console.log("No playable cards available.");
       return;
     }
-  
+
     await apiService.post(`/matches/${matchId}/play/any`, {});
     console.log("Random card played.");
   };
@@ -886,30 +896,30 @@ const MatchPage: React.FC = () => {
       console.log("passRandomCards already called. Skipping...");
       return;
     }
-  
+
     passRandomCardsCalled.current = true; // Mark as called
-  
+
     if (cardsInHand.length < 3) {
       console.log("Not enough cards to pass.");
       return;
     }
-  
+
     const shuffledCards = [...cardsInHand].sort(() => Math.random() - 0.5); // Shuffle the cards
     const randomCardsToPass = shuffledCards.slice(0, 3); // Select the first 3 cards
-  
+
     try {
       const payload = {
         gameId: matchId,
         cards: randomCardsToPass.map((card) => card.code), // Send only the card codes
       };
       console.log("Passing random cards:", payload);
-  
+
       // Make the API request
       const response = await apiService.post(
         `/matches/${matchId}/passing`,
         payload,
       );
-  
+
       if (!response || typeof response !== "object") {
         message.open({
           type: "error",
@@ -920,7 +930,7 @@ const MatchPage: React.FC = () => {
         );
         return;
       }
-  
+
       setHasPassedCards(true);
       setCardsToPass(randomCardsToPass); // Update the state with the passed cards
       console.log("Random cards passed successfully.");
@@ -935,12 +945,11 @@ const MatchPage: React.FC = () => {
         cards: [], // Empty array for SKIP_PASSING
       };
       console.log("Sending skip passing payload:", payload);
-  
+
       // Send the request
       await apiService.post(`/matches/${matchId}/passing`, payload);
       setHasConfirmedSkipPassing(true); // Mark as confirmed
       console.log("Skip passing confirmed.");
-
     } catch (error) {
       handleApiError(error, "An error occurred while confirming skip passing.");
     }
@@ -948,8 +957,7 @@ const MatchPage: React.FC = () => {
 
   useEffect(() => {
     console.log("Has confirmed skip passing:", hasConfirmedSkipPassing);
-  }
-  , [hasConfirmedSkipPassing]);
+  }, [hasConfirmedSkipPassing]);
 
   return (
     <div className={`${styles.page} matchPage`}>
@@ -965,27 +973,28 @@ const MatchPage: React.FC = () => {
       </div>
 
       {(myTurn && timer !== null && timer !== Infinity &&
-        (currentGamePhase === "FIRSTTRICK" ||
-          currentGamePhase === "NORMALTRICK" ||
-          currentGamePhase === "FINALTRICK") ||
-        (currentGamePhase === "PASSING" && timer !== null && timer !== Infinity)) &&
+          (currentGamePhase === "FIRSTTRICK" ||
+            currentGamePhase === "NORMALTRICK" ||
+            currentGamePhase === "FINALTRICK") ||
+        (currentGamePhase === "PASSING" && timer !== null &&
+          timer !== Infinity)) &&
         (
           <div
             style={{
-            display: "flex",
-            justifyContent: "space-between", // Space out the elements
-            alignItems: "center", // Align the items vertically centered
-            position: "absolute",
-            top: "3%",
-            left: "17%",
-            transform: "translateX(-50%)",
-            backgroundColor: "white",
-            color: "black",
-            padding: "8px 15px",
-            borderRadius: "10px",
-            zIndex: 1000,
-            width: "auto", // Ensure the width adjusts based on content
-          }}
+              display: "flex",
+              justifyContent: "space-between", // Space out the elements
+              alignItems: "center", // Align the items vertically centered
+              position: "absolute",
+              top: "3%",
+              left: "17%",
+              transform: "translateX(-50%)",
+              backgroundColor: "white",
+              color: "black",
+              padding: "8px 15px",
+              borderRadius: "10px",
+              zIndex: 1000,
+              width: "auto", // Ensure the width adjusts based on content
+            }}
           >
             Time Remaining: {timer}s
           </div>
@@ -997,7 +1006,7 @@ const MatchPage: React.FC = () => {
             items: [
               { key: "1", label: "Settings", onClick: () => toggleSettings() },
               { key: "2", label: "Rules" /*onClick: () => toggleSettings()*/ },
-              { key: "3", label: "Leave Match", onClick: showLeaveGameModal},
+              { key: "3", label: "Leave Match", onClick: showLeaveGameModal },
               { type: "divider" },
               ...(isFastForwardAvailable && myTurn
                 ? [
@@ -1148,33 +1157,51 @@ const MatchPage: React.FC = () => {
         <div className="hand-3-extension"></div>
 
         <div className="pile">
-          {[trickSlot0, trickSlot1, trickSlot2, trickSlot3].map((slot, index) => {
-            // Render the card if the slot is not empty
-            return slot.length > 0 ? (
-              <div
-                key={index}
-                style={{
-                  position: "absolute",
-                  top: index === 0 ? "75%" : index === 1 ? "50%" : index === 2 ? "25%" : "50%",
-                  left: index === 0 ? "50%" : index === 1 ? "25%" : index === 2 ? "50%" : "75%",
-                  transform: `translate(-50%, -50%) rotate(${index * 90}deg) scale(1.5)`, // Rotate and scale
-                  zIndex: slot[0].zIndex, // Use the zIndex from the card object
-                }}
-              >
-                <Card
-                  code={slot[0].code}
-                  suit={slot[0].suit}
-                  value={slot[0].value}
-                  cardOrder={slot[0].cardOrder}
-                  image={slot[0].image}
-                  backimage={cardback}
-                  flipped
-                  onClick={slot[0].onClick}
-                  zIndex={slot[0].zIndex} // Pass zIndex to the Card component
-                />
-              </div>
-            ) : null; // Render nothing if the slot is empty
-          })}
+          {[trickSlot0, trickSlot1, trickSlot2, trickSlot3].map(
+            (slot, index) => {
+              // Render the card if the slot is not empty
+              return slot.length > 0
+                ? (
+                  <div
+                    key={index}
+                    style={{
+                      position: "absolute",
+                      top: index === 0
+                        ? "75%"
+                        : index === 1
+                        ? "50%"
+                        : index === 2
+                        ? "25%"
+                        : "50%",
+                      left: index === 0
+                        ? "50%"
+                        : index === 1
+                        ? "25%"
+                        : index === 2
+                        ? "50%"
+                        : "75%",
+                      transform: `translate(-50%, -50%) rotate(${
+                        index * 90
+                      }deg) scale(1.5)`, // Rotate and scale
+                      zIndex: slot[0].zIndex, // Use the zIndex from the card object
+                    }}
+                  >
+                    <Card
+                      code={slot[0].code}
+                      suit={slot[0].suit}
+                      value={slot[0].value}
+                      cardOrder={slot[0].cardOrder}
+                      image={slot[0].image}
+                      backimage={cardback}
+                      flipped
+                      onClick={slot[0].onClick}
+                      zIndex={slot[0].zIndex} // Pass zIndex to the Card component
+                    />
+                  </div>
+                )
+                : null; // Render nothing if the slot is empty
+            },
+          )}
         </div>
 
         <div className="game-playerscore0">
@@ -1273,7 +1300,8 @@ const MatchPage: React.FC = () => {
           </div>
         )}
 
-        {currentGamePhase === "PASSING" && cardsToPass.length === 3 && !hasPassedCards && (
+        {currentGamePhase === "PASSING" && cardsToPass.length === 3 &&
+          !hasPassedCards && (
           <button
             type="button"
             onClick={handlePassCards}
@@ -1393,66 +1421,68 @@ const MatchPage: React.FC = () => {
           </div>
         )}
 
-        {((pollingResponse?.matchPhase === "IN_PROGRESS" && pollingResponse?.gamePhase === "RESULT") ||
-         (pollingResponse?.matchPhase === "RESULT" && pollingResponse?.gamePhase === "FINISHED"))
-        && (
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 1000,
-              backgroundColor: "darkgreen",
-              color: "white",
-              padding: "20px",
-              border: "2px solid white",
-              borderRadius: "10px",
-              textAlign: "center",
-              width: "fit-content", // Automatically adjust width based on content
-              maxWidth: "90%", // Optional: Limit the maximum width for responsiveness
-              height: "auto", // Automatically adjust height based on content
-              maxHeight: "80%", // Optional: Limit the maximum height for responsiveness
-              overflowY: "auto", // Add scrolling if content overflows vertically
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)", // Add a shadow for better visibility
-            }}
-          >
-            <div>
-              <h2>Round Complete</h2>
-              <div
-                className={`${modalStyles.modalMessage} ${modalStyles.modalMessageGameResult}`}
-                dangerouslySetInnerHTML={{ __html: htmlContent }}
-              />
-            </div>
-
-            <div style={{ marginBottom: "15px" }} />
-
-            {/* Confirm button or waiting message */}
-            {!isWaitingForPlayers
-              ? (
-                <Button
-                  onClick={handleConfirmNewGame}
-                  className={styles.whiteButton}
-                >
-                  Confirm
-                </Button>
-              )
-              : (
+        {((pollingResponse?.matchPhase === "IN_PROGRESS" &&
+          pollingResponse?.gamePhase === "RESULT") ||
+          (pollingResponse?.matchPhase === "RESULT" &&
+            pollingResponse?.gamePhase === "FINISHED")) &&
+          (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                zIndex: 1000,
+                backgroundColor: "darkgreen",
+                color: "white",
+                padding: "20px",
+                border: "2px solid white",
+                borderRadius: "10px",
+                textAlign: "center",
+                width: "fit-content", // Automatically adjust width based on content
+                maxWidth: "90%", // Optional: Limit the maximum width for responsiveness
+                height: "auto", // Automatically adjust height based on content
+                maxHeight: "80%", // Optional: Limit the maximum height for responsiveness
+                overflowY: "auto", // Add scrolling if content overflows vertically
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)", // Add a shadow for better visibility
+              }}
+            >
+              <div>
+                <h2>Round Complete</h2>
                 <div
-                  style={{
-                    marginTop: "20px",
-                    padding: "10px 20px",
-                    fontSize: "1rem",
-                    backgroundColor: "darkgreen",
-                    color: "white",
-                    borderRadius: "5px",
-                  }}
-                >
-                  Waiting for other players...
-                </div>
-              )}
-          </div>
-        )}
+                  className={`${modalStyles.modalMessage} ${modalStyles.modalMessageGameResult}`}
+                  dangerouslySetInnerHTML={{ __html: htmlContent }}
+                />
+              </div>
+
+              <div style={{ marginBottom: "15px" }} />
+
+              {/* Confirm button or waiting message */}
+              {!isWaitingForPlayers
+                ? (
+                  <Button
+                    onClick={handleConfirmNewGame}
+                    className={styles.whiteButton}
+                  >
+                    Confirm
+                  </Button>
+                )
+                : (
+                  <div
+                    style={{
+                      marginTop: "20px",
+                      padding: "10px 20px",
+                      fontSize: "1rem",
+                      backgroundColor: "darkgreen",
+                      color: "white",
+                      borderRadius: "5px",
+                    }}
+                  >
+                    Waiting for other players...
+                  </div>
+                )}
+            </div>
+          )}
 
         {isLeaveGameModalVisible && (
           <div
@@ -1483,8 +1513,7 @@ const MatchPage: React.FC = () => {
               <p style={{ fontSize: "1.2rem", marginBottom: "20px" }}>
                 Are you sure you want to leave the game?
               </p>
-              
-              
+
               <div style={{ display: "flex", justifyContent: "space-around" }}>
                 <Button
                   onClick={handleLeaveGame}
@@ -1507,7 +1536,6 @@ const MatchPage: React.FC = () => {
           </div>
         )}
       </div>
-
 
       {(pollingResponse?.matchPhase === "FINISHED") && (
         <div
@@ -1534,9 +1562,7 @@ const MatchPage: React.FC = () => {
           <div>
             <h2>Match Finished</h2>
             <div
-              className={`${modalStyles.modalMessage} ${                
-                  modalStyles.modalMessageMatchFinished
-                }`}
+              className={`${modalStyles.modalMessage} ${modalStyles.modalMessageMatchFinished}`}
               dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
           </div>
@@ -1544,18 +1570,16 @@ const MatchPage: React.FC = () => {
             className={styles.whiteButton}
             onClick={() => router.push("/landingpageuser")} // Route to landing page
             style={{
-            marginTop: "20px",
-            marginBottom: "20px"
-
-          }}
+              marginTop: "20px",
+              marginBottom: "20px",
+            }}
           >
             Leave Match
-          </Button>          
+          </Button>
         </div>
       )}
 
-
-        <DebugOverlay gameData={debugData} />
+      <DebugOverlay gameData={debugData} />
     </div>
   );
 };

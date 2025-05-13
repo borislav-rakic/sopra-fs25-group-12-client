@@ -32,7 +32,7 @@ const Card: React.FC<cardProps> = (
     isPlayable = false,
     isPassable = false,
     isDisabled = false,
-    zIndex
+    zIndex,
   },
 ) => {
   const [flipped] = useState(initialFlipped);
@@ -54,7 +54,7 @@ const Card: React.FC<cardProps> = (
       ${isPassable ? styles.passableCard : ""}
       ${isDisabled ? styles.disabledCard : ""}`}
       onClick={handleCardClick}
-      style={{zIndex}}
+      style={{ zIndex }}
     >
       {flipped
         ? (

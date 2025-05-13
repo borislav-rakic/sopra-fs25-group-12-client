@@ -161,14 +161,13 @@ const StartPage: React.FC = () => {
         }
 
         Object.entries(match.invites || {}).forEach(([slotStr, userId]) => {
-          const slot = (Number(slotStr) -1) % 4;
+          const slot = (Number(slotStr) - 1) % 4;
           const index = slot;
 
           const user = usersRef.current.find((u) => Number(u.id) === userId);
           updatedSelectedPlayers[index] = user?.username ?? "Waiting...";
           updatedInviteStatus[index] = "waiting";
           updatedPendingInvites[index] = userId;
-
         });
 
         setSelectedPlayers(updatedSelectedPlayers);
@@ -180,39 +179,39 @@ const StartPage: React.FC = () => {
           router.push(`/match/${gameId}`);
         }
       } catch (error) {
-            console.log("Error caught:", error); // Inspect the error structure
-      
-            // Check if the error has a `response` property (e.g., Axios errors)
-            if (
-              typeof error === "object" && error !== null && "status" in error &&
-              error.status === 403
-            ) {
-              message.open({
-                type: "error",
-                content: "You are not authorized to view this match.",
-              });
-              router.push("/landingpageuser");
-            } else if (
-              typeof error === "object" && error !== null && "status" in error &&
-              error.status === 409
-            ) {
-              message.open({
-                type: "error",
-                content: "You are not authorized to view this match.",
-              });
-              router.push("/landingpageuser");
-            } else if (error instanceof Error) {
-              // Handle standard Error objects
-              handleApiError(error, "Failed to fetch match data.");
-            } else {
-              // Fallback for unexpected error structures
-              console.error("Unexpected error structure:", error);
-              message.open({
-                type: "error",
-                content: "An unexpected error occurred. Please try again.",
-              });
-            }
-          }
+        console.log("Error caught:", error); // Inspect the error structure
+
+        // Check if the error has a `response` property (e.g., Axios errors)
+        if (
+          typeof error === "object" && error !== null && "status" in error &&
+          error.status === 403
+        ) {
+          message.open({
+            type: "error",
+            content: "You are not authorized to view this match.",
+          });
+          router.push("/landingpageuser");
+        } else if (
+          typeof error === "object" && error !== null && "status" in error &&
+          error.status === 409
+        ) {
+          message.open({
+            type: "error",
+            content: "You are not authorized to view this match.",
+          });
+          router.push("/landingpageuser");
+        } else if (error instanceof Error) {
+          // Handle standard Error objects
+          handleApiError(error, "Failed to fetch match data.");
+        } else {
+          // Fallback for unexpected error structures
+          console.error("Unexpected error structure:", error);
+          message.open({
+            type: "error",
+            content: "An unexpected error occurred. Please try again.",
+          });
+        }
+      }
     };
 
     const loadCurrentUser = async () => {
@@ -288,7 +287,7 @@ const StartPage: React.FC = () => {
       });
       return;
     }
-  
+
     try {
       const currentUser = await apiService.get<User>("/users/me");
       if (user.id === currentUser.id) {
@@ -302,23 +301,23 @@ const StartPage: React.FC = () => {
         userId: user.id,
         playerSlot: index,
       });
-  
+
       const updated = [...selectedPlayers];
       updated[index] = user.username;
       setSelectedPlayers(updated);
-  
+
       const statusUpdate = [...inviteStatus];
       statusUpdate[index] = "waiting";
       setInviteStatus(statusUpdate);
-  
+
       const updatedPending = [...pendingInvites];
       updatedPending[index] = Number(user.id);
       setPendingInvites(updatedPending);
-  
+
       const toggleInviteCopy = [...showInvite];
       toggleInviteCopy[index] = false; // Close the invite window
       setShowInvite(toggleInviteCopy);
-  
+
       message.open({
         type: "success",
         content: `Invitation sent to ${username}`,
@@ -450,19 +449,19 @@ const StartPage: React.FC = () => {
       const updated = [...selectedPlayers];
       updated[index] = "computer";
       setSelectedPlayers(updated);
-    
+
       const toggle = [...showDifficulty];
       toggle[index] = true;
       setShowDifficulty(toggle);
-    
+
       const toggleInviteCopy = [...showInvite];
       toggleInviteCopy[index] = false; // Close the invite window
       setShowInvite(toggleInviteCopy);
-    
+
       const difficulties = [...selectedDifficulties];
       difficulties[index] = difficulty;
       setSelectedDifficulties(difficulties);
-    
+
       try {
         await apiService.post(`/matches/${gameId}/ai`, {
           difficulty: difficulty,
