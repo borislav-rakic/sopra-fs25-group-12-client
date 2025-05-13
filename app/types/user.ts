@@ -7,12 +7,12 @@ export interface User {
   status: string | null;
   scoreTotal: number;
   gamesPlayed: number;
-  avgPlacement: number;
+  avgGamePlacement: number;
   moonShots: number;
   perfectGames: number;
   perfectMatches: number;
-  currentStreak: number;
-  longestStreak: number;
+  currentGameStreak: number;
+  longestGameStreak: number;
 }
 
 export interface UserAuthDTO {
