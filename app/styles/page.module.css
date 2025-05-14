@@ -196,3 +196,12 @@ a.secondary {
   top: 50%;
   transform: translateY(-50%) rotate(90deg);
 }
+
+.cardImage {
+  max-width: 275px;
+  height: auto;
+  aspect-ratio: 384 / 262;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}

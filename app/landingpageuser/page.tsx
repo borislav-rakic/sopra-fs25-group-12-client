@@ -186,13 +186,22 @@ const LandingPageUser: React.FC = () => {
             </div>
           )}
 
-          <Image
-            src="/LandingPageCards.png"
-            alt="Hearts Attack Cards"
-            width={200}
-            height={150}
-            className={styles.cardImage}
-          />
+          <div
+            style={{
+              position: "relative",
+              width: "275px",
+              aspectRatio: "275 / 187",
+            }}
+          >
+            <Image
+              src="/LandingPageCards.png"
+              alt="Hearts Attack Cards"
+              fill
+              className={styles.cardImage}
+              style={{ objectFit: "contain" }}
+              priority
+            />
+          </div>
 
           <h1 className="luckiestGuy" style={{ marginTop: 24 }}>
             HEARTS ATTACK!
