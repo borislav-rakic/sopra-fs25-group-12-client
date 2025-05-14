@@ -13,7 +13,7 @@ import { MatchMessage } from "@/types/matchMessage"; // adjust path as needed
 import cardStyles from "@/styles/card.module.css";
 
 // import { Match } from "@/types/match";
-import { useEffect, useState, useRef, use } from "react";
+import { useEffect, useState, useRef } from "react";
 import { PollingDTO } from "@/types/polling";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
@@ -99,42 +99,6 @@ const MatchPage: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
-
-  const [temporaryCards, setTemporaryCards] = useState<
-    { id: string; startX: number; startY: number; endX: number; endY: number; card: cardProps }[]
-  >([]);
-
-  type TemporaryCard = {
-    id: string;
-    startX: number;
-    startY: number;
-    endX: number;
-    endY: number;
-    card: cardProps;
-  };
-
-  // Add this near your other state declarations
-  const [animatedCards, setAnimatedCards] = useState<Map<string, TemporaryCard>>(new Map());
-
-  const addAnimatedCard = useCallback((card: TemporaryCard) => {
-    setAnimatedCards(prev => {
-      const newMap = new Map(prev);
-      if (!newMap.has(card.id)) {  // Only add if card doesn't exist
-        newMap.set(card.id, card);
-      }
-      return newMap;
-    });
-  }, []);
-
-  const removeAnimatedCard = useCallback((cardId: string) => {
-    setAnimatedCards(prev => {
-      const newMap = new Map(prev);
-      newMap.delete(cardId);
-      return newMap;
-    });
-  }, []);
-
-  
 
   //const [slot, setSlot] = useState(1);
   //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
@@ -977,7 +941,7 @@ const MatchPage: React.FC = () => {
         currentGamePhase === "FINALTRICK"
       ) {
         console.log("It's my turn to play a card! Starting 30-second timer...");
-        setTimer(3000); // Start the timer at 30 seconds
+        setTimer(30); // Start the timer at 30 seconds
         playRandomCardCalled.current = false;
 
         const intervalId = setInterval(() => {
@@ -1085,75 +1049,6 @@ const MatchPage: React.FC = () => {
   }
   , [hasConfirmedSkipPassing]);
 
-
-const MovingCard: React.FC<{
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
-  card: cardProps;
-}> = ({ startX, startY, endX, endY, card }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const duration = 350; // Animation duration in milliseconds
-    const startTime = performance.now();
-
-    const animate = (currentTime: number) => {
-      const elapsedTime = currentTime - startTime;
-      const progress = Math.min(elapsedTime / duration, 1); // Clamp progress between 0 and 1
-
-      const currentX = startX + (endX - startX) * progress;
-      const currentY = startY + (endY - startY) * progress;
-
-      if (cardRef.current) {
-        cardRef.current.style.transform = `translate(${currentX}px, ${currentY}px)`;
-      }
-
-      if (progress < 1) {
-        animationFrameRef.current = requestAnimationFrame(animate);
-      }
-    };
-
-    animationFrameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, [startX, startY, endX, endY]);
-
-  return (
-    <div
-      ref={cardRef}
-      className={cardStyles.cardMove}
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        transform: `translate(${startX}px, ${startY}px)`, // Set initial position
-        zIndex: 500,
-      }}
-    >
-      <Card
-        code={card.code}
-        suit={card.suit}
-        value={card.value}
-        cardOrder={card.cardOrder}
-        image={card.image}
-        backimage={card.backimage}
-        flipped={true}
-        onClick={() => console.log("Card clicked")}
-      />
-    </div>
-  );
-};
-
-  useEffect(() => {
-    console.log("Current temporary cards:", temporaryCards);
-  }, [temporaryCards]);
 
   return (
     <div className={`${styles.page} matchPage`}>
