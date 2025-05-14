@@ -556,7 +556,7 @@ a {
   background-color: lightgray;
   border-radius: 6px;
   top: 80%;
-  left: 80%;
+  left: 76%;
   transform: rotate(0deg);
   transform-origin: top left;
   text-align: left;
@@ -573,7 +573,7 @@ a {
   height: 15%;
   background-color: lightgray;
   border-radius: 6px;
-  top: 80%;
+  top: 76%;
   left: 5%;
   transform: rotate(0deg);
   transform-origin: top left;
@@ -592,7 +592,7 @@ a {
   background-color: lightgray;
   border-radius: 6px;
   top: 5%;
-  left: 5%;
+  left: 9%;
   transform: rotate(0deg);
   transform-origin: top left;
   text-align: left;
@@ -609,7 +609,7 @@ a {
   height: 15%;
   background-color: lightgray;
   border-radius: 6px;
-  top: 5%;
+  top: 9%;
   left: 80%;
   transform: rotate(0deg);
   transform-origin: top left;
@@ -633,6 +633,7 @@ a {
   border-radius: 100%;
   top: 5%;
   left: 5%;
+  margin-bottom: 10px;
 }
 
 .game-avatarbox img {

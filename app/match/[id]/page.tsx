@@ -1326,7 +1326,6 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {getDisplayName(players[0])}
           </div>
-          <div className="game-playerscore">Score: {roundScore[0]}</div>
         </div>
 
         <div className="game-playerscore1">
@@ -1344,7 +1343,6 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {getDisplayName(players[1])}
           </div>
-          <div className="game-playerscore">Score: {roundScore[1]}</div>
         </div>
 
         <div className="game-playerscore2">
@@ -1362,7 +1360,6 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {getDisplayName(players[2])}
           </div>
-          <div className="game-playerscore">Score: {roundScore[2]}</div>
         </div>
 
         <div className="game-playerscore3">
@@ -1380,7 +1377,6 @@ const MatchPage: React.FC = () => {
           <div className="game-playername">
             {getDisplayName(players[3])}
           </div>
-          <div className="game-playerscore">Score: {roundScore[3]}</div>
         </div>
 
         {currentGamePhase === "PASSING" && cardsToPass.length < 3 && (
