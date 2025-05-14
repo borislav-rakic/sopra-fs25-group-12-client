@@ -21,13 +21,22 @@ type LeaderboardRow = {
 const filterOptions = [
   { key: "scoreTotal", label: "Score Total" },
   { key: "gamesPlayed", label: "Games Played" },
-  { key: "avgGameRanking", label: "Avg. Ranking" },
+  { key: "matchesPlayed", label: "Matches Played" },
+  { key: "avgGameRanking", label: "Avg. Game Ranking" },
+  { key: "avgMatchRanking", label: "Avg. Match Ranking" },
   { key: "moonShots", label: "Moon Shots" },
   { key: "perfectGames", label: "Perfect Games" },
   { key: "perfectMatches", label: "Perfect Matches" },
-  { key: "currentGameStreak", label: "Current Streak" },
-  { key: "longestGameStreak", label: "Longest Streak" },
+  { key: "currentGameStreak", label: "Current Game Streak" },
+  { key: "longestGameStreak", label: "Longest Game Streak" },
+  { key: "currentMatchStreak", label: "Current Match Streak" },
+  { key: "longestMatchStreak", label: "Longest Match Streak" },
 ];
+
+const formatStatValue = (value: unknown): string | number => {
+  if (typeof value !== "number") return String(value); // safe fallback
+  return Number.isInteger(value) ? value : value.toFixed(2);
+};
 
 const LeaderboardPage: React.FC = () => {
   const apiService = useApi();
@@ -62,7 +71,7 @@ const LeaderboardPage: React.FC = () => {
         selectedFilter,
       dataIndex: "score_total",
       key: "score_total",
-      render: (value: number) => value?.toFixed?.(3) ?? value, // Format number if possible
+      render: (value: number) => formatStatValue(value),
     },
   ];
 

@@ -196,3 +196,44 @@ a.secondary {
   top: 50%;
   transform: translateY(-50%) rotate(90deg);
 }
+
+.cardImage {
+  max-width: 275px;
+  height: auto;
+  aspect-ratio: 384 / 262;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.collapsePanel {
+  background-color: #1f3d2b;
+  border-radius: 12px;
+  border: 1px solid #335c43;
+}
+
+.bonusList {
+  list-style: none;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  background-color: #1f3d2b;
+  /* dark green for card feel */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid #335c43;
+}
+
+.bonusList li {
+  margin-bottom: 0.75em;
+  font-size: 1rem;
+  color: #eaf8f0;
+  /* soft mint-like white */
+  display: flex;
+  align-items: center;
+}
+
+.emoji {
+  margin-right: 0.6em;
+  font-size: 1.3em;
+  flex-shrink: 0;
+}

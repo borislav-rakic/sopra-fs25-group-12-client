@@ -186,13 +186,22 @@ const LandingPageUser: React.FC = () => {
             </div>
           )}
 
-          <Image
-            src="/LandingPageCards.png"
-            alt="Hearts Attack Cards"
-            width={200}
-            height={150}
-            className={styles.cardImage}
-          />
+          <div
+            style={{
+              position: "relative",
+              width: "275px",
+              aspectRatio: "275 / 187",
+            }}
+          >
+            <Image
+              src="/LandingPageCards.png"
+              alt="Hearts Attack Cards"
+              fill
+              className={styles.cardImage}
+              style={{ objectFit: "contain" }}
+              priority
+            />
+          </div>
 
           <h1 className="luckiestGuy" style={{ marginTop: 24 }}>
             HEARTS ATTACK!
@@ -240,36 +249,29 @@ const LandingPageUser: React.FC = () => {
                 </Button>
               </Col>
             </Row>
-            <Row justify="center">
-              {user && user.isGuest && (
-                <>
-                  <Col>
-                    <span style={{ marginLeft: "1em" }}>
-                      You are logged in as a guest only.
-                    </span>
+            {user && user.isGuest && (
+              <Row justify="center">
+                <Col style={{ textAlign: "center", marginTop: "1em" }}>
+                  <p style={{ color: "#ccc", marginBottom: "0.5em" }}>
+                    You are logged in as a <strong>guest</strong>.
+                  </p>
+                  <Space>
                     <Button
-                      block
                       className={styles.whiteButton}
                       onClick={() => router.push("/login")}
-                      style={{ marginLeft: "1em" }}
                     >
                       Login
                     </Button>
-                  </Col>
-
-                  <Col>
                     <Button
-                      block
                       className={styles.whiteButton}
                       onClick={() => router.push("/register")}
-                      style={{ marginLeft: "1em" }}
                     >
                       Register
                     </Button>
-                  </Col>
-                </>
-              )}
-            </Row>
+                  </Space>
+                </Col>
+              </Row>
+            )}
           </Space>
 
           <SettingsPopup

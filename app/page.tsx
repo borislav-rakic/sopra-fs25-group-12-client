@@ -52,13 +52,22 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         <div className="contentContainer">
-          <Image
-            src="/LandingPageCards.png" // Replace with the actual path of your image
-            alt="Hearts Attack Cards"
-            width={275} // Adjust width as needed
-            height={225} // Adjust height as needed
-            className={styles.cardImage} // Add styling as needed in CSS
-          />
+          <div
+            style={{
+              position: "relative",
+              width: "275px",
+              aspectRatio: "275 / 187",
+            }}
+          >
+            <Image
+              src="/LandingPageCards.png"
+              alt="Hearts Attack Cards"
+              fill
+              className={styles.cardImage}
+              style={{ objectFit: "contain" }}
+              priority
+            />
+          </div>
 
           <h1 className="luckiestGuy" style={{ marginTop: 15 }}>
             HEARTS ATTACK!
