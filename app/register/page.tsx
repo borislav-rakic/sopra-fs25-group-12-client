@@ -84,6 +84,7 @@ const Register: React.FC = () => {
           }]}
         >
           <Input
+            type="password"
             placeholder="Enter new Password"
             onChange={(e) => {
               const noSpaces = e.target.value.replace(/\s/g, "");
