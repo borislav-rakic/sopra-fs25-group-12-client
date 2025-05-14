@@ -5,6 +5,7 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "@/styles/globals.css";
 import { InviteHandler } from "@/components/inviteHandler";
 import { Luckiest_Guy } from "next/font/google";
+import { usePathname } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +45,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  // Define pages where InviteHandler should not be rendered
+  const excludeInviteHandler = ["/start", "/match"];
+  const shouldRenderInviteHandler = !excludeInviteHandler.includes(pathname);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -84,7 +90,7 @@ export default function RootLayout({
         >
           <AntdRegistry>
             {children}
-            <InviteHandler />
+            {shouldRenderInviteHandler && <InviteHandler />}
           </AntdRegistry>
         </ConfigProvider>
       </body>
