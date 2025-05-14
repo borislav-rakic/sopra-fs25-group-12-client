@@ -361,8 +361,10 @@ const MatchPage: React.FC = () => {
               } else {
                 // Remove the element when animation is complete
                 setTimeout(() => {
-                  animatedCardDiv.remove();
                   setSlot([generateCard(card, 0, zIndex)]);
+                  setTimeout(() => {
+                    animatedCardDiv.remove();
+                  }, 250);
                 }, 100);
               }
             };
