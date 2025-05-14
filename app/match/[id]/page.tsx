@@ -10,9 +10,10 @@ import modalStyles from "@/styles/modalMessage.module.css";
 import { useApi } from "@/hooks/useApi";
 import { handleApiError } from "@/utils/errorHandlers";
 import { MatchMessage } from "@/types/matchMessage"; // adjust path as needed
+import cardStyles from "@/styles/card.module.css";
 
 // import { Match } from "@/types/match";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, use } from "react";
 import { PollingDTO } from "@/types/polling";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
@@ -98,6 +99,42 @@ const MatchPage: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
+
+  const [temporaryCards, setTemporaryCards] = useState<
+    { id: string; startX: number; startY: number; endX: number; endY: number; card: cardProps }[]
+  >([]);
+
+  type TemporaryCard = {
+    id: string;
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    card: cardProps;
+  };
+
+  // Add this near your other state declarations
+  const [animatedCards, setAnimatedCards] = useState<Map<string, TemporaryCard>>(new Map());
+
+  const addAnimatedCard = useCallback((card: TemporaryCard) => {
+    setAnimatedCards(prev => {
+      const newMap = new Map(prev);
+      if (!newMap.has(card.id)) {  // Only add if card doesn't exist
+        newMap.set(card.id, card);
+      }
+      return newMap;
+    });
+  }, []);
+
+  const removeAnimatedCard = useCallback((cardId: string) => {
+    setAnimatedCards(prev => {
+      const newMap = new Map(prev);
+      newMap.delete(cardId);
+      return newMap;
+    });
+  }, []);
+
+  
 
   //const [slot, setSlot] = useState(1);
   //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
@@ -200,7 +237,7 @@ const MatchPage: React.FC = () => {
   }), [cardback]);
 
   const generateCard = useCallback((code: string, order: number, zIndex: number = 10): cardProps => {
-    console.log("Generating card:", code, order, zIndex);
+    //console.log("Generating card:", code, order, zIndex);
     const rank = code[0];
     const suit = code[1];
 
@@ -255,19 +292,117 @@ const MatchPage: React.FC = () => {
       card: string,
       setSlot: (val: cardProps[]) => void,
       current: cardProps[],
-      zIndex: number,
+      zIndex: number
     ) => {
       if (
         (card === null && current.length > 0) || // Clear the slot if it has data but should be empty
         (current.length === 0 && card !== null) || // Update the slot if it is empty but should have data
         (current.length > 0 && current[0].code !== card) // Update the slot if the card code has changed
       ) {
-        setSlot((card === null || card === "") ? [] : [generateCard(card, 0, zIndex)]);
+        // Create a temporary card before generating the actual card
+        if (card !== null && card !== "") {
+          const tempCardId = `${card}-${Date.now()}`;
+          
+          const HAND_POSITIONS = [
+            { x: "50%", y: "80%" }, // Player's hand (bottom center)
+            { x: "20%", y: "50%" }, // Opponent 1's hand (right center)
+            { x: "50%", y: "20%" }, // Opponent 2's hand (top center)
+            { x: "80%", y: "50%" }, // Opponent 3's hand (left center)
+          ];
+
+          const TRICK_POSITIONS = [
+            { x: "50%", y: "60%" }, // Trick slot 0
+            { x: "40%", y: "50%" }, // Trick slot 1
+            { x: "50%", y: "40%" }, // Trick slot 2
+            { x: "60%", y: "50%" }, // Trick slot 3
+          ];
+
+          const ROTATIONS = [
+          0,    // Position 0 (bottom)
+          90,   // Position 1 (left)
+          0,    // Position 2 (top)
+          90,   // Position 3 (right)
+        ];
+
+          const gameboard = document.querySelector(".gameboard") as HTMLElement;
+          const gameboardRect = gameboard.getBoundingClientRect();
+
+          const cardWidth = 100; // Width of the card in pixels
+          const cardHeight = 140; // Height of the card in pixels
+
+          const { x: startXPercent, y: startYPercent } = HAND_POSITIONS[position];
+          const { x: endXPercent, y: endYPercent } = TRICK_POSITIONS[position];
+
+          const startX = (parseFloat(startXPercent) / 100) * gameboardRect.width;
+          const startY = (parseFloat(startYPercent) / 100) * gameboardRect.height;
+          const endX = (parseFloat(endXPercent) / 100) * gameboardRect.width;
+          const endY = (parseFloat(endYPercent) / 100) * gameboardRect.height;
+          const rotation = ROTATIONS[position];
+
+          // Create a new div element for the animated card
+          const animatedCardDiv = document.createElement('div');
+          animatedCardDiv.id = tempCardId;
+          animatedCardDiv.style.position = 'absolute';
+          animatedCardDiv.style.width = `${cardWidth}px`;
+          animatedCardDiv.style.height = `${cardHeight}px`;
+          animatedCardDiv.style.left = `${startX - cardWidth / 2}px`;
+          animatedCardDiv.style.top = `${startY - cardHeight / 2}px`;
+          animatedCardDiv.style.transform = `rotate(${rotation}deg)`;
+          animatedCardDiv.style.zIndex = '500';
+
+          // Set transform-origin to center
+          animatedCardDiv.style.transformOrigin = 'center';
+          
+          // Create the card element (you'll need to adjust this based on your Card component)
+          const cardElement = document.createElement('div');
+          cardElement.style.width = '100%';
+          cardElement.style.height = '100%';
+          cardElement.innerHTML = `<img src="${generateCard(card, 0, zIndex).image}" style="width: 100%; height: 100%;" />`;
+          animatedCardDiv.appendChild(cardElement);
+          
+          // Add the animated card to the DOM
+          const temporaryCardsContainer = document.querySelector(`.${cardStyles.temporaryCards}`);
+          if (temporaryCardsContainer) {
+            temporaryCardsContainer.appendChild(animatedCardDiv);
+
+            // Animate using requestAnimationFrame
+            const startTime = performance.now();
+            const duration = 350;
+
+            const animate = (currentTime: number) => {
+              const elapsedTime = currentTime - startTime;
+              const progress = Math.min(elapsedTime / duration, 1);
+
+              const currentX = startX + (endX - startX) * progress;
+              const currentY = startY + (endY - startY) * progress;
+
+              animatedCardDiv.style.left = `${currentX - cardWidth / 2}px`;
+              animatedCardDiv.style.top = `${currentY - cardHeight / 2}px`;
+
+
+              if (progress < 1) {
+                requestAnimationFrame(animate);
+              } else {
+                // Remove the element when animation is complete
+                setTimeout(() => {
+                  animatedCardDiv.remove();
+                  setSlot([generateCard(card, 0, zIndex)]);
+                }, 100);
+              }
+            };
+
+            requestAnimationFrame(animate);
+          }
+        } else {
+          setSlot([]);
+        }
+
+        //setSlot(card === null || card === "" ? [] : [generateCard(card, 0, zIndex)]);
         console.log(`Slot ${position} updated:`, card || "empty");
       } else {
         console.log(
           `Slot ${position} unchanged:`,
-          current[0]?.code || "empty",
+          current[0]?.code || "empty"
         );
       }
     };
@@ -668,7 +803,6 @@ const MatchPage: React.FC = () => {
           c.code !== card.code
         );
         setCardsInHand(updatedCardsInHand);
-        setTrickSlot0([card]);
         setCurrentPlayer(players[1] || "");
         console.log("currentPlayer:", currentPlayer);
 
@@ -843,7 +977,7 @@ const MatchPage: React.FC = () => {
         currentGamePhase === "FINALTRICK"
       ) {
         console.log("It's my turn to play a card! Starting 30-second timer...");
-        setTimer(30); // Start the timer at 30 seconds
+        setTimer(3000); // Start the timer at 30 seconds
         playRandomCardCalled.current = false;
 
         const intervalId = setInterval(() => {
@@ -951,6 +1085,76 @@ const MatchPage: React.FC = () => {
   }
   , [hasConfirmedSkipPassing]);
 
+
+const MovingCard: React.FC<{
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  card: cardProps;
+}> = ({ startX, startY, endX, endY, card }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const animationFrameRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const duration = 350; // Animation duration in milliseconds
+    const startTime = performance.now();
+
+    const animate = (currentTime: number) => {
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / duration, 1); // Clamp progress between 0 and 1
+
+      const currentX = startX + (endX - startX) * progress;
+      const currentY = startY + (endY - startY) * progress;
+
+      if (cardRef.current) {
+        cardRef.current.style.transform = `translate(${currentX}px, ${currentY}px)`;
+      }
+
+      if (progress < 1) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [startX, startY, endX, endY]);
+
+  return (
+    <div
+      ref={cardRef}
+      className={cardStyles.cardMove}
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        transform: `translate(${startX}px, ${startY}px)`, // Set initial position
+        zIndex: 500,
+      }}
+    >
+      <Card
+        code={card.code}
+        suit={card.suit}
+        value={card.value}
+        cardOrder={card.cardOrder}
+        image={card.image}
+        backimage={card.backimage}
+        flipped={true}
+        onClick={() => console.log("Card clicked")}
+      />
+    </div>
+  );
+};
+
+  useEffect(() => {
+    console.log("Current temporary cards:", temporaryCards);
+  }, [temporaryCards]);
+
   return (
     <div className={`${styles.page} matchPage`}>
       <div className="message-box">
@@ -1045,6 +1249,11 @@ const MatchPage: React.FC = () => {
       </div>
 
       <div className="gameboard">
+
+      <div className={`${cardStyles.temporaryCards}`} />
+
+
+
         <div className="hand-0">
           {cardsInHand.map((card, index) => (
             <Card
