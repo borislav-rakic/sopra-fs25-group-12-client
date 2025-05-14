@@ -34,10 +34,15 @@ export default function ScoringRules() {
         Scoring Overview
       </Title>
 
-      <Paragraph style={{ color: "white", fontSize: "1rem", marginBottom: "1.5rem" }}>
-        In <strong>Hearts Attack</strong>, you generally want to <strong>avoid scoring during the game</strong>.
-        However, for Player Stats and leaderboards, you can earn points for various accomplishments.
-        These achievements — like <strong>winning games or matches, shooting the moon</strong>, and more — are detailed below.
+      <Paragraph
+        style={{ color: "white", fontSize: "1rem", marginBottom: "1.5rem" }}
+      >
+        In <strong>Hearts Attack</strong>, you generally want to{" "}
+        <strong>avoid scoring during the game</strong>. However, for Player
+        Stats and leaderboards, you can earn points for various accomplishments.
+        These achievements — like{" "}
+        <strong>winning games or matches, shooting the moon</strong>, and more —
+        are detailed below.
       </Paragraph>
 
       {/* In-Game Scoring */}
@@ -45,8 +50,8 @@ export default function ScoringRules() {
         In-Game Scoring
       </Title>
       <Paragraph style={{ color: "white" }}>
-        During each round, players accumulate penalty points by taking certain cards in tricks.
-        The goal is to avoid gaining points.
+        During each round, players accumulate penalty points by taking certain
+        cards in tricks. The goal is to avoid gaining points.
       </Paragraph>
       <Table
         columns={inGameColumns}
@@ -56,8 +61,10 @@ export default function ScoringRules() {
         size="small"
       />
       <Paragraph style={{ color: "white" }}>
-        <strong>Shooting the Moon:</strong> If you collect all 13 Hearts and the Queen of Spades in a round,
-        you score <strong>0 points</strong>, and each other player scores <strong>+26 points</strong>.
+        <strong>Shooting the Moon:</strong>{" "}
+        If you collect all 13 Hearts and the Queen of Spades in a round, you
+        score <strong>0 points</strong>, and each other player scores{" "}
+        <strong>+26 points</strong>.
       </Paragraph>
 
       {/* Game-Level Bonuses */}
@@ -68,15 +75,29 @@ export default function ScoringRules() {
         After each 13-round game, bonus points are awarded based on performance:
       </Paragraph>
       <ul className={styles.bonusList}>
-        <li><span className={styles.emoji}>🏆</span> +1 for game winners (lowest score)</li>
-        <li><span className={styles.emoji}>❌</span> -1 for game losers (highest score)</li>
-        <li><span className={styles.emoji}>⚖️</span> Neutral (0) for others</li>
-        <li><span className={styles.emoji}>🌙</span> +3 for shooting the moon</li>
-        <li><span className={styles.emoji}>🎯</span> +1 for a perfect game (0 points, no moon shot)</li>
+        <li>
+          <span className={styles.emoji}>🏆</span>{" "}
+          +1 for game winners (lowest score)
+        </li>
+        <li>
+          <span className={styles.emoji}>❌</span>{" "}
+          -1 for game losers (highest score)
+        </li>
+        <li>
+          <span className={styles.emoji}>⚖️</span> Neutral (0) for others
+        </li>
+        <li>
+          <span className={styles.emoji}>🌙</span> +3 for shooting the moon
+        </li>
+        <li>
+          <span className={styles.emoji}>🎯</span>{" "}
+          +1 for a perfect game (0 points, no moon shot)
+        </li>
       </ul>
       <Paragraph style={{ color: "white" }}>
         <em>
-          Game stats tracked include: <strong>games played</strong>, <strong>average game ranking</strong>, and <strong>streaks</strong>.
+          Game stats tracked include: <strong>games played</strong>,{" "}
+          <strong>average game ranking</strong>, and <strong>streaks</strong>.
         </em>
       </Paragraph>
 
@@ -85,7 +106,8 @@ export default function ScoringRules() {
         Match-Level Scoring
       </Title>
       <Paragraph style={{ color: "white" }}>
-        After a match (multiple games), players receive points based on their overall rank:
+        After a match (multiple games), players receive points based on their
+        overall rank:
       </Paragraph>
       <Table
         columns={matchColumns}
@@ -95,16 +117,27 @@ export default function ScoringRules() {
         size="small"
       />
       <Paragraph style={{ color: "white" }}>
-        Bonus points are also awarded for defeating AI opponents or achieving a perfect match:
+        Bonus points are also awarded for defeating AI opponents or achieving a
+        perfect match:
       </Paragraph>
       <ul className={styles.bonusList}>
-        <li><span className={styles.emoji}>🤖</span> +4 for 1st place vs at least one hard AI</li>
-        <li><span className={styles.emoji}>🤖</span> +2 for 1st place vs at least one medium AI</li>
-        <li><span className={styles.emoji}>🌟</span> +20 for a perfect match (0 points across all games)</li>
+        <li>
+          <span className={styles.emoji}>🤖</span>{" "}
+          +4 for 1st place vs at least one hard AI
+        </li>
+        <li>
+          <span className={styles.emoji}>🤖</span>{" "}
+          +2 for 1st place vs at least one medium AI
+        </li>
+        <li>
+          <span className={styles.emoji}>🌟</span>{" "}
+          +20 for a perfect match (0 points across all games)
+        </li>
       </ul>
       <Paragraph style={{ color: "white" }}>
         <em>
-          Match stats tracked include: <strong>matches played</strong> and <strong>average match ranking</strong>.
+          Match stats tracked include: <strong>matches played</strong> and{" "}
+          <strong>average match ranking</strong>.
         </em>
       </Paragraph>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Table, Typography } from "antd";
+import { Button, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import "@/styles/globals.css";
 import styles from "@/styles/page.module.css";
@@ -8,13 +8,13 @@ import ScoringRules from "@/components/ScoringRules";
 
 const { Title, Paragraph } = Typography;
 
-const scoringData = [
+const _scoringData = [
   { key: "1", card: "Each Heart", points: "1 point" },
   { key: "2", card: "Queen of Spades", points: "13 points" },
   { key: "3", card: "All other cards", points: "0 points" },
 ];
 
-const scoringColumns = [
+const _scoringColumns = [
   {
     title: "Card",
     dataIndex: "card",
@@ -31,7 +31,10 @@ const RulesPage: React.FC = () => {
   const router = useRouter();
 
   return (
-    <div className="contentContainer" style={{maxWidth:750, textAlign: "left" }}>
+    <div
+      className="contentContainer"
+      style={{ maxWidth: 750, textAlign: "left" }}
+    >
       <Title level={2} style={{ color: "white" }}>💡 How to Play Hearts</Title>
       <Paragraph style={{ color: "white" }}>
         Welcome to <strong>Hearts Attack!</strong>{" "}
@@ -59,32 +62,40 @@ const RulesPage: React.FC = () => {
       </Paragraph>
 
       <Paragraph style={{ color: "white", marginBottom: "0.5em" }}>
-        <strong>Round 1:</strong> Pass to the player on your <strong>left</strong>.
+        <strong>Round 1:</strong> Pass to the player on your{" "}
+        <strong>left</strong>.
         <br />
-        <strong>Round 2:</strong> Pass to the player seated <strong>across</strong> from you.
+        <strong>Round 2:</strong> Pass to the player seated{" "}
+        <strong>across</strong> from you.
         <br />
-        <strong>Round 3:</strong> Pass to the player on your <strong>right</strong>.
+        <strong>Round 3:</strong> Pass to the player on your{" "}
+        <strong>right</strong>.
         <br />
         <strong>Round 4:</strong> <em>No passing</em>.
       </Paragraph>
 
       <Paragraph style={{ color: "white" }}>
-        From Round 5 onward, this pattern repeats.
-        After passing, you’ll receive <strong>3 cards</strong> from another player, so you'll hold a full hand of <strong>13 cards</strong>.
+        From Round 5 onward, this pattern repeats. After passing, you’ll receive
+        {" "}
+        <strong>3 cards</strong>{" "}
+        from another player, so you'll hold a full hand of{" "}
+        <strong>13 cards</strong>.
       </Paragraph>
 
       <Paragraph style={{ color: "white" }}>
-        The player holding the <strong>Two of Clubs ♣</strong> must start the first trick by playing that card.
-        All other players must follow suit (i.e., play a Club ♣) if they can.
+        The player holding the <strong>Two of Clubs ♣</strong>{" "}
+        must start the first trick by playing that card. All other players must
+        follow suit (i.e., play a Club ♣) if they can.
       </Paragraph>
 
       <Paragraph style={{ color: "white" }}>
-        <strong>Hearts</strong> and the <strong>Queen of Spades ♠</strong> cannot be played during the first
-        round — even if a player has no Clubs.
+        <strong>Hearts</strong> and the <strong>Queen of Spades ♠</strong>{" "}
+        cannot be played during the first round — even if a player has no Clubs.
       </Paragraph>
 
       <Paragraph style={{ color: "white" }}>
-        In all other rounds, players must follow suit if possible. If they cannot, they may play any other card.
+        In all other rounds, players must follow suit if possible. If they
+        cannot, they may play any other card.
       </Paragraph>
 
       <Paragraph style={{ color: "white" }}>
@@ -111,11 +122,13 @@ const RulesPage: React.FC = () => {
       </Paragraph>
 
       <Paragraph style={{ color: "white" }}>
-        After all 13 tricks in a round are completed, each player counts the cards they have won.
+        After all 13 tricks in a round are completed, each player counts the
+        cards they have won.
         <br />
         - Every <strong>Heart</strong> is worth <strong>1 point</strong>.
         <br />
-        - The <strong>Queen of Spades</strong> is worth <strong>13 points</strong>.
+        - The <strong>Queen of Spades</strong> is worth{" "}
+        <strong>13 points</strong>.
         <br />
         These points are added to your total score for the game.
       </Paragraph>
@@ -137,15 +150,19 @@ const RulesPage: React.FC = () => {
       </Paragraph>
 
       <Title level={2} style={{ color: "white" }}>📊 Scoring</Title>
-      <Paragraph style={{ color: "white", fontSize: "1rem", marginBottom: "0.5rem" }}>
-        In <strong>Hearts Attack</strong>, you generally want to <strong>avoid scoring during the game</strong>.
-        However, for Player Stats and leaderboards, you can earn points for various accomplishments.
-        These achievements — like <strong>winning games or matches, shooting the moon,</strong> and more — are detailed below.
+      <Paragraph
+        style={{ color: "white", fontSize: "1rem", marginBottom: "0.5rem" }}
+      >
+        In <strong>Hearts Attack</strong>, you generally want to{" "}
+        <strong>avoid scoring during the game</strong>. However, for Player
+        Stats and leaderboards, you can earn points for various accomplishments.
+        These achievements — like{" "}
+        <strong>winning games or matches, shooting the moon,</strong>{" "}
+        and more — are detailed below.
       </Paragraph>
 
       <ScoringRules />
 
-      
       <div
         style={{ display: "flex", justifyContent: "center", marginTop: "12px" }}
       >
