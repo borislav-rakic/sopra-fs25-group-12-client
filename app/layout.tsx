@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import { ConfigProvider, theme } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
@@ -23,23 +24,6 @@ const luckiestGuy = Luckiest_Guy({
   variable: "--font-luckiest-guy",
 });
 
-export const metadata: Metadata = {
-  title: "SoPra Group 12: Hearts Attack",
-  description: "sopra-fs25-template-client",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", type: "image/x-icon" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
-    ],
-    apple: [
-      { url: "/web-app-manifest-192x192.png", sizes: "192x192" },
-      { url: "/web-app-manifest-512x512.png", sizes: "512x512" },
-    ],
-  },
-  manifest: "/site.webmanifest",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -48,7 +32,7 @@ export default function RootLayout({
   const pathname = usePathname();
   // Define pages where InviteHandler should not be rendered
   const excludeInviteHandler = ["/start", "/match"];
-  const shouldRenderInviteHandler = !excludeInviteHandler.includes(pathname);
+  const shouldRenderInviteHandler = excludeInviteHandler.includes(pathname);
 
   return (
     <html lang="en" suppressHydrationWarning>
