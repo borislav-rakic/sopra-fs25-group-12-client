@@ -129,5 +129,6 @@ reason).
 |                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **@borislav-rakic**  | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **@dominiqueheller** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                      | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@dominiqueheller** | 08.05.2025 | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/66589b99b101b96a3ff10f93ac198ffffb5b3188 | Implemented frontend of skipping passing phase in every fourth round | Without seperate handling for this case, the game would get stuck here |
+|                      | 09.05.2025 | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/d1b2aceca61079da37b8952c52867640a6b88bfd | Implemented a way for the client to detect when a player is in a game and then routes them to said game | Prevents a user from leaving a game via URL, where they might try to start or join a new game, which should not happen |
+|                      | 14.05.2025 | https://github.com/borislav-rakic/sopra-fs25-group-12-client/commit/ab087c4520b6abfc00a049af299d402f2b274c54 | Added first animations for  a player playing a card | Card animations add a lot for UX |
