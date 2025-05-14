@@ -164,7 +164,7 @@ const JoinPage: React.FC = () => {
 
   const columns: TableProps<Match>["columns"] = [
     { title: "MatchID", dataIndex: "matchId", key: "matchId" },
-    { title: "Host", dataIndex: "host", key: "host" },
+    { title: "Host", dataIndex: "hostUsername", key: "hostUsername" },
     { title: "Length", dataIndex: "length", key: "length" },
     {
       title: "",
