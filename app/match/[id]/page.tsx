@@ -356,6 +356,7 @@ const MatchPage: React.FC = () => {
               animatedCardDiv.style.top = `${currentY - cardHeight / 2}px`;
 
               if (progress < 1) {
+                console.log("Animating..." + progress);
                 requestAnimationFrame(animate);
               } else {
                 // Remove the element when animation is complete
