@@ -123,7 +123,6 @@
   box-shadow: none; /* Remove any hover effects */
 }
 
-
 .cardMove {
   position: absolute;
   top: var(--start-y, 0px);
@@ -131,7 +130,6 @@
   transform-origin: center;
   animation-fill-mode: forwards;
 }
-
 
 .temporaryCards {
   position: absolute;

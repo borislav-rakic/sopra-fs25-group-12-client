@@ -203,10 +203,11 @@ const MatchPage: React.FC = () => {
     onClick: () => {},
   }), [cardback]);
 
-  const generateCard = useCallback((code: string, order: number, zIndex: number = 10): cardProps => {
-    //console.log("Generating card:", code, order, zIndex);
-    const rank = code[0];
-    const suit = code[1];
+  const generateCard = useCallback(
+    (code: string, order: number, zIndex: number = 10): cardProps => {
+      //console.log("Generating card:", code, order, zIndex);
+      const rank = code[0];
+      const suit = code[1];
 
       const rankToValue: { [key: string]: bigint } = {
         "2": BigInt(2),
@@ -260,7 +261,7 @@ const MatchPage: React.FC = () => {
       card: string,
       setSlot: (val: cardProps[]) => void,
       current: cardProps[],
-      zIndex: number
+      zIndex: number,
     ) => {
       if (
         (card === null && current.length > 0) || // Clear the slot if it has data but should be empty
@@ -270,7 +271,7 @@ const MatchPage: React.FC = () => {
         // Create a temporary card before generating the actual card
         if (card !== null && card !== "") {
           const tempCardId = `${card}-${Date.now()}`;
-          
+
           const HAND_POSITIONS = [
             { x: "50%", y: "80%" }, // Player's hand (bottom center)
             { x: "20%", y: "50%" }, // Opponent 1's hand (right center)
@@ -286,11 +287,11 @@ const MatchPage: React.FC = () => {
           ];
 
           const ROTATIONS = [
-          0,    // Position 0 (bottom)
-          90,   // Position 1 (left)
-          0,    // Position 2 (top)
-          90,   // Position 3 (right)
-        ];
+            0, // Position 0 (bottom)
+            90, // Position 1 (left)
+            0, // Position 2 (top)
+            90, // Position 3 (right)
+          ];
 
           const gameboard = document.querySelector(".gameboard") as HTMLElement;
           const gameboardRect = gameboard.getBoundingClientRect();
@@ -298,38 +299,45 @@ const MatchPage: React.FC = () => {
           const cardWidth = 100; // Width of the card in pixels
           const cardHeight = 140; // Height of the card in pixels
 
-          const { x: startXPercent, y: startYPercent } = HAND_POSITIONS[position];
+          const { x: startXPercent, y: startYPercent } =
+            HAND_POSITIONS[position];
           const { x: endXPercent, y: endYPercent } = TRICK_POSITIONS[position];
 
-          const startX = (parseFloat(startXPercent) / 100) * gameboardRect.width;
-          const startY = (parseFloat(startYPercent) / 100) * gameboardRect.height;
+          const startX = (parseFloat(startXPercent) / 100) *
+            gameboardRect.width;
+          const startY = (parseFloat(startYPercent) / 100) *
+            gameboardRect.height;
           const endX = (parseFloat(endXPercent) / 100) * gameboardRect.width;
           const endY = (parseFloat(endYPercent) / 100) * gameboardRect.height;
           const rotation = ROTATIONS[position];
 
           // Create a new div element for the animated card
-          const animatedCardDiv = document.createElement('div');
+          const animatedCardDiv = document.createElement("div");
           animatedCardDiv.id = tempCardId;
-          animatedCardDiv.style.position = 'absolute';
+          animatedCardDiv.style.position = "absolute";
           animatedCardDiv.style.width = `${cardWidth}px`;
           animatedCardDiv.style.height = `${cardHeight}px`;
           animatedCardDiv.style.left = `${startX - cardWidth / 2}px`;
           animatedCardDiv.style.top = `${startY - cardHeight / 2}px`;
           animatedCardDiv.style.transform = `rotate(${rotation}deg)`;
-          animatedCardDiv.style.zIndex = '500';
+          animatedCardDiv.style.zIndex = "500";
 
           // Set transform-origin to center
-          animatedCardDiv.style.transformOrigin = 'center';
-          
+          animatedCardDiv.style.transformOrigin = "center";
+
           // Create the card element (you'll need to adjust this based on your Card component)
-          const cardElement = document.createElement('div');
-          cardElement.style.width = '100%';
-          cardElement.style.height = '100%';
-          cardElement.innerHTML = `<img src="${generateCard(card, 0, zIndex).image}" style="width: 100%; height: 100%;" />`;
+          const cardElement = document.createElement("div");
+          cardElement.style.width = "100%";
+          cardElement.style.height = "100%";
+          cardElement.innerHTML = `<img src="${
+            generateCard(card, 0, zIndex).image
+          }" style="width: 100%; height: 100%;" />`;
           animatedCardDiv.appendChild(cardElement);
-          
+
           // Add the animated card to the DOM
-          const temporaryCardsContainer = document.querySelector(`.${cardStyles.temporaryCards}`);
+          const temporaryCardsContainer = document.querySelector(
+            `.${cardStyles.temporaryCards}`,
+          );
           if (temporaryCardsContainer) {
             temporaryCardsContainer.appendChild(animatedCardDiv);
 
@@ -346,7 +354,6 @@ const MatchPage: React.FC = () => {
 
               animatedCardDiv.style.left = `${currentX - cardWidth / 2}px`;
               animatedCardDiv.style.top = `${currentY - cardHeight / 2}px`;
-
 
               if (progress < 1) {
                 requestAnimationFrame(animate);
@@ -370,7 +377,7 @@ const MatchPage: React.FC = () => {
       } else {
         console.log(
           `Slot ${position} unchanged:`,
-          current[0]?.code || "empty"
+          current[0]?.code || "empty",
         );
       }
     };
@@ -1052,9 +1059,7 @@ const MatchPage: React.FC = () => {
 
   useEffect(() => {
     console.log("Has confirmed skip passing:", hasConfirmedSkipPassing);
-  }
-  , [hasConfirmedSkipPassing]);
-
+  }, [hasConfirmedSkipPassing]);
 
   return (
     <div className={`${styles.page} matchPage`}>
@@ -1178,10 +1183,7 @@ const MatchPage: React.FC = () => {
       </div>
 
       <div className="gameboard">
-
-      <div className={`${cardStyles.temporaryCards}`} />
-
-
+        <div className={`${cardStyles.temporaryCards}`} />
 
         <div className="hand-0">
           {cardsInHand.map((card, index) => (
