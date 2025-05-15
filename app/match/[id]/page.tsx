@@ -95,6 +95,7 @@ const MatchPage: React.FC = () => {
   const [hasPassedCards, setHasPassedCards] = useState(false);
   const [hasConfirmedSkipPassing, setHasConfirmedSkipPassing] = useState(false);
   const [timer, setTimer] = useState<number | null>(null);
+  const [trickWinner, setTrickWinner] = useState<string | null>(null);
 
   const playRandomCardCalled = useRef(false);
   const passRandomCardsCalled = useRef(false);
@@ -102,6 +103,7 @@ const MatchPage: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
+
 
   //const [slot, setSlot] = useState(1);
   //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
@@ -356,7 +358,7 @@ const MatchPage: React.FC = () => {
               animatedCardDiv.style.top = `${currentY - cardHeight / 2}px`;
 
               if (progress < 1) {
-                console.log("Animating..." + progress);
+                console.log("Animating" + progress);
                 requestAnimationFrame(animate);
               } else {
                 // Remove the element when animation is complete
@@ -414,6 +416,17 @@ const MatchPage: React.FC = () => {
       console.log("Backend says myTurn:", response.myTurn);
       setMyTurn(response.myTurn ?? false);
       console.log("myTurn (just set):", response.myTurn ?? false);
+
+      if (response.currentPlayerSlot !== null) {
+        setCurrentPlayer(players[response.currentPlayerSlot] ?? "");
+      }
+
+      if (
+        response.currentTrickDTO &&
+        response.currentTrickDTO.winningPosition !== null
+      ) {
+        setTrickWinner(players[response.currentTrickDTO.winningPosition] ?? "");
+      }
 
       if (Array.isArray(response.matchMessages)) {
         const newMessages = response.matchMessages.filter(
@@ -785,8 +798,6 @@ const MatchPage: React.FC = () => {
           c.code !== card.code
         );
         setCardsInHand(updatedCardsInHand);
-        setCurrentPlayer(players[1] || "");
-        console.log("currentPlayer:", currentPlayer);
 
         // Then fetch the updated game state
         setPollingPausedUntil(Date.now() + 1500); // pause for 1.5s
@@ -1091,7 +1102,7 @@ const MatchPage: React.FC = () => {
               alignItems: "center", // Align the items vertically centered
               position: "absolute",
               top: "3%",
-              left: "17%",
+              left: "50%",
               transform: "translateX(-50%)",
               backgroundColor: "white",
               color: "black",
@@ -1102,8 +1113,40 @@ const MatchPage: React.FC = () => {
             }}
           >
             Time Remaining: {timer}s
-          </div>
-        )}
+        </div>
+      )}
+
+      {(
+        (["FIRSTTRICK", "NORMALTRICK", "FINALTRICK"].includes(currentGamePhase)) ||
+        (["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase))
+      ) && (
+        <div
+          style={{
+            position: "absolute",
+            top: "7%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor: ["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase) ? "#75bd9d" : "#22426b",
+            color: ["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase) ? "#16181D" : "white",
+            padding: "8px 18px",
+            borderRadius: "10px",
+            zIndex: 1000,
+            fontSize: "1.15rem",
+            textAlign: "center",
+            minWidth: "200px",
+          }}
+        >
+          {["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase)
+            ? (trickWinner
+                ? `${trickWinner} won the trick!`
+                : "Trick complete!")
+            : (currentPlayer
+                ? `It's ${currentPlayer}'s turn`
+                : "Waiting for player...")}
+        </div>
+      )}
+
+      
 
       <div className="menu-dropdown">
         <Dropdown
