@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import "@ant-design/v5-patch-for-react-19";
 import { Button, Form, Input, message, Modal, Table } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { Match } from "@/types/match";
