@@ -12,5 +12,5 @@ export interface Match {
   player3Id?: number | null;
   player4Id?: number | null;
   playerNames: string[];
-  slotavailable: boolean;
+  slotAvailable?: boolean;
 }

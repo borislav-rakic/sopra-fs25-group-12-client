@@ -35,8 +35,9 @@ const JoinPage: React.FC = () => {
     const fetchMatches = async () => {
       try {
         const fetchedMatches = await apiService.get<Match[]>("/matches");
-        setMatches(fetchedMatches);
-        setFilteredMatches(fetchedMatches);
+        const availableMatches = fetchedMatches.filter((match) => match.slotAvailable);
+        setMatches(availableMatches);
+        setFilteredMatches(availableMatches);
       } catch {
         message.open({
           type: "error",
