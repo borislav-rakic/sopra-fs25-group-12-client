@@ -32,7 +32,7 @@ export default function RootLayout({
   const pathname = usePathname();
   // Define pages where InviteHandler should not be rendered
   const excludeInviteHandler = ["/start", "/match"];
-  const shouldRenderInviteHandler = excludeInviteHandler.includes(pathname);
+  const shouldRenderInviteHandler = !excludeInviteHandler.includes(pathname);
 
   return (
     <html lang="en" suppressHydrationWarning>
