@@ -20,6 +20,7 @@ import Card, { cardProps } from "@/components/card";
 import { TrickDTO } from "@/types/trick";
 import { DownOutlined } from "@ant-design/icons";
 import { useCallback } from "react";
+import { PlayerCard } from "@/types/playerCard";
 
 const MatchPage: React.FC = () => {
   const USE_AUTOMATIC_POLLING = true; // switch to true for auto every 2000ms
@@ -82,7 +83,6 @@ const MatchPage: React.FC = () => {
   >("RUNNING");
   const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
   const [/*heartsBroken*/, setHeartsBroken] = useState(false);
-  const [firstCardPlayed, setFirstCardPlayed] = useState(false);
   //const [isFirstRound, setIsFirstRound] = useState(true);
   const [myTurn, setMyTurn] = useState(false);
   const [playableCards, setPlayableCards] = useState<Array<string | null>>([]);
@@ -104,9 +104,8 @@ const MatchPage: React.FC = () => {
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
 
-
-  //const [slot, setSlot] = useState(1);
-  //const [trickLeaderSlot, setTrickLeaderSlot] = useState(2);
+  const DEAL_ANIMATION_DURATION = 3500; 
+  const isDealing = useRef<boolean>(false);
 
   const [htmlContent, setHtmlContent] = useState<string>("");
   const [serverMessages, setServerMessages] = useState<MatchMessage[]>([]);
@@ -346,8 +345,18 @@ const MatchPage: React.FC = () => {
             // Animate using requestAnimationFrame
             const startTime = performance.now();
             const duration = 350;
+            const targetFps = 200;
+            const minFrameTime = 1000 / targetFps;
+            let lastFrameTime = 0;
+
 
             const animate = (currentTime: number) => {
+              if (currentTime - lastFrameTime < minFrameTime) {
+                requestAnimationFrame(animate);
+                return;
+              }
+              lastFrameTime = currentTime;
+
               const elapsedTime = currentTime - startTime;
               const progress = Math.min(elapsedTime / duration, 1);
 
@@ -409,22 +418,32 @@ const MatchPage: React.FC = () => {
         setPollingPausedUntil(Infinity); // Halt polling permanently
       }
 
-      setHeartsBroken(response.heartsBroken ?? false);
-      setLastTrickPhase(trickPhase);
-      setTrickPhase(response.trickPhase);
-      setCurrentGamePhase(response.gamePhase ?? "");
-      console.log("Backend says myTurn:", response.myTurn);
-      setMyTurn(response.myTurn ?? false);
-      console.log("myTurn (just set):", response.myTurn ?? false);
+      const localHandsEmpty = cardsInHand.length === 0
+        && opponent1Cards.length === 0
+        && opponent2Cards.length === 0
+        && opponent3Cards.length === 0;
+      
+      const serverHandsFull =
+        response.playerCards && response.playerCards.length > 0 &&
+        response.cardsInHandPerPlayer &&
+        Object.values(response.cardsInHandPerPlayer).every((n) => n > 0);
+
+      if (!localHandsEmpty || !serverHandsFull) {
+        isDealing.current = false;
+        setHeartsBroken(response.heartsBroken ?? false);
+        setLastTrickPhase(trickPhase);
+        setTrickPhase(response.trickPhase);
+        setCurrentGamePhase(response.gamePhase ?? "");
+        console.log("Backend says myTurn:", response.myTurn);
+        setMyTurn(response.myTurn ?? false);
+        console.log("myTurn (just set):", response.myTurn ?? false);
+      }
 
       if (response.currentPlayerSlot !== null) {
         setCurrentPlayer(players[response.currentPlayerSlot] ?? "");
       }
 
-      if (
-        response.currentTrickDTO &&
-        response.currentTrickDTO.winningPosition !== null
-      ) {
+      if (response.currentTrickDTO && response.currentTrickDTO.winningPosition !== null) {
         setTrickWinner(players[response.currentTrickDTO.winningPosition] ?? "");
       }
 
@@ -510,6 +529,43 @@ const MatchPage: React.FC = () => {
         pointsArray[(3 + slot) % 4],
       ]);
 
+      console.log(localHandsEmpty, serverHandsFull, isDealing.current);
+      if (localHandsEmpty && serverHandsFull && !isDealing.current) {
+        isDealing.current = true;
+        setPollingPausedUntil(Date.now() + DEAL_ANIMATION_DURATION);
+
+        // Optionally trigger your animation here (e.g., set a state to show animation UI)
+        console.log("Dealing animation started");
+
+        animateDealingCards(response.playerCards ?? []);
+
+        setTimeout(() => {
+          // After animation, fill hands
+          if (response.playerCards) {
+            setCardsInHand(response.playerCards.map((item) =>
+              generateCard(item.card.code, item.card.cardOrder)
+            ));
+          }
+          if (response.cardsInHandPerPlayer) {
+            const hand = [
+              response.cardsInHandPerPlayer["0"] ?? 0,
+              response.cardsInHandPerPlayer["1"] ?? 0,
+              response.cardsInHandPerPlayer["2"] ?? 0,
+              response.cardsInHandPerPlayer["3"] ?? 0,
+            ];
+            setOpponent1Cards(Array.from({ length: hand[1] }, generateEnemyCard));
+            setOpponent2Cards(Array.from({ length: hand[2] }, generateEnemyCard));
+            setOpponent3Cards(Array.from({ length: hand[3] }, generateEnemyCard));
+          }
+        }, DEAL_ANIMATION_DURATION-500);
+        console.log("Dealing animation done");
+        return; // Don't update hands yet, wait for animation
+      }
+
+
+      // Anything after this point will not be updated before the animation
+      //
+      //
       if (response.playerCards) {
         const newHand = response.playerCards.map((item) =>
           generateCard(item.card.code, item.card.cardOrder)
@@ -529,21 +585,9 @@ const MatchPage: React.FC = () => {
         setPlayableCards(playableCardCodes);
       }
 
-      if (!firstCardPlayed && (response.currentTrick?.length ?? 0) > 0) {
-        setFirstCardPlayed(true);
-      }
-
-      /* if (response.trickPhase === "JUSTCOMPLETED") {
-        handleFullTrick(
-          response.previousTrick || [],
-          slot,
-          response.previousTrickLeaderPlayerSlot || 0,
-        );
-      } else { */
       if (response.currentTrickDTO) {
         handleTrickFromLogic(response.currentTrickDTO);
       }
-      /* } */
 
       if (response.cardsInHandPerPlayer) {
         const hand = [
@@ -570,6 +614,7 @@ const MatchPage: React.FC = () => {
           Array.from({ length: shifted[3] }, generateEnemyCard),
         );
       }
+
     } catch (error) {
       console.log("Error caught:", error); // Inspect the error structure
 
@@ -616,12 +661,171 @@ const MatchPage: React.FC = () => {
     console.log("Finished fetchMatchData for", matchId);
   }, [
     matchId,
-    firstCardPlayed,
     generateCard,
     handleTrickFromLogic,
     apiService,
     generateEnemyCard,
+    cardsInHand,
+    isDealing, 
+    opponent1Cards,
+    opponent2Cards,
+    opponent3Cards,
   ]);
+
+  const animateDealingCards = (playerCards: PlayerCard[]) => {
+  const gameboard = document.querySelector(".gameboard") as HTMLElement;
+  const gameboardRect = gameboard.getBoundingClientRect();
+  const gameboardWidth = gameboardRect.width;
+  const handDiv = document.querySelector('.hand-0-extension') as HTMLElement;
+  const handRect = handDiv.getBoundingClientRect();
+  const handWidth = handRect.width;
+  const numCards = playerCards.length;
+
+  const CARD_WIDTH = 70;
+  const CARD_HEIGHT = CARD_WIDTH * 1.397; // Adjust this value to change the height of the cards
+  const DEAL_SCALE = 1.5;
+  const DEAL_ROTATION = 90;
+  const DEAL_DURATION = 250; // ms per card
+  const DEAL_STAGGER = 50; // ms between each card
+  const CARD_SPACING = (handWidth - CARD_WIDTH) / (numCards - 1);
+
+  console.log("handwidth", handWidth);
+  console.log("CARD_WIDTH", CARD_WIDTH);
+  console.log("CARD_SPACING", CARD_SPACING);
+
+  console.log((gameboardWidth*(25/100)));
+  console.log((CARD_WIDTH/50));
+
+  const handPositions = [
+    { x: (gameboardWidth*(25/100)) + (CARD_WIDTH*(50/100)), y: (gameboardWidth*(85/100)) /* + (CARD_WIDTH*(50/100)) */, rotation: 0, dx: CARD_SPACING, dy: 0 },   // Player (bottom)
+    { x: (gameboardWidth*(15/100)) /* + (CARD_WIDTH*(50/100)) */, y: (gameboardWidth*(25/100)) + (CARD_WIDTH*(50/100)), rotation: 90, dx: 0, dy: CARD_SPACING }, // Enemy 1 (left)
+    { x: (gameboardWidth*(75/100)) - (CARD_WIDTH*(50/100)), y: (gameboardWidth*(15/100)) /* + (CARD_WIDTH*(50/100)) */, rotation: 0, dx: -CARD_SPACING, dy: 0 },  // Enemy 2 (top)
+    { x: (gameboardWidth*(85/100)) /* + (CARD_WIDTH*(50/100)) */, y: (gameboardWidth*(75/100)) - (CARD_WIDTH*(50/100)), rotation: 90, dx: 0, dy: -CARD_SPACING },  // Enemy 3 (right)
+  ];
+
+  console.log("handPositions", handPositions);
+
+  // Prepare dealing order
+  const dealOrder: { hand: number; card: PlayerCard | null }[] = [];
+  let playerIndex = 0;
+  for (let i = 0; i < 52; i++) {
+    const hand = i % 4;
+    if (hand === 0 && playerCards[playerIndex]) {
+      dealOrder.push({ hand, card: playerCards[playerIndex++] });
+    } else {
+      dealOrder.push({ hand, card: null });
+    }
+  }
+
+  // Track how many cards have been dealt to each hand
+  const handCardCounts = [0, 0, 0, 0];
+
+  // Animation state for all cards in flight
+  const animatingCards: {
+    div: HTMLDivElement;
+    hand: number;
+    startTime: number;
+    offset: number;
+    card: PlayerCard | null;
+    finished: boolean;
+  }[] = [];
+
+  const rect = gameboard.getBoundingClientRect();
+
+  // Spawn all cards with their staggered start times
+  dealOrder.forEach((deal, i) => {
+    const offset = handCardCounts[deal.hand];
+    handCardCounts[deal.hand]++;
+
+    // Create card div
+    const cardDiv = document.createElement("div");
+    cardDiv.className = "dealing-card";
+    cardDiv.style.position = "absolute";
+    cardDiv.style.left = "50%";
+    cardDiv.style.top = "50%";
+    cardDiv.style.width = `${CARD_WIDTH}px`;
+    cardDiv.style.height = `${CARD_HEIGHT}px`;
+    cardDiv.style.transform = `translate(-50%, -50%) scale(${DEAL_SCALE}) rotate(${DEAL_ROTATION}deg)`;
+    cardDiv.style.zIndex = "1001";
+    if (deal.hand === 0 && deal.card) {
+      cardDiv.innerHTML = `<img src="https://deckofcardsapi.com/static/img/${deal.card.card.code}.png" style="width:100%;height:100%;border-radius:8px;" />`;
+    } else {
+      cardDiv.innerHTML = `<img src="/card_back/b101.png" style="width:100%;height:100%;border-radius:8px;" />`;
+    }
+    gameboard.appendChild(cardDiv);
+
+    animatingCards.push({
+      div: cardDiv,
+      hand: deal.hand,
+      startTime: performance.now() + i * DEAL_STAGGER,
+      offset,
+      card: deal.card,
+      finished: false,
+    });
+  });
+
+  let lastFrameTime = 0;
+  const TARGET_FPS = 120;
+  const MIN_FRAME_TIME = 1000 / TARGET_FPS;
+
+  // Animate all cards using requestAnimationFrame
+  function animateAll(now: number) {
+    if (now - lastFrameTime < MIN_FRAME_TIME) {
+      requestAnimationFrame(animateAll);
+      return;
+    }
+    lastFrameTime = now;
+
+    let allFinished = true;
+    animatingCards.forEach((anim, idx) => {
+      if (anim.finished) return;
+      const handPos = handPositions[anim.hand];
+      const baseX = (handPos.x); 
+      const baseY = (handPos.y);
+      const destX = baseX + handPos.dx * anim.offset;
+      const destY = baseY + handPos.dy * anim.offset;
+
+      const elapsed = now - anim.startTime;
+      if (elapsed < 0) {
+        allFinished = false;
+        return; // Not started yet
+      }
+      const progress = Math.min(elapsed / DEAL_DURATION, 1);
+
+      // Interpolate position, scale, and rotation
+      const curX = 0.5 * rect.width + (destX - 0.5 * rect.width) * progress;
+      const curY = 0.5 * rect.height + (destY - 0.5 * rect.height) * progress;
+      const curScale = DEAL_SCALE - (DEAL_SCALE - 1) * progress;
+      const curRot = DEAL_ROTATION + (handPos.rotation - DEAL_ROTATION) * progress;
+
+      anim.div.style.left = `${curX}px`;
+      anim.div.style.top = `${curY}px`;
+      anim.div.style.transform = `translate(-50%, -50%) scale(${curScale}) rotate(${curRot}deg)`;
+      
+      if(idx === 10) {
+        console.log("Card scale", curScale);
+      }
+
+      if (progress >= 1) {
+        anim.finished = true;
+      } else {
+        allFinished = false;
+      }
+    });
+    if (!allFinished) {
+      requestAnimationFrame(animateAll);
+
+      // Remove all cards and deck after the animation duration
+      setTimeout(() => {
+        animatingCards.forEach(anim => anim.div.remove());
+        /* deckDiv.remove(); */
+      }, DEAL_ANIMATION_DURATION);
+
+    }
+  }
+  requestAnimationFrame(animateAll);
+}
+  
 
   useEffect(() => {
     if (USE_AUTOMATIC_POLLING) {
@@ -817,9 +1021,6 @@ const MatchPage: React.FC = () => {
     }
   };
 
-  // Checks if the played card is a valid play in the current trick.
-  // uses the played card, the existing trick, and the player's hand to determine if the play is valid.
-  // We use the status of trickslot3 to determine if the player is playing the first card of the trick or not.
   const verifyTrick = (card: cardProps) => {
     console.log("Verifying trick for card: ", card.code);
     console.log("playableCards: ", playableCards);
