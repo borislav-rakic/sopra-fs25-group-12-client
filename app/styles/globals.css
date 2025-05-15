@@ -822,6 +822,7 @@ a {
   /* Makes the box scrollable */
   z-index: 1000;
   /* Ensures it appears above other elements */
+  pointer-events: none;
 }
 
 .message {
@@ -835,4 +836,5 @@ a {
   border-radius: 10px;
   font-family: var(--font-luckiest-guy);
   /* Ensures long messages wrap */
+  pointer-events: none;
 }
