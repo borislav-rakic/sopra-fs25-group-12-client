@@ -836,11 +836,6 @@ const StartPage: React.FC = () => {
       return null;
     }
 
-    message.open({
-      type: "info",
-      content: `Pending join requests: ${JSON.stringify(joinRequests)}`,
-    });
-
     return joinRequests.map((request) => (
       <Modal
         key={request.userId}
