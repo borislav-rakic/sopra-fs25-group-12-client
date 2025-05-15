@@ -866,6 +866,17 @@ const MatchPage: React.FC = () => {
   }
   
   const animatePassingCards = (passingCards: String[], receivingCards: String[], id: number) => {
+    if (id === 0) {
+      console.log("cannot pass to self");
+      return;
+    }
+
+    const gameboard = document.querySelector(".gameboard") as HTMLElement;
+    const gameboardRect = gameboard.getBoundingClientRect();
+    const gameboardWidth = gameboardRect.width;
+    const handDiv = document.querySelector('.hand-0-extension') as HTMLElement;
+    const handRect = handDiv.getBoundingClientRect();
+    const handWidth = handRect.width;
 
   }
 

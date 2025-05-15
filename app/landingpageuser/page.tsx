@@ -85,15 +85,27 @@ const LandingPageUser: React.FC = () => {
           }
         }
       } catch (err: unknown) {
-        console.error("Failed to fetch user data:", err);
-        setUser(null);
-
-        const error = err as { status?: number; message?: string };
-
-        if (error.status === 401 || error.message?.includes("Invalid token")) {
+        if (
+          typeof err === "object" && err !== null && "status" in err &&
+          err.status === 401
+          ) {
+          message.open({
+            type: "error",
+            content: "You are not currently logged in.",
+          });
           localStorage.removeItem("token");
           router.push("/");
-        }
+          } else {
+            console.error("Failed to fetch user data:", err);
+            setUser(null);
+
+            const error = err as { status?: number; message?: string };
+
+            if (error.status === 401 || error.message?.includes("Invalid token")) {
+              localStorage.removeItem("token");
+              router.push("/");
+            }
+          }
       }
     };
 

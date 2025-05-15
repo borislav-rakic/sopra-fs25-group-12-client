@@ -7,6 +7,7 @@ import "@/styles/globals.css";
 import { InviteHandler } from "@/components/inviteHandler";
 import { Luckiest_Guy } from "next/font/google";
 import { usePathname } from "next/navigation";
+import path from "path";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,7 @@ export default function RootLayout({
   const pathname = usePathname();
   // Define pages where InviteHandler should not be rendered
   const excludeInviteHandler = ["/start", "/match"];
-  const shouldRenderInviteHandler = !excludeInviteHandler.includes(pathname);
+  const shouldRenderInviteHandler = !excludeInviteHandler.includes(pathname) || pathname === "/";
 
   return (
     <html lang="en" suppressHydrationWarning>
