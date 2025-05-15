@@ -40,9 +40,8 @@ export const InviteHandler: React.FC = () => {
           setInvite(null);
           setModalVisible(false);
         }
-      } catch (error: any) {
-        const status = error?.status || error?.response?.status;
-        if (status === 401 || status === 403) {
+      } catch (error) {
+        if (typeof error === "object" && error !== null && "status" in error && (error.status === 403 || error.status === 401)) {
           localStorage.removeItem("token");
           setInvite(null);
           setModalVisible(false);

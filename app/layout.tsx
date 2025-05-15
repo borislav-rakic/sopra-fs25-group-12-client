@@ -7,7 +7,6 @@ import "@/styles/globals.css";
 import { InviteHandler } from "@/components/inviteHandler";
 import { Luckiest_Guy } from "next/font/google";
 import { usePathname } from "next/navigation";
-import path from "path";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
