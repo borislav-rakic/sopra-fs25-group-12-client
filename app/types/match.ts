@@ -11,4 +11,5 @@ export interface Match {
   player2Id?: number | null;
   player3Id?: number | null;
   player4Id?: number | null;
+  playerNames: [string, string, string, string];
 }

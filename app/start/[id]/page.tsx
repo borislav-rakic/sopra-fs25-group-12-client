@@ -156,7 +156,7 @@ const StartPage: React.FC = () => {
           } else {
             // It's a real user
             const user = usersRef.current.find((u) => Number(u.id) === pid);
-            updatedSelectedPlayers[i] = user?.username ?? "Unknown User";
+            updatedSelectedPlayers[i] = match.playerNames[i] ?? user?.username ?? "";
           }
         }
 
