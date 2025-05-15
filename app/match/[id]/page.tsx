@@ -592,6 +592,15 @@ const MatchPage: React.FC = () => {
           content: "You are not authorized to view this match.",
         });
         router.push("/landingpageuser");
+      } else if (
+        typeof error === "object" && error !== null && "status" in error &&
+        error.status === 404
+      ) {
+        message.open({
+          type: "error",
+          content: "This match does not exist.",
+        });
+        router.push("/landingpageuser");
       } else if (error instanceof Error) {
         // Handle standard Error objects
         handleApiError(error, "Failed to fetch match data.");
