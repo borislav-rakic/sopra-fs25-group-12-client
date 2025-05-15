@@ -69,7 +69,7 @@ const MatchPage: React.FC = () => {
   const [trickSlot3, setTrickSlot3] = useState<cardProps[]>([]);
 
   const [matchScore, setMatchScore] = useState([0, 0, 0, 0]);
-  const [roundScore, setRoundScore] = useState([0, 0, 0, 0]);
+  const [/*roundScore*/, setRoundScore] = useState([0, 0, 0, 0]);
 
   const [/*currentTrick*/, setCurrentTrick] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState("");

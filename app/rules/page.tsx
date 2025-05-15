@@ -8,24 +8,24 @@ import ScoringRules from "@/components/ScoringRules";
 
 const { Title, Paragraph } = Typography;
 
-const _scoringData = [
-  { key: "1", card: "Each Heart", points: "1 point" },
-  { key: "2", card: "Queen of Spades", points: "13 points" },
-  { key: "3", card: "All other cards", points: "0 points" },
-];
+// const _scoringData = [
+//   { key: "1", card: "Each Heart", points: "1 point" },
+//   { key: "2", card: "Queen of Spades", points: "13 points" },
+//   { key: "3", card: "All other cards", points: "0 points" },
+// ];
 
-const _scoringColumns = [
-  {
-    title: "Card",
-    dataIndex: "card",
-    key: "card",
-  },
-  {
-    title: "Points",
-    dataIndex: "points",
-    key: "points",
-  },
-];
+// const _scoringColumns = [
+//   {
+//     title: "Card",
+//     dataIndex: "card",
+//     key: "card",
+//   },
+//   {
+//     title: "Points",
+//     dataIndex: "points",
+//     key: "points",
+//   },
+// ];
 
 const RulesPage: React.FC = () => {
   const router = useRouter();
@@ -75,10 +75,10 @@ const RulesPage: React.FC = () => {
       </Paragraph>
 
       <Paragraph style={{ color: "white" }}>
-        From Round 5 onward, this pattern repeats. After passing, you’ll receive
+        From Round 5 onward, this pattern repeats. After passing, you&apos;ll receive
         {" "}
         <strong>3 cards</strong>{" "}
-        from another player, so you'll hold a full hand of{" "}
+        from another player, so you&apos;ll hold a full hand of{" "}
         <strong>13 cards</strong>.
       </Paragraph>
 

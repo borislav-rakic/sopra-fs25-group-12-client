@@ -17,14 +17,28 @@ const matchPlacementData = [
   { key: "4", place: "4th Place", points: "-1 point" },
 ];
 
-const inGameColumns = [
+import type { ColumnsType } from "antd/es/table";
+
+interface InGameScoringDataType {
+  key: string;
+  card: string;
+  points: string;
+}
+
+interface MatchPlacementDataType {
+  key: string;
+  place: string;
+  points: string;
+}
+
+const inGameColumns: ColumnsType<InGameScoringDataType> = [
   { title: "Card", dataIndex: "card", key: "card" },
-  { title: "Points", dataIndex: "points", key: "points", align: "right" },
+  { title: "Points", dataIndex: "points", key: "points", align: "right" as const },
 ];
 
-const matchColumns = [
+const matchColumns: ColumnsType<MatchPlacementDataType> = [
   { title: "Placement", dataIndex: "place", key: "place" },
-  { title: "Points", dataIndex: "points", key: "points", align: "right" },
+  { title: "Points", dataIndex: "points", key: "points", align: "right" as const },
 ];
 
 export default function ScoringRules() {
