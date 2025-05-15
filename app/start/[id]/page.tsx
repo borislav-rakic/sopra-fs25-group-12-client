@@ -140,6 +140,11 @@ const StartPage: React.FC = () => {
           match.player4Id,
         ];
 
+        if (usersRef.current.length === 0) {
+        console.warn("User list not loaded yet. Skipping player name assignment.");
+        return;
+      }
+
         for (let i = 0; i < playerIdsArray.length; i++) {
           const pid = playerIdsArray[i];
 
@@ -156,7 +161,7 @@ const StartPage: React.FC = () => {
           } else {
             // It's a real user
             const user = usersRef.current.find((u) => Number(u.id) === pid);
-            updatedSelectedPlayers[i] = user?.username ?? "Unknown User";
+            updatedSelectedPlayers[i] = user?.username ?? match.playerNames?.[i] ?? "Unknown User";
           }
         }
 
