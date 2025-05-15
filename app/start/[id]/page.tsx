@@ -68,6 +68,7 @@ const StartPage: React.FC = () => {
   const [joinRequests, setJoinRequests] = useState<
     { userId: string; status: string }[]
   >([]);
+  const [isActionLoading, setIsActionLoading] = useState(false);
 
   interface JoinRequest {
     userId: string;
@@ -377,8 +378,14 @@ const StartPage: React.FC = () => {
   };
 
   const handleStart = async () => {
+    if (!gameId) return;
+    setIsActionLoading(true);
     try {
       await apiService.post(`/matches/${gameId}/start`, {});
+      message.open({
+        type: "info",
+        content: "Starting Match...",
+      });
       router.push(`/match/${gameId}`);
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -411,6 +418,8 @@ const StartPage: React.FC = () => {
   };
 
   const handleCancelMatch = async () => {
+    if (!gameId) return;
+    setIsActionLoading(true);
     try {
       await apiService.delete(`/matches/${gameId}`);
       message.open({
@@ -423,7 +432,9 @@ const StartPage: React.FC = () => {
         type: "error",
         content: "Could not cancel the match.",
       });
-    }
+    } finally {
+    setIsActionLoading(false);
+  }
   };
 
   const renderHostCard = () => (
@@ -958,6 +969,8 @@ const StartPage: React.FC = () => {
                 block
                 className={styles.whiteButton}
                 onClick={handleCancelMatch}
+                disabled={isActionLoading}
+                loading={isActionLoading}
               >
                 Cancel Match
               </Button>
@@ -965,6 +978,8 @@ const StartPage: React.FC = () => {
                 block
                 className={styles.whiteButton}
                 onClick={handleStart}
+                disabled={isActionLoading}
+                loading={isActionLoading}
               >
                 Start
               </Button>
