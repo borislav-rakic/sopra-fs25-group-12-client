@@ -102,7 +102,7 @@ const MatchPage: React.FC = () => {
   const [playmat, setPlaymat] = useState("");
   const [cardback, setCardback] = useState("");
 
-  const DEAL_ANIMATION_DURATION = 3500; 
+  const DEAL_ANIMATION_DURATION = 3500;
   const isDealing = useRef<boolean>(false);
 
   const PASSING_ANIMATION_DURATION = 1500;
@@ -353,7 +353,6 @@ const MatchPage: React.FC = () => {
             const minFrameTime = 1000 / targetFps;
             let lastFrameTime = 0;
 
-
             const animate = (currentTime: number) => {
               if (currentTime - lastFrameTime < minFrameTime) {
                 requestAnimationFrame(animate);
@@ -406,8 +405,7 @@ const MatchPage: React.FC = () => {
   }, [generateCard, trickSlot0, trickSlot1, trickSlot2, trickSlot3]);
 
   const fetchMatchData = useCallback(async () => {
-
-    if (typeof matchId === "string" && !/^\d+$/.test(matchId)){
+    if (typeof matchId === "string" && !/^\d+$/.test(matchId)) {
       message.open({
         type: "error",
         content: "invalid URL",
@@ -435,22 +433,24 @@ const MatchPage: React.FC = () => {
         return;
       }
 
-      const localHandsEmpty = cardsInHand.length === 0
-        && opponent1Cards.length === 0
-        && opponent2Cards.length === 0
-        && opponent3Cards.length === 0;
+      const localHandsEmpty = cardsInHand.length === 0 &&
+        opponent1Cards.length === 0 &&
+        opponent2Cards.length === 0 &&
+        opponent3Cards.length === 0;
       console.log("localHandsEmpty", localHandsEmpty);
-      
-      const serverHandsFull = response.cardsInHandPerPlayer 
-        && response.cardsInHandPerPlayer[0] === 13
-        && response.cardsInHandPerPlayer[1] === 13
-        && response.cardsInHandPerPlayer[2] === 13
-        && response.cardsInHandPerPlayer[3] === 13;
+
+      const serverHandsFull = response.cardsInHandPerPlayer &&
+        response.cardsInHandPerPlayer[0] === 13 &&
+        response.cardsInHandPerPlayer[1] === 13 &&
+        response.cardsInHandPerPlayer[2] === 13 &&
+        response.cardsInHandPerPlayer[3] === 13;
 
       console.log("serverHandsFull", serverHandsFull);
 
       console.log(currentGamePhase, previousGamePhase);
-      if(response.gamePhase === "FIRSTTRICK" && previousGamePhase === "PASSING") {
+      if (
+        response.gamePhase === "FIRSTTRICK" && previousGamePhase === "PASSING"
+      ) {
         passNow.current = true;
         setCurrentGamePhase(response.gamePhase ?? "");
         setPreviousGamePhase(response.gamePhase ?? "");
@@ -479,7 +479,10 @@ const MatchPage: React.FC = () => {
         setCurrentPlayer(players[response.currentPlayerSlot] ?? "");
       }
 
-      if (response.currentTrickDTO && response.currentTrickDTO.winningPosition !== null) {
+      if (
+        response.currentTrickDTO &&
+        response.currentTrickDTO.winningPosition !== null
+      ) {
         setTrickWinner(players[response.currentTrickDTO.winningPosition] ?? "");
       }
 
@@ -578,9 +581,11 @@ const MatchPage: React.FC = () => {
         setTimeout(() => {
           // After animation, fill hands
           if (response.playerCards) {
-            setCardsInHand(response.playerCards.map((item) =>
-              generateCard(item.card.code, item.card.cardOrder)
-            ));
+            setCardsInHand(
+              response.playerCards.map((item) =>
+                generateCard(item.card.code, item.card.cardOrder)
+              ),
+            );
           }
           if (response.cardsInHandPerPlayer) {
             const hand = [
@@ -589,11 +594,17 @@ const MatchPage: React.FC = () => {
               response.cardsInHandPerPlayer["2"] ?? 0,
               response.cardsInHandPerPlayer["3"] ?? 0,
             ];
-            setOpponent1Cards(Array.from({ length: hand[1] }, generateEnemyCard));
-            setOpponent2Cards(Array.from({ length: hand[2] }, generateEnemyCard));
-            setOpponent3Cards(Array.from({ length: hand[3] }, generateEnemyCard));
+            setOpponent1Cards(
+              Array.from({ length: hand[1] }, generateEnemyCard),
+            );
+            setOpponent2Cards(
+              Array.from({ length: hand[2] }, generateEnemyCard),
+            );
+            setOpponent3Cards(
+              Array.from({ length: hand[3] }, generateEnemyCard),
+            );
           }
-        }, DEAL_ANIMATION_DURATION-500);
+        }, DEAL_ANIMATION_DURATION - 500);
         console.log("Dealing animation done");
         return; // Don't update hands yet, wait for animation
       }
@@ -604,31 +615,49 @@ const MatchPage: React.FC = () => {
         console.log("preparing to animate card passing");
 
         // Remove 3 cards from each enemy hand
-        setOpponent1Cards(prev => prev.slice(0, Math.max(0, prev.length - 3)));
-        setOpponent2Cards(prev => prev.slice(0, Math.max(0, prev.length - 3)));
-        setOpponent3Cards(prev => prev.slice(0, Math.max(0, prev.length - 3)));
-
-        console.log("opponents hand sizes", opponent1Cards.length, opponent2Cards.length, opponent3Cards.length);
-
-        // Remove passed cards from player's hand
-        setCardsInHand(prev =>
-          prev.filter(card => !passingCardsforAnimation.current.includes(card.code))
+        setOpponent1Cards((prev) =>
+          prev.slice(0, Math.max(0, prev.length - 3))
+        );
+        setOpponent2Cards((prev) =>
+          prev.slice(0, Math.max(0, prev.length - 3))
+        );
+        setOpponent3Cards((prev) =>
+          prev.slice(0, Math.max(0, prev.length - 3))
         );
 
-        const receivedCards = getReceivedCardCodes(response.playerCards ?? [], cardsInHand);
+        console.log(
+          "opponents hand sizes",
+          opponent1Cards.length,
+          opponent2Cards.length,
+          opponent3Cards.length,
+        );
+
+        // Remove passed cards from player's hand
+        setCardsInHand((prev) =>
+          prev.filter((card) =>
+            !passingCardsforAnimation.current.includes(card.code)
+          )
+        );
+
+        const receivedCards = getReceivedCardCodes(
+          response.playerCards ?? [],
+          cardsInHand,
+        );
 
         console.log("passing cards", passingCardsforAnimation.current);
         console.log("received cards", receivedCards);
         console.log("current player hand", cardsInHand);
         console.log("passing to player in slot", response.passingToPlayerSlot);
 
-
         console.log("invoking animatePassingCards");
-        animatePassingCards(passingCardsforAnimation.current, receivedCards, passId.current);
+        animatePassingCards(
+          passingCardsforAnimation.current,
+          receivedCards,
+          passId.current,
+        );
         passNow.current = false;
         return;
       }
-
 
       // Anything after this point will not be updated before the animation
       //
@@ -681,7 +710,6 @@ const MatchPage: React.FC = () => {
           Array.from({ length: shifted[3] }, generateEnemyCard),
         );
       }
-
     } catch (error) {
       console.log("Error caught:", error); // Inspect the error structure
 
@@ -733,7 +761,7 @@ const MatchPage: React.FC = () => {
     apiService,
     generateEnemyCard,
     cardsInHand,
-    isDealing, 
+    isDealing,
     opponent1Cards,
     opponent2Cards,
     opponent3Cards,
@@ -743,7 +771,7 @@ const MatchPage: React.FC = () => {
     const gameboard = document.querySelector(".gameboard") as HTMLElement;
     const gameboardRect = gameboard.getBoundingClientRect();
     const gameboardWidth = gameboardRect.width;
-    const handDiv = document.querySelector('.hand-0-extension') as HTMLElement;
+    const handDiv = document.querySelector(".hand-0-extension") as HTMLElement;
     const handRect = handDiv.getBoundingClientRect();
     const handWidth = handRect.width;
     const numCards = playerCards.length;
@@ -760,14 +788,38 @@ const MatchPage: React.FC = () => {
     console.log("CARD_WIDTH", CARD_WIDTH);
     console.log("CARD_SPACING", CARD_SPACING);
 
-    console.log((gameboardWidth*(25/100)));
-    console.log((CARD_WIDTH/50));
+    console.log(gameboardWidth * (25 / 100));
+    console.log(CARD_WIDTH / 50);
 
     const handPositions = [
-      { x: (gameboardWidth*(25/100)) + (CARD_WIDTH*(50/100)), y: (gameboardWidth*(85/100)) /* + (CARD_WIDTH*(50/100)) */, rotation: 0, dx: CARD_SPACING, dy: 0 },   // Player (bottom)
-      { x: (gameboardWidth*(15/100)) /* + (CARD_WIDTH*(50/100)) */, y: (gameboardWidth*(25/100)) + (CARD_WIDTH*(50/100)), rotation: 90, dx: 0, dy: CARD_SPACING }, // Enemy 1 (left)
-      { x: (gameboardWidth*(75/100)) - (CARD_WIDTH*(50/100)), y: (gameboardWidth*(15/100)) /* + (CARD_WIDTH*(50/100)) */, rotation: 0, dx: -CARD_SPACING, dy: 0 },  // Enemy 2 (top)
-      { x: (gameboardWidth*(85/100)) /* + (CARD_WIDTH*(50/100)) */, y: (gameboardWidth*(75/100)) - (CARD_WIDTH*(50/100)), rotation: 90, dx: 0, dy: -CARD_SPACING },  // Enemy 3 (right)
+      {
+        x: (gameboardWidth * (25 / 100)) + (CARD_WIDTH * (50 / 100)),
+        y: (gameboardWidth * (85 / 100)), /* + (CARD_WIDTH*(50/100)) */
+        rotation: 0,
+        dx: CARD_SPACING,
+        dy: 0,
+      }, // Player (bottom)
+      {
+        x: (gameboardWidth * (15 / 100)), /* + (CARD_WIDTH*(50/100)) */
+        y: (gameboardWidth * (25 / 100)) + (CARD_WIDTH * (50 / 100)),
+        rotation: 90,
+        dx: 0,
+        dy: CARD_SPACING,
+      }, // Enemy 1 (left)
+      {
+        x: (gameboardWidth * (75 / 100)) - (CARD_WIDTH * (50 / 100)),
+        y: (gameboardWidth * (15 / 100)), /* + (CARD_WIDTH*(50/100)) */
+        rotation: 0,
+        dx: -CARD_SPACING,
+        dy: 0,
+      }, // Enemy 2 (top)
+      {
+        x: (gameboardWidth * (85 / 100)), /* + (CARD_WIDTH*(50/100)) */
+        y: (gameboardWidth * (75 / 100)) - (CARD_WIDTH * (50 / 100)),
+        rotation: 90,
+        dx: 0,
+        dy: -CARD_SPACING,
+      }, // Enemy 3 (right)
     ];
 
     console.log("handPositions", handPositions);
@@ -812,12 +864,15 @@ const MatchPage: React.FC = () => {
       cardDiv.style.top = "50%";
       cardDiv.style.width = `${CARD_WIDTH}px`;
       cardDiv.style.height = `${CARD_HEIGHT}px`;
-      cardDiv.style.transform = `translate(-50%, -50%) scale(${DEAL_SCALE}) rotate(${DEAL_ROTATION}deg)`;
+      cardDiv.style.transform =
+        `translate(-50%, -50%) scale(${DEAL_SCALE}) rotate(${DEAL_ROTATION}deg)`;
       cardDiv.style.zIndex = "1001";
       if (deal.hand === 0 && deal.card) {
-        cardDiv.innerHTML = `<img src="https://deckofcardsapi.com/static/img/${deal.card.card.code}.png" style="width:100%;height:100%;border-radius:8px;" />`;
+        cardDiv.innerHTML =
+          `<img src="https://deckofcardsapi.com/static/img/${deal.card.card.code}.png" style="width:100%;height:100%;border-radius:8px;" />`;
       } else {
-        cardDiv.innerHTML = `<img src="${cardback}" style="width:100%;height:100%;border-radius:8px;" />`;
+        cardDiv.innerHTML =
+          `<img src="${cardback}" style="width:100%;height:100%;border-radius:8px;" />`;
       }
       gameboard.appendChild(cardDiv);
 
@@ -847,8 +902,8 @@ const MatchPage: React.FC = () => {
       animatingCards.forEach((anim, idx) => {
         if (anim.finished) return;
         const handPos = handPositions[anim.hand];
-        const baseX = (handPos.x); 
-        const baseY = (handPos.y);
+        const baseX = handPos.x;
+        const baseY = handPos.y;
         const destX = baseX + handPos.dx * anim.offset;
         const destY = baseY + handPos.dy * anim.offset;
 
@@ -863,13 +918,15 @@ const MatchPage: React.FC = () => {
         const curX = 0.5 * rect.width + (destX - 0.5 * rect.width) * progress;
         const curY = 0.5 * rect.height + (destY - 0.5 * rect.height) * progress;
         const curScale = DEAL_SCALE - (DEAL_SCALE - 1) * progress;
-        const curRot = DEAL_ROTATION + (handPos.rotation - DEAL_ROTATION) * progress;
+        const curRot = DEAL_ROTATION +
+          (handPos.rotation - DEAL_ROTATION) * progress;
 
         anim.div.style.left = `${curX}px`;
         anim.div.style.top = `${curY}px`;
-        anim.div.style.transform = `translate(-50%, -50%) scale(${curScale}) rotate(${curRot}deg)`;
-        
-        if(idx === 10) {
+        anim.div.style.transform =
+          `translate(-50%, -50%) scale(${curScale}) rotate(${curRot}deg)`;
+
+        if (idx === 10) {
           console.log("Card scale", curScale);
         }
 
@@ -884,16 +941,19 @@ const MatchPage: React.FC = () => {
 
         // Remove all cards and deck after the animation duration
         setTimeout(() => {
-          animatingCards.forEach(anim => anim.div.remove());
+          animatingCards.forEach((anim) => anim.div.remove());
           /* deckDiv.remove(); */
         }, DEAL_ANIMATION_DURATION);
-
       }
     }
     requestAnimationFrame(animateAll);
-  }
-  
-  const animatePassingCards = (passingCards: string[], receivingCards: string[], passingToId: number) => {
+  };
+
+  const animatePassingCards = (
+    passingCards: string[],
+    receivingCards: string[],
+    passingToId: number,
+  ) => {
     if (passingToId === 0) {
       console.log("cannot pass to self");
       return;
@@ -911,10 +971,26 @@ const MatchPage: React.FC = () => {
     // Hand positions and rotations: 0 = you, 1 = left, 2 = top, 3 = right
     const gameboardRect = gameboard.getBoundingClientRect();
     const handCenters = [
-      { x: gameboardRect.width * 0.5 + CARD_WIDTH / 2, y: gameboardRect.width * 0.85, rotation: 0 },   // you (bottom)
-      { x: gameboardRect.width * 0.15, y: gameboardRect.width * 0.5 + CARD_WIDTH / 2, rotation: 90 },  // left
-      { x: gameboardRect.width * 0.5 - CARD_WIDTH / 2, y: gameboardRect.width * 0.15, rotation: 180 }, // top (opposite)
-      { x: gameboardRect.width * 0.85, y: gameboardRect.width * 0.5 - CARD_WIDTH / 2, rotation: 270 }, // right
+      {
+        x: gameboardRect.width * 0.5 + CARD_WIDTH / 2,
+        y: gameboardRect.width * 0.85,
+        rotation: 0,
+      }, // you (bottom)
+      {
+        x: gameboardRect.width * 0.15,
+        y: gameboardRect.width * 0.5 + CARD_WIDTH / 2,
+        rotation: 90,
+      }, // left
+      {
+        x: gameboardRect.width * 0.5 - CARD_WIDTH / 2,
+        y: gameboardRect.width * 0.15,
+        rotation: 180,
+      }, // top (opposite)
+      {
+        x: gameboardRect.width * 0.85,
+        y: gameboardRect.width * 0.5 - CARD_WIDTH / 2,
+        rotation: 270,
+      }, // right
     ];
 
     const passingMap: { [key: number]: number[] } = {
@@ -961,19 +1037,27 @@ const MatchPage: React.FC = () => {
         cardDiv.style.top = `${from.y - 40 + i * 30}px`;
         cardDiv.style.width = `${CARD_WIDTH}px`;
         cardDiv.style.height = `${CARD_HEIGHT}px`;
-        cardDiv.style.transform = `translate(-50%, -50%) scale(${PASS_SCALE}) rotate(${from.rotation}deg)`;
+        cardDiv.style.transform =
+          `translate(-50%, -50%) scale(${PASS_SCALE}) rotate(${from.rotation}deg)`;
         cardDiv.style.zIndex = "2001";
 
         // Show real card image only for your outgoing and incoming cards
         if (fromIdx === 0) {
           // Your outgoing cards
-          cardDiv.innerHTML = `<img src="https://deckofcardsapi.com/static/img/${passingCards[i]}.png" style="width:100%;height:100%;border-radius:8px;" />`;
+          cardDiv.innerHTML =
+            `<img src="https://deckofcardsapi.com/static/img/${
+              passingCards[i]
+            }.png" style="width:100%;height:100%;border-radius:8px;" />`;
         } else if (toIdx === 0) {
           // Cards you are receiving
-          cardDiv.innerHTML = `<img src="https://deckofcardsapi.com/static/img/${receivingCards[i]}.png" style="width:100%;height:100%;border-radius:8px;" />`;
+          cardDiv.innerHTML =
+            `<img src="https://deckofcardsapi.com/static/img/${
+              receivingCards[i]
+            }.png" style="width:100%;height:100%;border-radius:8px;" />`;
         } else {
           // Other players: show card back
-          cardDiv.innerHTML = `<img src="${cardback}" style="width:100%;height:100%;border-radius:8px;" />`;
+          cardDiv.innerHTML =
+            `<img src="${cardback}" style="width:100%;height:100%;border-radius:8px;" />`;
         }
 
         gameboard.appendChild(cardDiv);
@@ -983,7 +1067,11 @@ const MatchPage: React.FC = () => {
           from: fromIdx,
           to: toIdx,
           startTime: performance.now() + i * PASS_STAGGER,
-          cardCode: fromIdx === 0 ? passingCards[i] : toIdx === 0 ? receivingCards[i] : "",
+          cardCode: fromIdx === 0
+            ? passingCards[i]
+            : toIdx === 0
+            ? receivingCards[i]
+            : "",
           finished: false,
           fromRot: from.rotation,
           toRot: to.rotation,
@@ -1020,7 +1108,8 @@ const MatchPage: React.FC = () => {
 
         anim.div.style.left = `${curX}px`;
         anim.div.style.top = `${curY}px`;
-        anim.div.style.transform = `translate(-50%, -50%) scale(${curScale}) rotate(${curRot}deg)`;
+        anim.div.style.transform =
+          `translate(-50%, -50%) scale(${curScale}) rotate(${curRot}deg)`;
 
         if (progress >= 1) {
           anim.finished = true;
@@ -1033,19 +1122,21 @@ const MatchPage: React.FC = () => {
         requestAnimationFrame(animateAll);
       } else {
         setTimeout(() => {
-          animatingCards.forEach(anim => anim.div.remove());
+          animatingCards.forEach((anim) => anim.div.remove());
         }, 500);
       }
     }
     requestAnimationFrame(animateAll);
   };
-  
 
-  function getReceivedCardCodes(newHand: PlayerCard[], currentHand: cardProps[]): string[] {
-    const currentCodes = new Set(currentHand.map(card => card.code));
+  function getReceivedCardCodes(
+    newHand: PlayerCard[],
+    currentHand: cardProps[],
+  ): string[] {
+    const currentCodes = new Set(currentHand.map((card) => card.code));
     return newHand
-      .filter(cardObj => !currentCodes.has(cardObj.card.code))
-      .map(cardObj => cardObj.card.code);
+      .filter((cardObj) => !currentCodes.has(cardObj.card.code))
+      .map((cardObj) => cardObj.card.code);
   }
 
   useEffect(() => {
@@ -1555,11 +1646,13 @@ const MatchPage: React.FC = () => {
             }}
           >
             Time Remaining: {timer}s
-        </div>
-      )}
+          </div>
+        )}
 
       {(
-        (["FIRSTTRICK", "NORMALTRICK", "FINALTRICK"].includes(currentGamePhase)) ||
+        (["FIRSTTRICK", "NORMALTRICK", "FINALTRICK"].includes(
+          currentGamePhase,
+        )) ||
         (["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase))
       ) && (
         <div
@@ -1568,8 +1661,14 @@ const MatchPage: React.FC = () => {
             top: "7%",
             left: "50%",
             transform: "translateX(-50%)",
-            backgroundColor: ["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase) ? "white" : "white",
-            color: ["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase) ? "black" : "black",
+            backgroundColor:
+              ["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase)
+                ? "white"
+                : "white",
+            color:
+              ["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase)
+                ? "black"
+                : "black",
             padding: "8px 18px",
             borderRadius: "10px",
             border: "1px solid white",
@@ -1581,15 +1680,13 @@ const MatchPage: React.FC = () => {
         >
           {["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase)
             ? (trickWinner
-                ? `${trickWinner} won the trick!`
-                : "Trick complete!")
+              ? `${trickWinner} won the trick!`
+              : "Trick complete!")
             : (currentPlayer
-                ? `It's ${currentPlayer}'s turn`
-                : "Waiting for player...")}
+              ? `It's ${currentPlayer}'s turn`
+              : "Waiting for player...")}
         </div>
       )}
-
-      
 
       <div className="menu-dropdown">
         <Dropdown

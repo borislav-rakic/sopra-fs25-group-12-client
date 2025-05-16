@@ -75,9 +75,8 @@ const RulesPage: React.FC = () => {
       </Paragraph>
 
       <Paragraph style={{ color: "white" }}>
-        From Round 5 onward, this pattern repeats. After passing, you&apos;ll receive
-        {" "}
-        <strong>3 cards</strong>{" "}
+        From Round 5 onward, this pattern repeats. After passing, you&apos;ll
+        receive <strong>3 cards</strong>{" "}
         from another player, so you&apos;ll hold a full hand of{" "}
         <strong>13 cards</strong>.
       </Paragraph>

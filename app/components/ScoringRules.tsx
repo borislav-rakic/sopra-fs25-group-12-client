@@ -33,12 +33,22 @@ interface MatchPlacementDataType {
 
 const inGameColumns: ColumnsType<InGameScoringDataType> = [
   { title: "Card", dataIndex: "card", key: "card" },
-  { title: "Points", dataIndex: "points", key: "points", align: "right" as const },
+  {
+    title: "Points",
+    dataIndex: "points",
+    key: "points",
+    align: "right" as const,
+  },
 ];
 
 const matchColumns: ColumnsType<MatchPlacementDataType> = [
   { title: "Placement", dataIndex: "place", key: "place" },
-  { title: "Points", dataIndex: "points", key: "points", align: "right" as const },
+  {
+    title: "Points",
+    dataIndex: "points",
+    key: "points",
+    align: "right" as const,
+  },
 ];
 
 export default function ScoringRules() {

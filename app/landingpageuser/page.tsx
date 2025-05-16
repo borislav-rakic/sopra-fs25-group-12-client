@@ -88,24 +88,26 @@ const LandingPageUser: React.FC = () => {
         if (
           typeof err === "object" && err !== null && "status" in err &&
           err.status === 401
-          ) {
+        ) {
           message.open({
             type: "error",
             content: "You are not currently logged in.",
           });
           localStorage.removeItem("token");
           router.push("/");
-          } else {
-            console.error("Failed to fetch user data:", err);
-            setUser(null);
+        } else {
+          console.error("Failed to fetch user data:", err);
+          setUser(null);
 
-            const error = err as { status?: number; message?: string };
+          const error = err as { status?: number; message?: string };
 
-            if (error.status === 401 || error.message?.includes("Invalid token")) {
-              localStorage.removeItem("token");
-              router.push("/");
-            }
+          if (
+            error.status === 401 || error.message?.includes("Invalid token")
+          ) {
+            localStorage.removeItem("token");
+            router.push("/");
           }
+        }
       }
     };
 
@@ -125,9 +127,14 @@ const LandingPageUser: React.FC = () => {
   //   localStorage.removeItem("token");
   // };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.removeItem("token");
     router.push("/");
+    try {
+      await apiService.post("/logout", {});
+    } catch (error) {
+      console.warn("Logout failed silently:", error);
+    }
   };
 
   const handleNewMatch = async () => {

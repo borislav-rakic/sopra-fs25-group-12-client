@@ -41,11 +41,16 @@ export const InviteHandler: React.FC = () => {
           setModalVisible(false);
         }
       } catch (error) {
-        if (typeof error === "object" && error !== null && "status" in error && (error.status === 403 || error.status === 401)) {
+        if (
+          typeof error === "object" && error !== null && "status" in error &&
+          (error.status === 403 || error.status === 401)
+        ) {
           localStorage.removeItem("token");
           setInvite(null);
           setModalVisible(false);
-          console.warn("Token invalid or expired, removed token and skipping invite check.");
+          console.warn(
+            "Token invalid or expired, removed token and skipping invite check.",
+          );
         } else {
           console.error("Unexpected error fetching invites:", error);
         }
