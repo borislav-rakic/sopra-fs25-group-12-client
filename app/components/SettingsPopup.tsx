@@ -23,7 +23,7 @@ const playMatColors = [
   "black",
 ];
 
-const cardBackFiles = Array.from({ length: 6 }, (_, i) => `b10${i + 1}.png`);
+const cardBackFiles = Array.from({ length: 6 }, (_, i) => `c10${i + 1}.png`);
 
 const SettingsPopup: React.FC<SettingsPopupProps> = ({
   isOpen,
