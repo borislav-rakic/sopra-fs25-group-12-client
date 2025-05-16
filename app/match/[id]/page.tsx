@@ -406,6 +406,16 @@ const MatchPage: React.FC = () => {
   }, [generateCard, trickSlot0, trickSlot1, trickSlot2, trickSlot3]);
 
   const fetchMatchData = useCallback(async () => {
+
+    if (typeof matchId === "string" && !/^\d+$/.test(matchId)){
+      message.open({
+        type: "error",
+        content: "invalid URL",
+      });
+      router.push("/landingpageuser");
+      return;
+    }
+
     try {
       console.log("Fetching match data");
 
@@ -1081,6 +1091,17 @@ const MatchPage: React.FC = () => {
       setMyTurn(false);
     }
   }, [trickPhase]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      message.open({
+        type: "error",
+        content: "You must be logged in to view this page.",
+      });
+      router.push("/"); // or "/landingpageuser"
+    }
+  }, [router]);
 
   useEffect(() => {
     if (lastTrickPhase === "JUSTCOMPLETED" && trickPhase === "READY") {
