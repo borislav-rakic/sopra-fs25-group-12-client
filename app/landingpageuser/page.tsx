@@ -128,13 +128,13 @@ const LandingPageUser: React.FC = () => {
   // };
 
   const handleLogout = async () => {
-    localStorage.removeItem("token");
-    router.push("/");
     try {
       await apiService.post("/logout", {});
     } catch (error) {
       console.warn("Logout failed silently:", error);
     }
+    localStorage.removeItem("token");
+    router.push("/");
   };
 
   const handleNewMatch = async () => {
