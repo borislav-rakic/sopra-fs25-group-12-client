@@ -60,14 +60,6 @@ const Login: React.FC = () => {
         onFinish={handleLogin}
         layout="vertical"
       >
-        <Form.Item>
-          <p style={{ color: "white", fontSize: "16px", marginBottom: "10px" }}>
-            For testing purposes we have users &quot;User1&quot;,
-            &quot;User2&quot;, &hellip; , &quot;User9&quot;<br />with Passwords
-            &quot;Secret1&quot;, &quot;Secret2&quot;, &hellip; ,
-            &quot;Secret9&quot;.
-          </p>
-        </Form.Item>
         <Form.Item
           name="username"
           label="Username:"
