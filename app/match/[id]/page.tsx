@@ -109,6 +109,7 @@ const MatchPage: React.FC = () => {
   const passNow = useRef<boolean>(false);
   const [previousGamePhase, setPreviousGamePhase] = useState<string>("");
   const passingCardsforAnimation = useRef<string[]>(["", "", ""]);
+  const passId = useRef<number>(0);
 
   const [htmlContent, setHtmlContent] = useState<string>("");
   const [serverMessages, setServerMessages] = useState<MatchMessage[]>([]);
@@ -426,10 +427,12 @@ const MatchPage: React.FC = () => {
         && opponent3Cards.length === 0;
       console.log("localHandsEmpty", localHandsEmpty);
       
-      const serverHandsFull =
-        response.playerCards && response.playerCards.length > 0 &&
-        response.cardsInHandPerPlayer &&
-        Object.values(response.cardsInHandPerPlayer).every((n) => n > 0);
+      const serverHandsFull = response.cardsInHandPerPlayer 
+        && response.cardsInHandPerPlayer[0] === 13
+        && response.cardsInHandPerPlayer[1] === 13
+        && response.cardsInHandPerPlayer[2] === 13
+        && response.cardsInHandPerPlayer[3] === 13;
+
       console.log("serverHandsFull", serverHandsFull);
 
       console.log(currentGamePhase, previousGamePhase);
@@ -447,6 +450,16 @@ const MatchPage: React.FC = () => {
         setMyTurn(response.myTurn ?? false);
         setPreviousGamePhase(response.gamePhase ?? "");
       }
+
+      if (response.passingToPlayerSlot !== null) {
+        passId.current = response.passingToPlayerSlot;
+      }
+
+      if (currentGamePhase === "NORMALTRICK") {
+        passId.current = 0;
+      }
+
+      console.log("passId", passId.current);
 
       if (response.currentPlayerSlot !== null) {
         setCurrentPlayer(players[response.currentPlayerSlot] ?? "");
@@ -593,10 +606,11 @@ const MatchPage: React.FC = () => {
         console.log("passing cards", passingCardsforAnimation.current);
         console.log("received cards", receivedCards);
         console.log("current player hand", cardsInHand);
-        console.log("passing to player in slot", response.passingToPlayerSlot ?? 0);
+        console.log("passing to player in slot", response.passingToPlayerSlot);
 
-        // Start the animation
-        animatePassingCards(passingCardsforAnimation.current, receivedCards, response.passingToPlayerSlot ?? 0);
+
+        console.log("invoking animatePassingCards");
+        animatePassingCards(passingCardsforAnimation.current, receivedCards, passId.current);
         passNow.current = false;
         return;
       }
@@ -865,20 +879,154 @@ const MatchPage: React.FC = () => {
     requestAnimationFrame(animateAll);
   }
   
-  const animatePassingCards = (passingCards: string[], receivingCards: string[], id: number) => {
-    if (id === 0) {
+  const animatePassingCards = (passingCards: string[], receivingCards: string[], passingToId: number) => {
+    if (passingToId === 0) {
       console.log("cannot pass to self");
       return;
     }
 
-/*     const gameboard = document.querySelector(".gameboard") as HTMLElement;
-    const gameboardRect = gameboard.getBoundingClientRect();
-    const gameboardWidth = gameboardRect.width;
-    const handDiv = document.querySelector('.hand-0-extension') as HTMLElement;
-    const handRect = handDiv.getBoundingClientRect();
-    const handWidth = handRect.width; */
+    const gameboard = document.querySelector(".gameboard") as HTMLElement;
+    if (!gameboard) return;
 
-  }
+    const CARD_WIDTH = 70;
+    const CARD_HEIGHT = CARD_WIDTH * 1.397;
+    const PASS_SCALE = 1.2;
+    const PASS_DURATION = 700;
+    const PASS_STAGGER = 60;
+    const CARD_BACK_IMAGE = "/card_back/b101.png";
+
+    // Hand positions and rotations: 0 = you, 1 = left, 2 = top, 3 = right
+    const gameboardRect = gameboard.getBoundingClientRect();
+    const handCenters = [
+      { x: gameboardRect.width * 0.5 + CARD_WIDTH / 2, y: gameboardRect.width * 0.85, rotation: 0 },   // you (bottom)
+      { x: gameboardRect.width * 0.15, y: gameboardRect.width * 0.5 + CARD_WIDTH / 2, rotation: 90 },  // left
+      { x: gameboardRect.width * 0.5 - CARD_WIDTH / 2, y: gameboardRect.width * 0.15, rotation: 180 }, // top (opposite)
+      { x: gameboardRect.width * 0.85, y: gameboardRect.width * 0.5 - CARD_WIDTH / 2, rotation: 270 }, // right
+    ];
+
+    const passingMap: { [key: number]: number[] } = {
+      1: [1, 2, 3, 0],
+      2: [2, 0, 1, 3],
+      3: [3, 1, 2, 0],
+    };
+    const passTo = passingMap[passingToId];
+
+    function getStaggeredDest(to: number, i: number) {
+      const staggerOffset = (i - 1) * CARD_WIDTH;
+      if (to === 1 || to === 3) {
+        return { x: handCenters[to].x, y: handCenters[to].y + staggerOffset };
+      } else {
+        return { x: handCenters[to].x + staggerOffset, y: handCenters[to].y };
+      }
+    }
+
+    const animatingCards: {
+      div: HTMLDivElement;
+      from: number;
+      to: number;
+      startTime: number;
+      cardCode: string;
+      finished: boolean;
+      fromRot: number;
+      toRot: number;
+      destX: number;
+      destY: number;
+    }[] = [];
+
+    // Animate all passes for all players
+    for (let fromIdx = 0; fromIdx < 4; fromIdx++) {
+      const toIdx = passTo[fromIdx];
+      const from = handCenters[fromIdx];
+      const to = handCenters[toIdx];
+
+      for (let i = 0; i < 3; i++) {
+        const dest = getStaggeredDest(toIdx, i);
+        const cardDiv = document.createElement("div");
+        cardDiv.className = "passing-card";
+        cardDiv.style.position = "absolute";
+        cardDiv.style.left = `${from.x}px`;
+        cardDiv.style.top = `${from.y - 40 + i * 30}px`;
+        cardDiv.style.width = `${CARD_WIDTH}px`;
+        cardDiv.style.height = `${CARD_HEIGHT}px`;
+        cardDiv.style.transform = `translate(-50%, -50%) scale(${PASS_SCALE}) rotate(${from.rotation}deg)`;
+        cardDiv.style.zIndex = "2001";
+
+        // Show real card image only for your outgoing and incoming cards
+        if (fromIdx === 0) {
+          // Your outgoing cards
+          cardDiv.innerHTML = `<img src="https://deckofcardsapi.com/static/img/${passingCards[i]}.png" style="width:100%;height:100%;border-radius:8px;" />`;
+        } else if (toIdx === 0) {
+          // Cards you are receiving
+          cardDiv.innerHTML = `<img src="https://deckofcardsapi.com/static/img/${receivingCards[i]}.png" style="width:100%;height:100%;border-radius:8px;" />`;
+        } else {
+          // Other players: show card back
+          cardDiv.innerHTML = `<img src="${CARD_BACK_IMAGE}" style="width:100%;height:100%;border-radius:8px;" />`;
+        }
+
+        gameboard.appendChild(cardDiv);
+
+        animatingCards.push({
+          div: cardDiv,
+          from: fromIdx,
+          to: toIdx,
+          startTime: performance.now() + i * PASS_STAGGER,
+          cardCode: fromIdx === 0 ? passingCards[i] : toIdx === 0 ? receivingCards[i] : "",
+          finished: false,
+          fromRot: from.rotation,
+          toRot: to.rotation,
+          destX: dest.x,
+          destY: dest.y,
+        });
+      }
+    }
+
+    let lastFrameTime = 0;
+    function animateAll(now: number) {
+      if (now - lastFrameTime < 1000 / 120) {
+        requestAnimationFrame(animateAll);
+        return;
+      }
+      lastFrameTime = now;
+
+      let allFinished = true;
+      animatingCards.forEach((anim) => {
+        if (anim.finished) return;
+        const from = handCenters[anim.from];
+
+        const elapsed = now - anim.startTime;
+        if (elapsed < 0) {
+          allFinished = false;
+          return;
+        }
+        const progress = Math.min(elapsed / PASS_DURATION, 1);
+
+        const curX = from.x + (anim.destX - from.x) * progress;
+        const curY = from.y + (anim.destY - from.y) * progress;
+        const curScale = PASS_SCALE - (PASS_SCALE - 1) * progress;
+        const curRot = anim.fromRot + (anim.toRot - anim.fromRot) * progress;
+
+        anim.div.style.left = `${curX}px`;
+        anim.div.style.top = `${curY}px`;
+        anim.div.style.transform = `translate(-50%, -50%) scale(${curScale}) rotate(${curRot}deg)`;
+
+        if (progress >= 1) {
+          anim.finished = true;
+        } else {
+          allFinished = false;
+        }
+      });
+
+      if (!allFinished) {
+        requestAnimationFrame(animateAll);
+      } else {
+        setTimeout(() => {
+          animatingCards.forEach(anim => anim.div.remove());
+        }, 500);
+      }
+    }
+    requestAnimationFrame(animateAll);
+  };
+  
 
   function getReceivedCardCodes(newHand: PlayerCard[], currentHand: cardProps[]): string[] {
     const currentCodes = new Set(currentHand.map(card => card.code));
