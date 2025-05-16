@@ -98,26 +98,32 @@ Make sure you have the following installed:
 ### Running the Application Locally
 
 ### Clone The Repository
-```git clone https://github.com/borislav-rakic/sopra-fs25-group-12-client```
-### Navigate to the cloned directory in the terminal
-```cd sopra-fs25-student-client```
-### Inside the repository folder (with ```ls``` you can list files) there is a bash script _setup.sh_ that will install everything you need, according to the system you are using. Run the following command and follow the instructions
-   ```shell
-   source setup.sh
-   ```
-### Start Development Server
-```npm start```
-or 
-```npm run dev```
 
+`git clone https://github.com/borislav-rakic/sopra-fs25-group-12-client`
+
+### Navigate to the cloned directory in the terminal
+
+`cd sopra-fs25-student-client`
+
+### Inside the repository folder (with `ls` you can list files) there is a bash script _setup.sh_ that will install everything you need, according to the system you are using. Run the following command and follow the instructions
+
+```shell
+source setup.sh
+```
+
+### Start Development Server
+
+`npm start` or `npm run dev`
 
 ### Running Tests
-```npm test```
+
+`npm test`
 
 ### External Dependencies
 
 ### Releases
-```npm run build```
+
+`npm run build`
 
 ## Illustrations
 

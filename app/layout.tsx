@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
+"use client";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import { ConfigProvider, theme } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "@/styles/globals.css";
 import { InviteHandler } from "@/components/inviteHandler";
 import { Luckiest_Guy } from "next/font/google";
+import { usePathname } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,28 +24,16 @@ const luckiestGuy = Luckiest_Guy({
   variable: "--font-luckiest-guy",
 });
 
-export const metadata: Metadata = {
-  title: "SoPra Group 12: Hearts Attack",
-  description: "sopra-fs25-template-client",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", type: "image/x-icon" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
-    ],
-    apple: [
-      { url: "/web-app-manifest-192x192.png", sizes: "192x192" },
-      { url: "/web-app-manifest-512x512.png", sizes: "512x512" },
-    ],
-  },
-  manifest: "/site.webmanifest",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  // Define pages where InviteHandler should not be rendered
+  const excludeInviteHandler = ["/start", "/match"];
+  const shouldRenderInviteHandler = !excludeInviteHandler.includes(pathname) || pathname === "/";
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -84,7 +74,7 @@ export default function RootLayout({
         >
           <AntdRegistry>
             {children}
-            <InviteHandler />
+            {shouldRenderInviteHandler && <InviteHandler />}
           </AntdRegistry>
         </ConfigProvider>
       </body>

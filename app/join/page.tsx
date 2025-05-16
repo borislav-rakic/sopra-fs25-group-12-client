@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import "@ant-design/v5-patch-for-react-19";
 import { Button, Form, Input, message, Modal, Table } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { Match } from "@/types/match";
@@ -34,8 +35,9 @@ const JoinPage: React.FC = () => {
     const fetchMatches = async () => {
       try {
         const fetchedMatches = await apiService.get<Match[]>("/matches");
-        setMatches(fetchedMatches);
-        setFilteredMatches(fetchedMatches);
+        const availableMatches = fetchedMatches.filter((match) => match.slotAvailable);
+        setMatches(availableMatches);
+        setFilteredMatches(availableMatches);
       } catch {
         message.open({
           type: "error",
@@ -164,8 +166,8 @@ const JoinPage: React.FC = () => {
 
   const columns: TableProps<Match>["columns"] = [
     { title: "MatchID", dataIndex: "matchId", key: "matchId" },
-    { title: "Host", dataIndex: "host", key: "host" },
-    { title: "Length", dataIndex: "length", key: "length" },
+    { title: "Host", dataIndex: "hostUsername", key: "hostUsername" },
+    { title: "Length", dataIndex: "matchGoal", key: "matchGoal" },
     {
       title: "",
       key: "action",

@@ -68,6 +68,7 @@ const StartPage: React.FC = () => {
   const [joinRequests, setJoinRequests] = useState<
     { userId: string; status: string }[]
   >([]);
+  const [isActionLoading, setIsActionLoading] = useState(false);
 
   interface JoinRequest {
     userId: string;
@@ -140,6 +141,11 @@ const StartPage: React.FC = () => {
           match.player4Id,
         ];
 
+        if (usersRef.current.length === 0) {
+        console.warn("User list not loaded yet. Skipping player name assignment.");
+        return;
+      }
+
         for (let i = 0; i < playerIdsArray.length; i++) {
           const pid = playerIdsArray[i];
 
@@ -156,7 +162,7 @@ const StartPage: React.FC = () => {
           } else {
             // It's a real user
             const user = usersRef.current.find((u) => Number(u.id) === pid);
-            updatedSelectedPlayers[i] = user?.username ?? "Unknown User";
+            updatedSelectedPlayers[i] = user?.username ?? match.playerNames?.[i] ?? "Unknown User";
           }
         }
 
@@ -198,6 +204,15 @@ const StartPage: React.FC = () => {
           message.open({
             type: "error",
             content: "You are not authorized to view this match.",
+          });
+          router.push("/landingpageuser");
+        } else if ( 
+          typeof error === "object" && error !== null && "status" in error &&
+          error.status === 404
+        ) {
+          message.open({
+            type: "error",
+            content: "This no longer exists. It was cancelled by the host or never existed.",
           });
           router.push("/landingpageuser");
         } else if (error instanceof Error) {
@@ -372,8 +387,14 @@ const StartPage: React.FC = () => {
   };
 
   const handleStart = async () => {
+    if (!gameId) return;
+    setIsActionLoading(true);
     try {
       await apiService.post(`/matches/${gameId}/start`, {});
+      message.open({
+        type: "info",
+        content: "Starting Match...",
+      });
       router.push(`/match/${gameId}`);
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -406,6 +427,8 @@ const StartPage: React.FC = () => {
   };
 
   const handleCancelMatch = async () => {
+    if (!gameId) return;
+    setIsActionLoading(true);
     try {
       await apiService.delete(`/matches/${gameId}`);
       message.open({
@@ -418,7 +441,9 @@ const StartPage: React.FC = () => {
         type: "error",
         content: "Could not cancel the match.",
       });
-    }
+    } finally {
+    setIsActionLoading(false);
+  }
   };
 
   const renderHostCard = () => (
@@ -836,11 +861,6 @@ const StartPage: React.FC = () => {
       return null;
     }
 
-    message.open({
-      type: "info",
-      content: `Pending join requests: ${JSON.stringify(joinRequests)}`,
-    });
-
     return joinRequests.map((request) => (
       <Modal
         key={request.userId}
@@ -958,6 +978,8 @@ const StartPage: React.FC = () => {
                 block
                 className={styles.whiteButton}
                 onClick={handleCancelMatch}
+                disabled={isActionLoading}
+                loading={isActionLoading}
               >
                 Cancel Match
               </Button>
@@ -965,6 +987,8 @@ const StartPage: React.FC = () => {
                 block
                 className={styles.whiteButton}
                 onClick={handleStart}
+                disabled={isActionLoading}
+                loading={isActionLoading}
               >
                 Start
               </Button>

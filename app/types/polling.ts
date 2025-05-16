@@ -21,6 +21,8 @@ export interface PollingDTO {
   currentTrickLeaderMatchPlayerSlot: number | null;
   currentTrickLeaderPlayerSlot: number | null;
   currentTrickDTO: TrickDTO | null; // TrickDTO object
+  currentPlayerSlot: number | null;
+  passingToPlayerSlot: number | null;
 
   previousTrick: Array<innerCard> | null;
   previousTrickWinnerMatchPlayerSlot: number | null;
