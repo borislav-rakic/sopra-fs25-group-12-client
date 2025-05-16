@@ -807,7 +807,7 @@ const MatchPage: React.FC = () => {
       if (deal.hand === 0 && deal.card) {
         cardDiv.innerHTML = `<img src="https://deckofcardsapi.com/static/img/${deal.card.card.code}.png" style="width:100%;height:100%;border-radius:8px;" />`;
       } else {
-        cardDiv.innerHTML = `<img src="/card_back/b101.png" style="width:100%;height:100%;border-radius:8px;" />`;
+        cardDiv.innerHTML = `<img src="${cardback}" style="width:100%;height:100%;border-radius:8px;" />`;
       }
       gameboard.appendChild(cardDiv);
 
@@ -897,7 +897,6 @@ const MatchPage: React.FC = () => {
     const PASS_SCALE = 1.2;
     const PASS_DURATION = 700;
     const PASS_STAGGER = 60;
-    const CARD_BACK_IMAGE = "/card_back/b101.png";
 
     // Hand positions and rotations: 0 = you, 1 = left, 2 = top, 3 = right
     const gameboardRect = gameboard.getBoundingClientRect();
@@ -964,7 +963,7 @@ const MatchPage: React.FC = () => {
           cardDiv.innerHTML = `<img src="https://deckofcardsapi.com/static/img/${receivingCards[i]}.png" style="width:100%;height:100%;border-radius:8px;" />`;
         } else {
           // Other players: show card back
-          cardDiv.innerHTML = `<img src="${CARD_BACK_IMAGE}" style="width:100%;height:100%;border-radius:8px;" />`;
+          cardDiv.innerHTML = `<img src="${cardback}" style="width:100%;height:100%;border-radius:8px;" />`;
         }
 
         gameboard.appendChild(cardDiv);
@@ -1126,7 +1125,7 @@ const MatchPage: React.FC = () => {
     }
     if (
       localStorage.getItem("cardback") &&
-      /^\/card_back\/b10[1-6]\.png$/.test(
+      /^\/card_back\/[b-c]10[1-6]\.png$/.test(
         localStorage.getItem("cardback") || "",
       )
     ) {
