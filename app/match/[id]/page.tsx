@@ -910,7 +910,7 @@ const MatchPage: React.FC = () => {
 
     const passingMap: { [key: number]: number[] } = {
       1: [1, 2, 3, 0],
-      2: [2, 1, 0, 3],
+      2: [2, 3, 0, 1],
       3: [3, 0, 1, 2],
     };
     const passTo = passingMap[passingToId];
