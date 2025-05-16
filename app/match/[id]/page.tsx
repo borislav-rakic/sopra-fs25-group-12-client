@@ -1131,8 +1131,8 @@ const MatchPage: React.FC = () => {
     ) {
       setCardback(localStorage.getItem("cardback") || "");
     } else {
-      setCardback("/card_back/b101.png"); // Default cardback
-      localStorage.setItem("cardback", "/card_back/b101.png");
+      setCardback("/card_back/c101.png"); // Default cardback
+      localStorage.setItem("cardback", "/card_back/c101.png");
     }
   }, []);
 
