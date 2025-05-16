@@ -361,10 +361,9 @@ const StartPage: React.FC = () => {
 
   const handleCancelInvite = async (index: number) => {
     if (!gameId) return;
-    const shiftedIndex = (index + 1) % 4;
     try {
-      console.log("Cancelling invite for index:", shiftedIndex);
-      await apiService.delete(`/matches/${gameId}/invite/${shiftedIndex}`);
+      console.log("Cancelling invite for index:", index);
+      await apiService.delete(`/matches/${gameId}/invite/${index}`);
 
       const updatedPlayers = [...selectedPlayers];
       updatedPlayers[index] = "";
