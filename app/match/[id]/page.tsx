@@ -421,6 +421,10 @@ const MatchPage: React.FC = () => {
         setPollingPausedUntil(Infinity); // Halt polling permanently
       }
 
+      if (response.matchPhase === "BEFORE_GAME") {
+        return;
+      }
+
       const localHandsEmpty = cardsInHand.length === 0
         && opponent1Cards.length === 0
         && opponent2Cards.length === 0
@@ -906,8 +910,8 @@ const MatchPage: React.FC = () => {
 
     const passingMap: { [key: number]: number[] } = {
       1: [1, 2, 3, 0],
-      2: [2, 0, 1, 3],
-      3: [3, 1, 2, 0],
+      2: [2, 1, 0, 3],
+      3: [3, 0, 1, 2],
     };
     const passTo = passingMap[passingToId];
 
