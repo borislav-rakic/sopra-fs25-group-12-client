@@ -1795,10 +1795,7 @@ const MatchPage: React.FC = () => {
 
     const resizeObserver = new window.ResizeObserver(() => updateSize());
     resizeObserver.observe(node);
-
-    console.log("window size", window.innerWidth, window.innerHeight);
-    console.log("gameboard size", gameboardSize.width, gameboardSize.height);
-
+    
     return () => resizeObserver.disconnect();
   }, []);
 
