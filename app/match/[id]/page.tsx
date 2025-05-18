@@ -123,6 +123,10 @@ const MatchPage: React.FC = () => {
     []
   );
 
+  const [fetchErrorCount, setFetchErrorCount] = useState(0);
+  const [lastFetchError, setLastFetchError] = useState<any>(null);
+
+
   ///////////////////////////
 
   ///////////////////////////
@@ -432,6 +436,7 @@ const MatchPage: React.FC = () => {
         {},
       );
       setPollingResponse(response);
+      setFetchErrorCount(0);
       console.log("Match data response:", response);
 
       if (response.matchPhase === "FINISHED") {
@@ -743,10 +748,36 @@ const MatchPage: React.FC = () => {
           Array.from({ length: shifted[3] }, generateEnemyCard),
         );
       }
-    } catch (error) {
-      console.log("Error caught:", error); // Inspect the error structure
+      } catch (error) {
+        setFetchErrorCount((prev) => prev + 1);
+        setLastFetchError(error); // <-- store the error in state
+      }
+      
+    console.log("Finished fetchMatchData for", matchId);
+  }, [
+    matchId,
+    generateCard,
+    handleTrickFromLogic,
+    apiService,
+    generateEnemyCard,
+    cardsInHand,
+    isDealing,
+    opponent1Cards,
+    opponent2Cards,
+    opponent3Cards,
+  ]);
 
-      // Check if the error has a `response` property (e.g., Axios errors)
+  useEffect(() => {
+    if (fetchErrorCount > 0 && fetchErrorCount < 3) {
+      // Retry after 150ms
+      const timeout = setTimeout(() => {
+        fetchMatchData();
+      }, 150);
+      return () => clearTimeout(timeout);
+    }
+    if (fetchErrorCount >= 3 && lastFetchError) {
+      // Handle error after 3 tries
+      const error = lastFetchError;
       if (
         typeof error === "object" && error !== null && "status" in error &&
         error.status === 403
@@ -775,10 +806,8 @@ const MatchPage: React.FC = () => {
         });
         router.push("/landingpageuser");
       } else if (error instanceof Error) {
-        // Handle standard Error objects
         handleApiError(error, "Failed to fetch match data.");
       } else {
-        // Fallback for unexpected error structures
         console.error("Unexpected error structure:", error);
         message.open({
           type: "error",
@@ -786,19 +815,7 @@ const MatchPage: React.FC = () => {
         });
       }
     }
-    console.log("Finished fetchMatchData for", matchId);
-  }, [
-    matchId,
-    generateCard,
-    handleTrickFromLogic,
-    apiService,
-    generateEnemyCard,
-    cardsInHand,
-    isDealing,
-    opponent1Cards,
-    opponent2Cards,
-    opponent3Cards,
-  ]);
+  }, [fetchErrorCount, lastFetchError, fetchMatchData, router]);
 
   const animateDealingCards = (playerCards: PlayerCard[]) => {
     const gameboard = document.querySelector(".gameboard") as HTMLElement;
