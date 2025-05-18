@@ -6,7 +6,7 @@
   object-fit: cover;
   /* Ensure the image scales without distortion */
   background-color: rgba(255, 255, 255, 0);
-  border: 1px solid rgba(0, 0, 0, 0);
+  /* border: 1px solid rgba(0, 0, 0, 0); */
   /* z-index: 20; */
   transition: transform 0.2s ease-in-out;
 }
@@ -56,13 +56,13 @@
 .cardContainer {
   /* Base state for all cards */
   position: relative;
-  height: 90px;
-  width: 65px;
+  height: 100%;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: transparent;
-  border: 1px solid transparent;
+  /* border: 1px solid transparent; */
   font-size: 30px;
   text-align: center;
   transition: all 0.2s ease;
@@ -73,21 +73,21 @@
 
 /* PASSING PHASE - lifted cards */
 .cardContainer.selected {
-  transform: translateY(-20px);
+  transform: translateY(calc(-0.02 * var(--gameboard-height)));
   z-index: 40;
   cursor: pointer;
 }
 
 /* PASSING PHASE + hover */
 .cardContainer.selected.scalable:hover {
-  transform: translateY(-20px) scale(1.1);
+  transform: translateY(calc(-0.02 * var(--gameboard-height))) scale(1.1);
   z-index: 50;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 /* PLAYABLE CARDS - trick phase */
 .cardContainer.playableCard {
-  transform: translateY(-8px);
+  transform: translateY(calc(-0.015 * var(--gameboard-height)));
   box-shadow: 0 0 10px 4px rgba(255, 255, 0, 0.75);
   overflow: hidden;
   cursor: pointer;
@@ -96,7 +96,7 @@
 
 /* PLAYABLE hover */
 .cardContainer.playableCard:hover {
-  transform: translateY(-12px);
+  transform: translateY(calc(-0.02 * var(--gameboard-height))) scale(1.1);
   box-shadow: 0 0 10px 4px rgba(255, 255, 0, 0.75);
   z-index: 40;
 }

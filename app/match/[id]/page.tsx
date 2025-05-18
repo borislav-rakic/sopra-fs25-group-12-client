@@ -13,7 +13,7 @@ import { MatchMessage } from "@/types/matchMessage"; // adjust path as needed
 import cardStyles from "@/styles/card.module.css";
 
 // import { Match } from "@/types/match";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, createRef } from "react";
 import { PollingDTO } from "@/types/polling";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
@@ -72,14 +72,10 @@ const MatchPage: React.FC = () => {
   const [matchScore, setMatchScore] = useState([0, 0, 0, 0]);
   const [/*roundScore*/, setRoundScore] = useState([0, 0, 0, 0]);
 
-  const [/*currentTrick*/, setCurrentTrick] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState("");
   const [currentGamePhase, setCurrentGamePhase] = useState("");
-  const [lastTrickPhase, setLastTrickPhase] = useState<
-    "READY" | "JUSTCOMPLETED" | "RUNNING"
-  >("RUNNING");
   const [trickPhase, setTrickPhase] = useState<
-    "READY" | "JUSTCOMPLETED" | "RUNNING"
+    "READYFORFIRSTCARD" | "JUSTCOMPLETED" | "RUNNING" | "PROCESSINGTRICK"
   >("RUNNING");
   const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
   const [myTurn, setMyTurn] = useState(false);
@@ -111,8 +107,22 @@ const MatchPage: React.FC = () => {
   const passingCardsforAnimation = useRef<string[]>(["", "", ""]);
   const passId = useRef<number>(0);
 
+  const CLEANUP_ANIMATION_DURATION = 1000;
+  const cleanupNow = useRef<boolean>(false);
+  const previousWinner = useRef<number>(-1);
+
   const [htmlContent, setHtmlContent] = useState<string>("");
   const [serverMessages, setServerMessages] = useState<MatchMessage[]>([]);
+
+  const gameboardRef = useRef<HTMLDivElement>(null);
+  const [gameboardSize, setGameboardSize] = useState({ width: 1000, height: 800 });
+
+  const CARD_WIDTH = gameboardSize.width * 0.1; 
+  const CARD_HEIGHT = CARD_WIDTH * 1.397;
+
+  const cardRefs = useRef<Array<React.RefObject<HTMLDivElement>>>(
+    []
+  );
 
   ///////////////////////////
 
@@ -269,68 +279,75 @@ const MatchPage: React.FC = () => {
       zIndex: number,
     ) => {
       if (
-        (card === null && current.length > 0) || // Clear the slot if it has data but should be empty
-        (current.length === 0 && card !== null) || // Update the slot if it is empty but should have data
-        (current.length > 0 && current[0].code !== card) // Update the slot if the card code has changed
+        (card === null && current.length > 0) ||
+        (current.length === 0 && card !== null) ||
+        (current.length > 0 && current[0].code !== card)
       ) {
-        // Create a temporary card before generating the actual card
         if (card !== null && card !== "") {
           const tempCardId = `${card}-${Date.now()}`;
 
           const HAND_POSITIONS = [
             { x: "50%", y: "80%" }, // Player's hand (bottom center)
-            { x: "20%", y: "50%" }, // Opponent 1's hand (right center)
+            { x: "20%", y: "50%" }, // Opponent 1's hand (left center)
             { x: "50%", y: "20%" }, // Opponent 2's hand (top center)
-            { x: "80%", y: "50%" }, // Opponent 3's hand (left center)
+            { x: "80%", y: "50%" }, // Opponent 3's hand (right center)
           ];
 
-          const TRICK_POSITIONS = [
-            { x: "50%", y: "60%" }, // Trick slot 0
-            { x: "40%", y: "50%" }, // Trick slot 1
-            { x: "50%", y: "40%" }, // Trick slot 2
-            { x: "60%", y: "50%" }, // Trick slot 3
+          const directions = [
+            [0, 1],   // Player 0: down
+            [-1, 0],  // Player 1: left
+            [0, -1],  // Player 2: up
+            [1, 0],   // Player 3: right
           ];
+          const [dx, dy] = directions[position];
 
           const ROTATIONS = [
-            0, // Position 0 (bottom)
-            90, // Position 1 (left)
-            0, // Position 2 (top)
-            90, // Position 3 (right)
+            0,   // Position 0 (bottom)
+            90,  // Position 1 (left)
+            180, // Position 2 (top)
+            270, // Position 3 (right)
           ];
 
           const gameboard = document.querySelector(".gameboard") as HTMLElement;
           const gameboardRect = gameboard.getBoundingClientRect();
 
-          const cardWidth = 100; // Width of the card in pixels
-          const cardHeight = 140; // Height of the card in pixels
+          const cardWidth = CARD_WIDTH;
+          const cardHeight = CARD_HEIGHT;
+          const scale = 1.2;
 
-          const { x: startXPercent, y: startYPercent } =
-            HAND_POSITIONS[position];
-          const { x: endXPercent, y: endYPercent } = TRICK_POSITIONS[position];
+          // Start position
+          const { x: startXPercent, y: startYPercent } = HAND_POSITIONS[position];
+          let startX = (parseFloat(startXPercent) / 100) * gameboardRect.width;
+          let startY = (parseFloat(startYPercent) / 100) * gameboardRect.height;
 
-          const startX = (parseFloat(startXPercent) / 100) *
-            gameboardRect.width;
-          const startY = (parseFloat(startYPercent) / 100) *
-            gameboardRect.height;
-          const endX = (parseFloat(endXPercent) / 100) * gameboardRect.width;
-          const endY = (parseFloat(endYPercent) / 100) * gameboardRect.height;
+          // If it's your card, use the DOM rect
+          if (position === 0 && lastPlayedCardRect.current) {
+            const rect = lastPlayedCardRect.current;
+            startX = rect.left - gameboardRect.left + rect.width / 2;
+            startY = rect.top - gameboardRect.top + rect.height / 2;
+          }
+
+          // End position: center + shift in direction
+          const centerX = gameboardRect.width / 2;
+          const centerY = gameboardRect.height / 2;
+          const endX = centerX + dx * ((cardHeight * scale) / 2);
+          const endY = centerY + dy * ((cardHeight * scale) / 2);
           const rotation = ROTATIONS[position];
 
-          // Create a new div element for the animated card
+          // Create the animated card
           const animatedCardDiv = document.createElement("div");
           animatedCardDiv.id = tempCardId;
           animatedCardDiv.style.position = "absolute";
+          animatedCardDiv.style.left = `${startX}px`;
+          animatedCardDiv.style.top = `${startY}px`;
           animatedCardDiv.style.width = `${cardWidth}px`;
           animatedCardDiv.style.height = `${cardHeight}px`;
-          animatedCardDiv.style.left = `${startX - cardWidth / 2}px`;
-          animatedCardDiv.style.top = `${startY - cardHeight / 2}px`;
-          animatedCardDiv.style.transform = `rotate(${rotation}deg)`;
+          animatedCardDiv.style.transform = `translate(-50%, -50%) scale(1) rotate(${rotation}deg)`;
           animatedCardDiv.style.zIndex = "500";
-
-          // Set transform-origin to center
+          animatedCardDiv.style.pointerEvents = "none";
+          animatedCardDiv.style.transition = "none";
           animatedCardDiv.style.transformOrigin = "center";
 
-          // Create the card element (you'll need to adjust this based on your Card component)
           const cardElement = document.createElement("div");
           cardElement.style.width = "100%";
           cardElement.style.height = "100%";
@@ -339,56 +356,50 @@ const MatchPage: React.FC = () => {
           }" style="width: 100%; height: 100%;" />`;
           animatedCardDiv.appendChild(cardElement);
 
-          // Add the animated card to the DOM
-          const temporaryCardsContainer = document.querySelector(
-            `.${cardStyles.temporaryCards}`,
-          );
-          if (temporaryCardsContainer) {
-            temporaryCardsContainer.appendChild(animatedCardDiv);
+          // Append directly to .gameboard for robustness
+          gameboard.appendChild(animatedCardDiv);
 
-            // Animate using requestAnimationFrame
-            const startTime = performance.now();
-            const duration = 350;
-            const targetFps = 200;
-            const minFrameTime = 1000 / targetFps;
-            let lastFrameTime = 0;
+          // Animate using requestAnimationFrame
+          const startTime = performance.now();
+          const duration = 500;
+          const targetFps = 120;
+          const minFrameTime = 1000 / targetFps;
+          let lastFrameTime = 0;
 
-            const animate = (currentTime: number) => {
-              if (currentTime - lastFrameTime < minFrameTime) {
-                requestAnimationFrame(animate);
-                return;
-              }
-              lastFrameTime = currentTime;
+          function animate(currentTime: number) {
+            if (currentTime - lastFrameTime < minFrameTime) {
+              requestAnimationFrame(animate);
+              return;
+            }
+            lastFrameTime = currentTime;
 
-              const elapsedTime = currentTime - startTime;
-              const progress = Math.min(elapsedTime / duration, 1);
+            const elapsedTime = currentTime - startTime;
+            const progress = Math.min(elapsedTime / duration, 1);
 
-              const currentX = startX + (endX - startX) * progress;
-              const currentY = startY + (endY - startY) * progress;
+            const currentX = startX + (endX - startX) * progress;
+            const currentY = startY + (endY - startY) * progress;
+            const currentScale = 1 + (scale - 1) * progress;
 
-              animatedCardDiv.style.left = `${currentX - cardWidth / 2}px`;
-              animatedCardDiv.style.top = `${currentY - cardHeight / 2}px`;
+            animatedCardDiv.style.left = `${currentX}px`;
+            animatedCardDiv.style.top = `${currentY}px`;
+            animatedCardDiv.style.transform = `translate(-50%, -50%) scale(${currentScale}) rotate(${rotation}deg)`;
 
-              if (progress < 1) {
-                requestAnimationFrame(animate);
-              } else {
-                // Remove the element when animation is complete
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            } else {
+              setTimeout(() => {
+                setSlot([generateCard(card, 0, zIndex)]);
                 setTimeout(() => {
-                  setSlot([generateCard(card, 0, zIndex)]);
-                  setTimeout(() => {
-                    animatedCardDiv.remove();
-                  }, 250);
-                }, 100);
-              }
-            };
-
-            requestAnimationFrame(animate);
+                  animatedCardDiv.remove();
+                }, 250);
+              }, 100);
+            }
           }
+
+          requestAnimationFrame(animate);
         } else {
           setSlot([]);
         }
-
-        //setSlot(card === null || card === "" ? [] : [generateCard(card, 0, zIndex)]);
         console.log(`Slot ${position} updated:`, card || "empty");
       } else {
         console.log(
@@ -437,17 +448,14 @@ const MatchPage: React.FC = () => {
         opponent1Cards.length === 0 &&
         opponent2Cards.length === 0 &&
         opponent3Cards.length === 0;
-      console.log("localHandsEmpty", localHandsEmpty);
-
+     
       const serverHandsFull = response.cardsInHandPerPlayer &&
         response.cardsInHandPerPlayer[0] === 13 &&
         response.cardsInHandPerPlayer[1] === 13 &&
         response.cardsInHandPerPlayer[2] === 13 &&
         response.cardsInHandPerPlayer[3] === 13;
 
-      console.log("serverHandsFull", serverHandsFull);
-
-      console.log(currentGamePhase, previousGamePhase);
+     
       if (
         response.gamePhase === "FIRSTTRICK" && previousGamePhase === "PASSING"
       ) {
@@ -456,13 +464,19 @@ const MatchPage: React.FC = () => {
         setPreviousGamePhase(response.gamePhase ?? "");
       }
 
-      if ((!localHandsEmpty || !serverHandsFull) && !passNow.current) {
+      if (response.trickPhase === "READYFORFIRSTCARD" && trickPhase === "PROCESSINGTRICK") {
+        cleanupNow.current = true;
+        setTrickPhase(response.trickPhase);
+        /* setCurrentGamePhase(response.gamePhase ?? ""); */
+      }
+
+      if ((!localHandsEmpty || !serverHandsFull) && !passNow.current && !cleanupNow.current) {
         isDealing.current = false;
-        setLastTrickPhase(trickPhase);
         setTrickPhase(response.trickPhase);
         setCurrentGamePhase(response.gamePhase ?? "");
         setMyTurn(response.myTurn ?? false);
         setPreviousGamePhase(response.gamePhase ?? "");
+        previousWinner.current = (response.previousTrickDTO?.winningPosition ?? -1);
       }
 
       if (response.passingToPlayerSlot !== null) {
@@ -659,6 +673,26 @@ const MatchPage: React.FC = () => {
         return;
       }
 
+      if (cleanupNow.current) {
+        setPollingPausedUntil(Date.now() + CLEANUP_ANIMATION_DURATION);
+        console.log("preparing to animate cleanup");
+
+        if (response.previousTrickDTO) {
+          animateTrickCleanup(response.previousTrickDTO, previousWinner.current);
+        }
+
+        setTimeout(() => {
+          setTrickSlot0([]);
+          setTrickSlot1([]);
+          setTrickSlot2([]);
+          setTrickSlot3([]);
+        }, CLEANUP_ANIMATION_DURATION - 500);
+        
+        console.log("trick cleanup done");
+
+        cleanupNow.current = false;
+      }
+
       // Anything after this point will not be updated before the animation
       //
       //
@@ -771,13 +805,11 @@ const MatchPage: React.FC = () => {
     const gameboard = document.querySelector(".gameboard") as HTMLElement;
     const gameboardRect = gameboard.getBoundingClientRect();
     const gameboardWidth = gameboardRect.width;
-    const handDiv = document.querySelector(".hand-0-extension") as HTMLElement;
+    const handDiv = document.querySelector(".hand-0") as HTMLElement;
     const handRect = handDiv.getBoundingClientRect();
     const handWidth = handRect.width;
     const numCards = playerCards.length;
 
-    const CARD_WIDTH = 70;
-    const CARD_HEIGHT = CARD_WIDTH * 1.397; // Adjust this value to change the height of the cards
     const DEAL_SCALE = 1.5;
     const DEAL_ROTATION = 90;
     const DEAL_DURATION = 250; // ms per card
@@ -962,8 +994,6 @@ const MatchPage: React.FC = () => {
     const gameboard = document.querySelector(".gameboard") as HTMLElement;
     if (!gameboard) return;
 
-    const CARD_WIDTH = 70;
-    const CARD_HEIGHT = CARD_WIDTH * 1.397;
     const PASS_SCALE = 1.2;
     const PASS_DURATION = 700;
     const PASS_STAGGER = 60;
@@ -1139,6 +1169,143 @@ const MatchPage: React.FC = () => {
       .map((cardObj) => cardObj.card.code);
   }
 
+  const animateTrickCleanup = (previousTrick: TrickDTO, winner: number) => {
+    const gameboard = document.querySelector(".gameboard") as HTMLElement;
+    if (!gameboard) return;
+
+    const ANIMATION_DURATION = 900;
+    const TARGET_FPS = 120;
+    const MIN_FRAME_TIME = 1000 / TARGET_FPS;
+    const STARTSCALE = 1.5;
+    const ENDSCALE = 0.2;
+
+    const gameboardRect = gameboard.getBoundingClientRect();
+    const CARD_SCALE = 1.2;
+
+    // Directions and rotations for each player
+    const directions = [
+      [0, 1],   // Player 0: down
+      [-1, 0],  // Player 1: left
+      [0, -1],  // Player 2: up
+      [1, 0],   // Player 3: right
+    ];
+    const rotations = [0, 90, 0, 90];
+
+    // Calculate pile positions (center + shift in direction)
+    const centerX = gameboardRect.width / 2;
+    const centerY = gameboardRect.height / 2;
+
+    const pilePositions = [0, 1, 2, 3].map((i) => {
+      const [dx, dy] = directions[i];
+      return {
+        x: centerX + dx * ((CARD_HEIGHT * CARD_SCALE) / 2),
+        y: centerY + dy * ((CARD_HEIGHT * CARD_SCALE) / 2),
+        rotation: rotations[i],
+      };
+    });
+
+    const boxCenters = [0, 1, 2, 3].map((i) => {
+      const el = document.querySelector(`.game-playerscore${i}`) as HTMLElement;
+      if (!el) {
+        // fallback to previous logic if not found
+        return {
+          x: gameboardRect.width * 0.5 + CARD_WIDTH / 2,
+          y: gameboardRect.width * 0.85,
+        };
+      }
+      const rect = el.getBoundingClientRect();
+      // Calculate center relative to gameboard
+      return {
+        x: rect.left - gameboardRect.left + rect.width / 2,
+        y: rect.top - gameboardRect.top + rect.height / 2,
+      };
+    });
+
+    // Prepare animated cards
+    const animatingCards: {
+      div: HTMLDivElement;
+      startX: number;
+      startY: number;
+      endX: number;
+      endY: number;
+      startRotation: number;
+      endRotation: number;
+      startTime: number;
+      finished: boolean;
+    }[] = [];
+
+    previousTrick.cards.forEach((card, idx) => {
+      if (!card || !card.code) return;
+      const start = pilePositions[idx];
+      const end = boxCenters[winner];
+
+      // Create overlay card
+      const cardDiv = document.createElement("div");
+      cardDiv.className = "cleanup-card";
+      cardDiv.style.position = "absolute";
+      cardDiv.style.left = `${start.x}px`;
+      cardDiv.style.top = `${start.y}px`;
+      cardDiv.style.width = `${CARD_WIDTH}px`;
+      cardDiv.style.height = `${CARD_HEIGHT}px`;
+      cardDiv.style.transform = "translate(-50%, -50%) scale(1.5)";
+      cardDiv.style.zIndex = "3000";
+      cardDiv.innerHTML = `<img src="https://deckofcardsapi.com/static/img/${card.code}.png" style="width:100%;height:100%;border-radius:8px;" />`;
+      gameboard.appendChild(cardDiv);
+
+      animatingCards.push({
+        div: cardDiv,
+        startX: start.x,
+        startY: start.y,
+        endX: end.x,
+        endY: end.y,
+        startRotation: start.rotation,
+        endRotation: 0, // You can rotate to 0 or keep as start.rotation
+        startTime: performance.now(),
+        finished: false,
+      });
+    });
+
+    let lastFrameTime = 0;
+    function animateAll(now: number) {
+      if (now - lastFrameTime < MIN_FRAME_TIME) {
+        requestAnimationFrame(animateAll);
+        return;
+      }
+      lastFrameTime = now;
+
+      let allFinished = true;
+      animatingCards.forEach((anim) => {
+        if (anim.finished) return;
+        const elapsed = now - anim.startTime;
+        const progress = Math.min(elapsed / ANIMATION_DURATION, 1);
+
+        const curX = anim.startX + (anim.endX - anim.startX) * progress;
+        const curY = anim.startY + (anim.endY - anim.startY) * progress;
+        const curScale = STARTSCALE + (ENDSCALE - STARTSCALE) * progress;
+        const curRotation = anim.startRotation + (anim.endRotation - anim.startRotation) * progress;
+
+        anim.div.style.left = `${curX}px`;
+        anim.div.style.top = `${curY}px`;
+        anim.div.style.transform = `translate(-50%, -50%) scale(${curScale}) rotate(${curRotation}deg)`;
+
+        if (progress >= 1) {
+          anim.finished = true;
+        } else {
+          allFinished = false;
+        }
+      });
+
+      if (!allFinished) {
+        requestAnimationFrame(animateAll);
+      } else {
+        setTimeout(() => {
+          animatingCards.forEach((anim) => anim.div.remove());
+        }, 200);
+      }
+    }
+    requestAnimationFrame(animateAll);
+  };
+
   useEffect(() => {
     if (USE_AUTOMATIC_POLLING) {
       const intervalId = setInterval(() => {
@@ -1195,18 +1362,6 @@ const MatchPage: React.FC = () => {
   }, [router]);
 
   useEffect(() => {
-    if (lastTrickPhase === "JUSTCOMPLETED" && trickPhase === "READY") {
-      // Delay the clearing to let the user see the trick
-      const timeoutId = setTimeout(() => {
-        handleClearTrick();
-      }, 1500); // 1.5 seconds delay
-
-      // Cleanup in case the component unmounts before timeout
-      return () => clearTimeout(timeoutId);
-    }
-  }, [lastTrickPhase, trickPhase]);
-
-  useEffect(() => {
     console.log("PlayableCards updated:", playableCards);
   }, [cardback, playableCards]);
 
@@ -1258,10 +1413,16 @@ const MatchPage: React.FC = () => {
     }
   }, [playmat]);
 
-  const handlePlayCard = async (card: cardProps) => {
+
+  const lastPlayedCardRect = useRef<DOMRect | null>(null);
+  const handlePlayCard = async (card: cardProps, cardRef: React.RefObject<HTMLDivElement | null>) => {
     console.log("Clicked card:", card.code);
     console.log("myTurn =", myTurn);
     console.log("currentGamePhase =", currentGamePhase);
+
+    if (cardRef.current) {
+      lastPlayedCardRect.current = cardRef.current.getBoundingClientRect();
+    }
 
     if (currentGamePhase === "PASSING") {
       if (cardsToPass.find((c) => c.code === card.code)) {
@@ -1396,14 +1557,6 @@ const MatchPage: React.FC = () => {
     } catch (error) {
       handleApiError(error, "An error occurred while passing cards.");
     }
-  };
-
-  const handleClearTrick = () => {
-    setTrickSlot0([]);
-    setTrickSlot1([]);
-    setTrickSlot2([]);
-    setTrickSlot3([]);
-    setCurrentTrick("");
   };
 
   const sortCards = (cards: cardProps[]) => {
@@ -1608,6 +1761,60 @@ const MatchPage: React.FC = () => {
     console.log("Has confirmed skip passing:", hasConfirmedSkipPassing);
   }, [hasConfirmedSkipPassing]);
 
+  const hand0Ref = useRef<HTMLDivElement>(null);
+  const [handWidth, setHandWidth] = useState(500);
+
+  useEffect(() => {
+    function updateHandWidth() {
+      if (hand0Ref.current) {
+        setHandWidth(hand0Ref.current.offsetWidth);
+      }
+    }
+    updateHandWidth(); // Set initially
+
+    window.addEventListener("resize", updateHandWidth);
+    return () => window.removeEventListener("resize", updateHandWidth);
+  }, [cardsInHand.length]);
+
+
+
+
+  useEffect(() => {
+    function updateSize() {
+      const node = gameboardRef.current;
+      if (!node) return;
+      setGameboardSize({
+        width: node.offsetWidth,
+        height: node.offsetHeight,
+      });
+    }
+
+    updateSize(); // Initial
+
+    const node = gameboardRef.current;
+    if (!node) return;
+
+    const resizeObserver = new window.ResizeObserver(() => updateSize());
+    resizeObserver.observe(node);
+
+    console.log("window size", window.innerWidth, window.innerHeight);
+    console.log("gameboard size", gameboardSize.width, gameboardSize.height);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+
+  useEffect(() => {
+    if (cardRefs.current.length !== cardsInHand.length) {
+      cardRefs.current = cardsInHand.map(
+        (_, i) => cardRefs.current[i] || createRef<HTMLDivElement>()
+      );
+    }
+  }, [cardsInHand.length]);
+
+
+
+
   return (
     <div className={`${styles.page} matchPage`}>
       <div className="message-box">
@@ -1767,87 +1974,219 @@ const MatchPage: React.FC = () => {
         </table>
       </div>
 
-      <div className="gameboard">
-        <div className={`${cardStyles.temporaryCards}`} />
+      <div 
+        className="gameboard" 
+        ref={gameboardRef}
+        style={{
+          "--gameboard-height": `${gameboardSize.height}px`,
+          "--gameboard-width": `${gameboardSize.width}px`,
+        } as React.CSSProperties}
+        >
 
-        <div className="hand-0">
-          {cardsInHand.map((card, index) => (
-            <Card
-              key={index}
-              code={card.code}
-              suit={card.suit}
-              value={card.value}
-              cardOrder={card.cardOrder}
-              image={card.image}
-              backimage={cardback}
-              flipped
-              onClick={currentGamePhase === "PASSING" && hasPassedCards
-                ? () => {}
-                : () => handlePlayCard(card)}
-              isSelected={cardsToPass.some((c) => c.code === card.code)}
-              isPlayable={playableCards.includes(card.code)}
-              isPassable={currentGamePhase === "PASSING"}
-              isDisabled={currentGamePhase === "PASSING" && hasPassedCards}
-            />
-          ))}
+        <div
+          className="hand-0"
+          ref={hand0Ref} // adjust height as needed
+        >
+          {cardsInHand.map((card, index) => {
+            const cardRef = cardRefs.current[index];
+            const numCards = cardsInHand.length;
+            const MAX_SPACING = CARD_WIDTH * 1.05; // px, adjust as you like
+            const spacing = numCards > 1
+              ? Math.min((handWidth - CARD_WIDTH) / (numCards - 1), MAX_SPACING)
+              : 0;
+            const left = index * spacing;
+
+            return (
+              <div
+                key={card.code}
+                ref={cardRef}
+                style={{
+                  position: "absolute",
+                  left: `${left}px`,
+                  top: 0,
+                  width: `${CARD_WIDTH}px`,
+                  height:`${CARD_HEIGHT}px`,
+                  transform: `translateY(${((gameboardSize.height * 0.2) - CARD_HEIGHT )/ 2}px)`,
+                  zIndex: index,
+                }}
+              >
+                <Card
+                  code={card.code}
+                  suit={card.suit}
+                  value={card.value}
+                  cardOrder={card.cardOrder}
+                  image={card.image}
+                  backimage={cardback}
+                  flipped
+                  onClick={currentGamePhase === "PASSING" && hasPassedCards
+                    ? () => {}
+                    : () => handlePlayCard(card, cardRef)}
+                  isSelected={cardsToPass.some((c) => c.code === card.code)}
+                  isPlayable={playableCards.includes(card.code)}
+                  isPassable={currentGamePhase === "PASSING"}
+                  isDisabled={currentGamePhase === "PASSING" && hasPassedCards}
+                />
+              </div>
+            );
+          })}
         </div>
 
-        <div className="hand-1">
-          {opponent1Cards.map((card, index) => (
-            <Card
-              key={index}
-              code={card.code}
-              suit={card.suit}
-              value={card.value}
-              cardOrder={card.cardOrder}
-              image={card.image}
-              backimage={cardback}
-              flipped={false}
-              onClick={card.onClick}
-            />
-          ))}
+        <div className="hand-1"
+          style={{
+            position: "absolute",
+            left: `25%`,
+            top: `35%`,
+            transform: "translateY(-50%) rotate(90deg)", // Rotate the whole hand!
+            width: `50%`, // or enough for all cards
+            height: `20%`,
+            display: "block",
+          }}
+        >
+          {opponent1Cards.map((card, index) => {
+            const numCards = opponent1Cards.length;
+            const MAX_SPACING = CARD_WIDTH * 1.05;
+            const spacing = numCards > 1
+              ? Math.min((handWidth - CARD_WIDTH) / (numCards - 1), MAX_SPACING)
+              : 0;
+            const left = index * spacing;
+
+            return (
+              <div
+                key={index}
+                style={{
+                  position: "absolute",
+                  left: `${left}px`,
+                  top: 0,
+                  width: `${CARD_WIDTH}px`,
+                  height: `${CARD_HEIGHT}px`,
+                  transform: `translateY(${((gameboardSize.height * 0.2) - CARD_HEIGHT )/ 2}px)`,
+                  zIndex: index,
+                }}
+              >
+                <Card
+                  code={card.code}
+                  suit={card.suit}
+                  value={card.value}
+                  cardOrder={card.cardOrder}
+                  image={card.image}
+                  backimage={cardback}
+                  flipped={false}
+                  onClick={card.onClick}
+                />
+              </div>
+            );
+          })}
         </div>
 
-        <div className="hand-2">
-          {opponent2Cards.map((card, index) => (
-            <Card
-              key={index}
-              code={card.code}
-              suit={card.suit}
-              value={card.value}
-              cardOrder={card.cardOrder}
-              image={card.image}
-              backimage={cardback}
-              flipped={false}
-              onClick={card.onClick}
-            />
-          ))}
+        <div className="hand-2"
+          style={{
+            position: "absolute",
+            left: `25%`,
+            top: `15%`,
+            transform: "translateY(-50%) rotate(180deg)", // Rotate the whole hand!
+            width: `50%`, // or enough for all cards
+            height: `20%`,
+            display: "block",
+          }}
+        >
+          {opponent2Cards.map((card, index) => {
+            const numCards = opponent2Cards.length;
+            const MAX_SPACING = CARD_WIDTH * 1.05;
+            const spacing = numCards > 1
+              ? Math.min((handWidth - CARD_WIDTH) / (numCards - 1), MAX_SPACING)
+              : 0;
+            const left = index * spacing;
+
+            return (
+              <div
+                key={index}
+                style={{
+                  position: "absolute",
+                  left: `${left}px`,
+                  top: 0,
+                  width: `${CARD_WIDTH}px`,
+                  height: `${CARD_HEIGHT}px`,
+                  transform: `translateY(${((gameboardSize.height * 0.2) - CARD_HEIGHT )/ 2}px)`,
+                  zIndex: index,
+                }}
+              >
+                <Card
+                  code={card.code}
+                  suit={card.suit}
+                  value={card.value}
+                  cardOrder={card.cardOrder}
+                  image={card.image}
+                  backimage={cardback}
+                  flipped={false}
+                  onClick={card.onClick}
+                />
+              </div>
+            );
+          })}
         </div>
 
-        <div className="hand-3">
-          {opponent3Cards.map((card, index) => (
-            <Card
-              key={index}
-              code={card.code}
-              suit={card.suit}
-              value={card.value}
-              cardOrder={card.cardOrder}
-              image={card.image}
-              backimage={cardback}
-              flipped={false}
-              onClick={card.onClick}
-            />
-          ))}
-        </div>
+        <div className="hand-3"
+          style={{
+            position: "absolute",
+            left: `75%`,
+            top: `85%`,
+            transform: "translateY(-50%) rotate(270deg)", // Rotate the whole hand!
+            width: `50%`, // or enough for all cards
+            height: `20%`,
+            display: "block",
+          }}
+        >
+          {opponent3Cards.map((card, index) => {
+            const numCards = opponent3Cards.length;
+            const MAX_SPACING = CARD_WIDTH * 1.05;
+            const spacing = numCards > 1
+              ? Math.min((handWidth - CARD_WIDTH) / (numCards - 1), MAX_SPACING)
+              : 0;
+            const left = index * spacing;
 
-        <div className="hand-0-extension"></div>
-        <div className="hand-1-extension"></div>
-        <div className="hand-2-extension"></div>
-        <div className="hand-3-extension"></div>
+            return (
+              <div
+                key={index}
+                style={{
+                  position: "absolute",
+                  left: `${left}px`,
+                  top: 0,
+                  width: `${CARD_WIDTH}px`,
+                  height: `${CARD_HEIGHT}px`,
+                  transform: `translateY(${((gameboardSize.height * 0.2) - CARD_HEIGHT )/ 2}px)`,
+                  zIndex: index,
+                }}
+              >
+                <Card
+                  code={card.code}
+                  suit={card.suit}
+                  value={card.value}
+                  cardOrder={card.cardOrder}
+                  image={card.image}
+                  backimage={cardback}
+                  flipped={false}
+                  onClick={card.onClick}
+                />
+              </div>
+            );
+          })}
+        </div>
 
         <div className="pile">
           {[trickSlot0, trickSlot1, trickSlot2, trickSlot3].map(
             (slot, index) => {
+
+              const directions = [
+                [0, 1],   // Player 0: down
+                [-1, 0],  // Player 1: left
+                [0, -1],  // Player 2: up
+                [1, 0],   // Player 3: right
+              ];
+              const [dx, dy] = directions[index];
+              const scale = 1.2; // Scale factor for the cards
+              const extraShiftX = dx * ((CARD_HEIGHT * scale) / 2);
+              const extraShiftY = dy * ((CARD_HEIGHT * scale) / 2);
+
               // Render the card if the slot is not empty
               return slot.length > 0
                 ? (
@@ -1855,24 +2194,12 @@ const MatchPage: React.FC = () => {
                     key={index}
                     style={{
                       position: "absolute",
-                      top: index === 0
-                        ? "75%"
-                        : index === 1
-                        ? "50%"
-                        : index === 2
-                        ? "25%"
-                        : "50%",
-                      left: index === 0
-                        ? "50%"
-                        : index === 1
-                        ? "25%"
-                        : index === 2
-                        ? "50%"
-                        : "75%",
-                      transform: `translate(-50%, -50%) rotate(${
-                        index * 90
-                      }deg) scale(1.5)`, // Rotate and scale
+                      top: "50%",
+                      left: "50%",
+                      transform: `translate(-50%, -50%) translate(${extraShiftX}px, ${extraShiftY}px) rotate(${index * 90}deg) scale(1)`, // Rotate and scale
                       zIndex: slot[0].zIndex, // Use the zIndex from the card object
+                      width: `${CARD_WIDTH * scale}px`,
+                      height: `${CARD_HEIGHT * scale}px`,
                     }}
                   >
                     <Card

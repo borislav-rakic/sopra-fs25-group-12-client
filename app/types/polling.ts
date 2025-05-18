@@ -2,7 +2,7 @@ import { PlayerCard } from "../types/playerCard";
 import { innerCard } from "../types/playerCard"; // assuming Card = innerCard in TS
 import { TrickDTO } from "../types/trick"; // assuming Trick = trick in TS
 
-export type TrickPhase = "READY" | "RUNNING" | "JUSTCOMPLETED";
+export type TrickPhase = "READYFORFIRSTCARD" | "RUNNING" | "JUSTCOMPLETED" | "PROCESSINGTRICK";
 import { MatchMessage } from "./matchMessage";
 
 export interface PollingDTO {
@@ -31,6 +31,8 @@ export interface PollingDTO {
   previousTrickPoints: number | null;
   resultHtml: string | null; // HTML string
   matchMessages: MatchMessage[] | null;
+
+  previousTrickDTO: TrickDTO | null; // TrickDTO object
 
   // Other players
   matchPlayers: Array<string> | null;
