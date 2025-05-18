@@ -10,7 +10,6 @@ import modalStyles from "@/styles/modalMessage.module.css";
 import { useApi } from "@/hooks/useApi";
 import { handleApiError } from "@/utils/errorHandlers";
 import { MatchMessage } from "@/types/matchMessage"; // adjust path as needed
-import cardStyles from "@/styles/card.module.css";
 
 // import { Match } from "@/types/match";
 import { useEffect, useRef, useState, createRef } from "react";
