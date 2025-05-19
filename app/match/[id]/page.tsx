@@ -1855,15 +1855,15 @@ const MatchPage: React.FC = () => {
             transform: "translateX(-50%)",
             backgroundColor:
               ["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase)
-                ? "white"
-                : "white",
+                ? "darkgreen"
+                : "darkgreen",
             color:
               ["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase)
-                ? "black"
-                : "black",
+                ? "white"
+                : "white",
             padding: "8px 18px",
             borderRadius: "10px",
-            border: "1px solid white",
+            border: "2px solid white",
             zIndex: 1000,
             fontSize: "1.15rem",
             textAlign: "center",
