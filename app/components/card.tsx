@@ -16,6 +16,7 @@ interface cardProps {
   isPassable?: boolean;
   isDisabled?: boolean;
   zIndex?: number;
+  isDummy?: boolean;
 }
 
 const Card: React.FC<cardProps> = (
@@ -33,6 +34,7 @@ const Card: React.FC<cardProps> = (
     isPassable = false,
     isDisabled = false,
     zIndex,
+    isDummy = false,
   },
 ) => {
   const [flipped] = useState(initialFlipped);
@@ -48,14 +50,18 @@ const Card: React.FC<cardProps> = (
 
   return (
     <div
-      className={`${styles.cardContainer} ${flipped ? styles.scalable : ""} 
-      ${isSelected ? styles.selected : ""}
-      ${isPlayable ? styles.playableCard : ""}
-      ${isPassable ? styles.passableCard : ""}
-      ${isDisabled ? styles.disabledCard : ""}`}
-      onClick={handleCardClick}
-      style={{ zIndex }}
-    >
+        className={`${styles.cardContainer} ${flipped ? styles.scalable : ""} 
+          ${isSelected ? styles.selected : ""}
+          ${isPlayable ? styles.playableCard : ""}
+          ${isPassable ? styles.passableCard : ""}
+          ${isDisabled ? styles.disabledCard : ""}
+          ${isDummy ? styles.dummyCard : ""}`}
+        onClick={handleCardClick}
+        style={{
+          zIndex,
+          ...(isDummy ? { opacity: 0, pointerEvents: "none" } : {}),
+        }}
+      >
       {flipped
         ? (
           <div className={styles.imageWrapper}>

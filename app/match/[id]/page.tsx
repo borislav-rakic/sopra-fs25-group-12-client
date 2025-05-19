@@ -13,6 +13,7 @@ import { MatchMessage } from "@/types/matchMessage"; // adjust path as needed
 
 // import { Match } from "@/types/match";
 import { useEffect, useRef, useState, createRef } from "react";
+import { flushSync } from "react-dom";
 import { PollingDTO } from "@/types/polling";
 import SettingsPopup from "@/components/SettingsPopup";
 import Card, { cardProps } from "@/components/card";
@@ -100,11 +101,22 @@ const MatchPage: React.FC = () => {
   const DEAL_ANIMATION_DURATION = 3500;
   const isDealing = useRef<boolean>(false);
 
-  const PASSING_ANIMATION_DURATION = 1500;
+  const PASSING_ANIMATION_DURATION = 1750;
   const passNow = useRef<boolean>(false);
   const [previousGamePhase, setPreviousGamePhase] = useState<string>("");
   const passingCardsforAnimation = useRef<string[]>(["", "", ""]);
   const passId = useRef<number>(0);
+  const [pendingPassingAnimation, setPendingPassingAnimation] = useState<{
+    passing: string[];
+    receiving: string[];
+    passingToId: number;
+  } | null>(null);
+  const [pendingPassingRemoveDone, setPendingPassingRemoveDone] = useState<null | {
+    response: PollingDTO,
+    receivedCards: string[],
+    passingCards: string[],
+    passToId: number,
+  }>(null);
 
   const CLEANUP_ANIMATION_DURATION = 1000;
   const cleanupNow = useRef<boolean>(false);
@@ -124,7 +136,7 @@ const MatchPage: React.FC = () => {
   );
 
   const [fetchErrorCount, setFetchErrorCount] = useState(0);
-  const [lastFetchError, setLastFetchError] = useState<any>(null);
+  const [lastFetchError, setLastFetchError] = useState<unknown>(null);
 
 
   ///////////////////////////
@@ -632,24 +644,6 @@ const MatchPage: React.FC = () => {
         setPollingPausedUntil(Date.now() + PASSING_ANIMATION_DURATION);
         console.log("preparing to animate card passing");
 
-        // Remove 3 cards from each enemy hand
-        setOpponent1Cards((prev) =>
-          prev.slice(0, Math.max(0, prev.length - 3))
-        );
-        setOpponent2Cards((prev) =>
-          prev.slice(0, Math.max(0, prev.length - 3))
-        );
-        setOpponent3Cards((prev) =>
-          prev.slice(0, Math.max(0, prev.length - 3))
-        );
-
-        console.log(
-          "opponents hand sizes",
-          opponent1Cards.length,
-          opponent2Cards.length,
-          opponent3Cards.length,
-        );
-
         // Remove passed cards from player's hand
         setCardsInHand((prev) =>
           prev.filter((card) =>
@@ -662,17 +656,19 @@ const MatchPage: React.FC = () => {
           cardsInHand,
         );
 
-        console.log("passing cards", passingCardsforAnimation.current);
-        console.log("received cards", receivedCards);
-        console.log("current player hand", cardsInHand);
-        console.log("passing to player in slot", response.passingToPlayerSlot);
-
-        console.log("invoking animatePassingCards");
-        animatePassingCards(
-          passingCardsforAnimation.current,
-          receivedCards,
-          passId.current,
+        setCardsInHand((prev) =>
+          prev.filter((card) =>
+            !passingCardsforAnimation.current.includes(card.code)
+          )
         );
+
+        setPendingPassingRemoveDone({
+          response,
+          receivedCards,
+          passingCards: passingCardsforAnimation.current,
+          passToId: passId.current,
+        });
+
         passNow.current = false;
         return;
       }
@@ -947,7 +943,7 @@ const MatchPage: React.FC = () => {
       lastFrameTime = now;
 
       let allFinished = true;
-      animatingCards.forEach((anim, idx) => {
+      animatingCards.forEach((anim) => {
         if (anim.finished) return;
         const handPos = handPositions[anim.hand];
         const baseX = handPos.x;
@@ -974,10 +970,6 @@ const MatchPage: React.FC = () => {
         anim.div.style.transform =
           `translate(-50%, -50%) scale(${curScale}) rotate(${curRot}deg)`;
 
-        if (idx === 10) {
-          console.log("Card scale", curScale);
-        }
-
         if (progress >= 1) {
           anim.finished = true;
         } else {
@@ -997,26 +989,27 @@ const MatchPage: React.FC = () => {
     requestAnimationFrame(animateAll);
   };
 
-  const animatePassingCards = (
-    passingCards: string[],
-    receivingCards: string[],
-    passingToId: number,
-  ) => {
-    if (passingToId === 0) {
-      console.log("cannot pass to self");
-      return;
-    }
+const animatePassingCards = (
+  passingCards: string[],
+  receivingCards: string[],
+  passingToId: number,
+) => {
+  if (passingToId === 0) {
+    console.log("cannot pass to self");
+    return;
+  }
 
-    const gameboard = document.querySelector(".gameboard") as HTMLElement;
-    if (!gameboard) return;
+  const gameboard = document.querySelector(".gameboard") as HTMLElement;
+  if (!gameboard) return;
 
-    const PASS_SCALE = 1.2;
-    const PASS_DURATION = 700;
-    const PASS_STAGGER = 60;
+  const PASS_SCALE = 1.2;
+  const POST_DELAY = 500;
+  const PASS_DURATION = PASSING_ANIMATION_DURATION - POST_DELAY;
+  const PASS_STAGGER = 60;
 
-    // Hand positions and rotations: 0 = you, 1 = left, 2 = top, 3 = right
-    const gameboardRect = gameboard.getBoundingClientRect();
-    const handCenters = [
+  // Centers and rotations for each hand (0 = you, 1 = left, 2 = top, 3 = right)
+  const gameboardRect = gameboard.getBoundingClientRect();
+  const handCenters = [
       {
         x: gameboardRect.width * 0.5 + CARD_WIDTH / 2,
         y: gameboardRect.width * 0.85,
@@ -1039,141 +1032,224 @@ const MatchPage: React.FC = () => {
       }, // right
     ];
 
-    const passingMap: { [key: number]: number[] } = {
-      1: [1, 2, 3, 0],
-      2: [2, 3, 0, 1],
-      3: [3, 0, 1, 2],
-    };
-    const passTo = passingMap[passingToId];
+  // Who passes to whom (rotates each round)
+  const passingMap: { [key: number]: number[] } = {
+    1: [1, 2, 3, 0],
+    2: [2, 3, 0, 1],
+    3: [3, 0, 1, 2],
+  };
+  const passTo = passingMap[passingToId];
 
-    function getStaggeredDest(to: number, i: number) {
-      const staggerOffset = (i - 1) * CARD_WIDTH;
-      if (to === 1 || to === 3) {
-        return { x: handCenters[to].x, y: handCenters[to].y + staggerOffset };
+  function getStaggeredDest(to: number, i: number) {
+    const staggerOffset = (i - 1) * CARD_WIDTH;
+    if (to === 1 || to === 3) {
+      return { x: handCenters[to].x, y: handCenters[to].y + staggerOffset };
+    } else {
+      return { x: handCenters[to].x + staggerOffset, y: handCenters[to].y };
+    }
+  }
+
+  const animatingCards: {
+    div: HTMLDivElement;
+    from: number;
+    to: number;
+    startTime: number;
+    cardCode: string;
+    finished: boolean;
+    fromRot: number;
+    toRot: number;
+    destX: number;
+    destY: number;
+  }[] = [];
+
+  function getHandInfo(handIdx: number) {
+    switch (handIdx) {
+      case 0:
+        return {
+          cards: cardsInHand,
+          handWidth: gameboardSize.width * 0.5,
+          handHeight: gameboardSize.height * 0.2,
+          handPosition: { x: gameboardSize.width * 0.3, y: gameboardSize.height * 0.85 },
+          rotation: 0,
+        };
+      case 1:
+        return {
+          cards: opponent1Cards,
+          handWidth: gameboardSize.width * 0.5,
+          handHeight: gameboardSize.height * 0.2,
+          handPosition: { x: gameboardSize.width * 0.15, y: gameboardSize.height * 0.3 },
+          rotation: 90,
+        };
+      case 2:
+        return {
+          cards: opponent2Cards,
+          handWidth: gameboardSize.width * 0.5,
+          handHeight: gameboardSize.height * 0.2,
+          handPosition: { x: gameboardSize.width * 0.7, y: gameboardSize.height * 0.15 },
+          rotation: 180,
+        };
+      case 3:
+        return {
+          cards: opponent3Cards,
+          handWidth: gameboardSize.width * 0.5,
+          handHeight: gameboardSize.height * 0.2,
+          handPosition: { x: gameboardSize.width * 0.85, y: gameboardSize.height * 0.7 },
+          rotation: 270,
+        };
+      default:
+        throw new Error("Invalid hand index");
+    }
+  }
+
+  // Animate passes for all players
+  for (let fromIdx = 0; fromIdx < 4; fromIdx++) {
+    const toIdx = passTo[fromIdx];
+    const from = handCenters[fromIdx];
+    const handInfo = getHandInfo(toIdx);
+
+    for (let i = 0; i < 3; i++) {
+      let dest = getStaggeredDest(toIdx, i);
+      let animatedZIndex = 2001;
+      let cardCode = "";
+      let imgSrc = cardback;
+
+      // Outgoing cards from player
+      if (fromIdx === 0) {
+        cardCode = passingCards[i];
+        imgSrc = `https://deckofcardsapi.com/static/img/${cardCode}.png`;
+      }
+      // Incoming cards to player
+      else if (toIdx === 0) {
+        cardCode = receivingCards[i];
+        imgSrc = `https://deckofcardsapi.com/static/img/${cardCode}.png`;
+      }
+
+      console.log("handInfo", handInfo);
+
+      let dummyIndex = -1;
+      if (toIdx === 0) {
+        // For your own hand, match by code
+        dummyIndex = handInfo.cards.findIndex(c => c.code === cardCode && c.isDummy);
       } else {
-        return { x: handCenters[to].x + staggerOffset, y: handCenters[to].y };
+        // For opponents, use the i-th dummy card (first, second, third dummy)
+        const dummyIndices = handInfo.cards
+          .map((c, idx) => (c.isDummy ? idx : -1))
+          .filter(idx => idx !== -1);
+        dummyIndex = dummyIndices[i];
       }
-    }
-
-    const animatingCards: {
-      div: HTMLDivElement;
-      from: number;
-      to: number;
-      startTime: number;
-      cardCode: string;
-      finished: boolean;
-      fromRot: number;
-      toRot: number;
-      destX: number;
-      destY: number;
-    }[] = [];
-
-    // Animate all passes for all players
-    for (let fromIdx = 0; fromIdx < 4; fromIdx++) {
-      const toIdx = passTo[fromIdx];
-      const from = handCenters[fromIdx];
-      const to = handCenters[toIdx];
-
-      for (let i = 0; i < 3; i++) {
-        const dest = getStaggeredDest(toIdx, i);
-        const cardDiv = document.createElement("div");
-        cardDiv.className = "passing-card";
-        cardDiv.style.position = "absolute";
-        cardDiv.style.left = `${from.x}px`;
-        cardDiv.style.top = `${from.y - 40 + i * 30}px`;
-        cardDiv.style.width = `${CARD_WIDTH}px`;
-        cardDiv.style.height = `${CARD_HEIGHT}px`;
-        cardDiv.style.transform =
-          `translate(-50%, -50%) scale(${PASS_SCALE}) rotate(${from.rotation}deg)`;
-        cardDiv.style.zIndex = "2001";
-
-        // Show real card image only for your outgoing and incoming cards
-        if (fromIdx === 0) {
-          // Your outgoing cards
-          cardDiv.innerHTML =
-            `<img src="https://deckofcardsapi.com/static/img/${
-              passingCards[i]
-            }.png" style="width:100%;height:100%;border-radius:8px;" />`;
-        } else if (toIdx === 0) {
-          // Cards you are receiving
-          cardDiv.innerHTML =
-            `<img src="https://deckofcardsapi.com/static/img/${
-              receivingCards[i]
-            }.png" style="width:100%;height:100%;border-radius:8px;" />`;
-        } else {
-          // Other players: show card back
-          cardDiv.innerHTML =
-            `<img src="${cardback}" style="width:100%;height:100%;border-radius:8px;" />`;
-        }
-
-        gameboard.appendChild(cardDiv);
-
-        animatingCards.push({
-          div: cardDiv,
-          from: fromIdx,
-          to: toIdx,
-          startTime: performance.now() + i * PASS_STAGGER,
-          cardCode: fromIdx === 0
-            ? passingCards[i]
-            : toIdx === 0
-            ? receivingCards[i]
-            : "",
-          finished: false,
-          fromRot: from.rotation,
-          toRot: to.rotation,
-          destX: dest.x,
-          destY: dest.y,
-        });
+      if (dummyIndex !== -1) {
+        const pos = calculateCardPosition(
+          dummyIndex,
+          handInfo.cards.length,
+          handInfo.handWidth,
+          handInfo.handHeight,
+          handInfo.handPosition,
+          handInfo.rotation,
+          toIdx
+        );
+        dest = { x: pos.left, y: pos.top };
+        animatedZIndex = 50 + dummyIndex;
       }
-    }
 
-    let lastFrameTime = 0;
-    function animateAll(now: number) {
-      if (now - lastFrameTime < 1000 / 120) {
-        requestAnimationFrame(animateAll);
+      // ...rest of your animation card creation code...
+      const cardDiv = document.createElement("div");
+      cardDiv.className = "passing-card";
+      cardDiv.style.position = "absolute";
+      cardDiv.style.left = `${from.x}px`;
+      cardDiv.style.top = `${from.y - 40 + i * 30}px`;
+      cardDiv.style.width = `${CARD_WIDTH}px`;
+      cardDiv.style.height = `${CARD_HEIGHT}px`;
+      cardDiv.style.transform =
+        `translate(-50%, -50%) scale(${PASS_SCALE}) rotate(${from.rotation}deg)`;
+      cardDiv.style.zIndex = animatedZIndex.toString();
+      cardDiv.innerHTML =
+        `<img src="${imgSrc}" style="width:100%;height:100%;border-radius:8px;" />`;
+
+      gameboard.appendChild(cardDiv);
+
+      animatingCards.push({
+        div: cardDiv,
+        from: fromIdx,
+        to: toIdx,
+        startTime: performance.now() + i * PASS_STAGGER,
+        cardCode,
+        finished: false,
+        fromRot: from.rotation,
+        toRot: handCenters[toIdx].rotation,
+        destX: dest.x,
+        destY: dest.y,
+      });
+    }
+  }
+
+  let lastFrameTime = 0;
+  function animateAll(now: number) {
+    if (now - lastFrameTime < 1000 / 120) {
+      requestAnimationFrame(animateAll);
+      return;
+    }
+    lastFrameTime = now;
+
+    let allFinished = true;
+    animatingCards.forEach((anim) => {
+      if (anim.finished) return;
+      const from = handCenters[anim.from];
+
+      const elapsed = now - anim.startTime;
+      if (elapsed < 0) {
+        allFinished = false;
         return;
       }
-      lastFrameTime = now;
+      const progress = Math.min(elapsed / PASS_DURATION, 1);
 
-      let allFinished = true;
-      animatingCards.forEach((anim) => {
-        if (anim.finished) return;
-        const from = handCenters[anim.from];
+      const curX = from.x + (anim.destX - from.x) * progress;
+      const curY = from.y + (anim.destY - from.y) * progress;
+      const curScale = PASS_SCALE - (PASS_SCALE - 1) * progress;
+      const curRot = anim.fromRot + (anim.toRot - anim.fromRot) * progress;
 
-        const elapsed = now - anim.startTime;
-        if (elapsed < 0) {
-          allFinished = false;
-          return;
-        }
-        const progress = Math.min(elapsed / PASS_DURATION, 1);
+      anim.div.style.left = `${curX}px`;
+      anim.div.style.top = `${curY}px`;
+      anim.div.style.transform =
+        `translate(-50%, -50%) scale(${curScale}) rotate(${curRot}deg)`;
 
-        const curX = from.x + (anim.destX - from.x) * progress;
-        const curY = from.y + (anim.destY - from.y) * progress;
-        const curScale = PASS_SCALE - (PASS_SCALE - 1) * progress;
-        const curRot = anim.fromRot + (anim.toRot - anim.fromRot) * progress;
-
-        anim.div.style.left = `${curX}px`;
-        anim.div.style.top = `${curY}px`;
-        anim.div.style.transform =
-          `translate(-50%, -50%) scale(${curScale}) rotate(${curRot}deg)`;
-
-        if (progress >= 1) {
-          anim.finished = true;
-        } else {
-          allFinished = false;
-        }
-      });
-
-      if (!allFinished) {
-        requestAnimationFrame(animateAll);
+      if (progress >= 1) {
+        anim.finished = true;
       } else {
-        setTimeout(() => {
-          animatingCards.forEach((anim) => anim.div.remove());
-        }, 500);
+        allFinished = false;
       }
+    });
+
+    if (!allFinished) {
+      requestAnimationFrame(animateAll);
+    } else {
+        flushSync(() => {
+        setCardsInHand((prev) =>
+          prev
+            .map((card) => {
+              if (card.isDummy) {
+                const real = (pollingResponse?.playerCards ?? []).find(
+                  (pc) => pc.card.code === card.code
+                );
+                if (real) {
+                  return generateCard(real.card.code, real.card.cardOrder);
+                }
+                return null;
+              }
+              return card;
+            })
+            .filter((c): c is cardProps => c !== null) // <-- Type guard for TypeScript
+        );
+        setOpponent1Cards((prev) => prev.map((c) => (c.isDummy ? generateEnemyCard() : c)));
+        setOpponent2Cards((prev) => prev.map((c) => (c.isDummy ? generateEnemyCard() : c)));
+        setOpponent3Cards((prev) => prev.map((c) => (c.isDummy ? generateEnemyCard() : c)));
+      });
+      setTimeout(() => {
+        animatingCards.forEach((anim) => anim.div.remove());
+      }, 200);
     }
-    requestAnimationFrame(animateAll);
-  };
+  }
+  requestAnimationFrame(animateAll);
+};
 
   function getReceivedCardCodes(
     newHand: PlayerCard[],
@@ -1184,6 +1260,128 @@ const MatchPage: React.FC = () => {
       .filter((cardObj) => !currentCodes.has(cardObj.card.code))
       .map((cardObj) => cardObj.card.code);
   }
+
+  const createDummyCard = (code: string, cardOrder: number): cardProps => ({
+    code: code,
+    suit: "",
+    value: BigInt(0),
+    cardOrder,
+    image: `https://deckofcardsapi.com/static/img/${code}.png`, 
+    backimage: cardback,
+    flipped: false,
+    onClick: () => {},
+    zIndex: 1,
+    isDummy: true, // Custom property to identify dummy cards
+  });
+
+  useEffect(() => {
+    if (
+      pendingPassingAnimation &&
+      // Check player hand
+      pendingPassingAnimation.receiving.every(code =>
+        cardsInHand.find(c => c.code === code && c.isDummy)
+      ) &&
+      // Check opponent hands (assuming 3 dummies per hand)
+      opponent1Cards.filter(c => c.isDummy).length >= 3 &&
+      opponent2Cards.filter(c => c.isDummy).length >= 3 &&
+      opponent3Cards.filter(c => c.isDummy).length >= 3
+    ) {
+      animatePassingCards(
+        pendingPassingAnimation.passing,
+        pendingPassingAnimation.receiving,
+        pendingPassingAnimation.passingToId
+      );
+      setPendingPassingAnimation(null);
+    }
+  }, [
+    pendingPassingAnimation,
+    cardsInHand,
+    opponent1Cards,
+    opponent2Cards,
+    opponent3Cards,
+  ]);
+
+  useEffect(() => {
+    console.log("pendingPassingRemoveDone", pendingPassingRemoveDone);
+    if (
+      pendingPassingRemoveDone &&
+      // Make sure the cards to be removed are actually gone
+      passingCardsforAnimation.current.every(
+        code => !cardsInHand.some(card => card.code === code)
+      )
+    ) {
+      console.log("now executing inside of pendingPassingRemoveDone");
+      // Now add dummy cards and trigger the animation as before
+      const { response, receivedCards, passingCards, passToId } = pendingPassingRemoveDone;
+
+      const receivedCardOrders = receivedCards.map(code => {
+        const found = (response.playerCards ?? []).find((pc: PlayerCard) => pc.card.code === code);
+        return found ? found.card.cardOrder : 0;
+      });
+
+      const dummyCards = receivedCards.map((code, i) =>
+        createDummyCard(code, receivedCardOrders[i])
+      );
+
+      console.log("dummyCards", dummyCards);
+
+      const newHandWithDummies = sortCards([...cardsInHand, ...dummyCards]);
+      setCardsInHand(newHandWithDummies);
+      
+      setOpponent1Cards(prev => {
+        if (prev.length < 3) return prev; // Not enough cards to replace
+        // Get 3 unique random indices
+        const indices = Array.from({ length: prev.length }, (_, i) => i)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 3);
+        // Create new dummy cards
+        const dummies = indices.map((_, i) => createDummyCard(`op1-dummy-${Date.now()}-${i}`, 0));
+        // Replace cards at those indices
+        return prev.map((card, idx) => {
+          const dummyIdx = indices.indexOf(idx);
+          return dummyIdx !== -1 ? dummies[dummyIdx] : card;
+        });
+      });
+
+      setOpponent2Cards(prev => {
+        if (prev.length < 3) return prev; // Not enough cards to replace
+        // Get 3 unique random indices
+        const indices = Array.from({ length: prev.length }, (_, i) => i)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 3);
+        // Create new dummy cards
+        const dummies = indices.map((_, i) => createDummyCard(`op2-dummy-${Date.now()}-${i}`, 0));
+        // Replace cards at those indices
+        return prev.map((card, idx) => {
+          const dummyIdx = indices.indexOf(idx);
+          return dummyIdx !== -1 ? dummies[dummyIdx] : card;
+        });
+      });
+
+      setOpponent3Cards(prev => {
+        if (prev.length < 3) return prev; // Not enough cards to replace
+        // Get 3 unique random indices
+        const indices = Array.from({ length: prev.length }, (_, i) => i)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 3);
+        // Create new dummy cards
+        const dummies = indices.map((_, i) => createDummyCard(`op3-dummy-${Date.now()}-${i}`, 0));
+        // Replace cards at those indices
+        return prev.map((card, idx) => {
+          const dummyIdx = indices.indexOf(idx);
+          return dummyIdx !== -1 ? dummies[dummyIdx] : card;
+        });
+      });
+    
+      setPendingPassingAnimation({
+        passing: passingCards,
+        receiving: receivedCards,
+        passingToId: passToId,
+      });
+
+      setPendingPassingRemoveDone(null);
+    }
+  }, [pendingPassingRemoveDone, cardsInHand]);
 
   const animateTrickCleanup = (previousTrick: TrickDTO, winner: number) => {
     const gameboard = document.querySelector(".gameboard") as HTMLElement;
@@ -1576,18 +1774,12 @@ const MatchPage: React.FC = () => {
   };
 
   const sortCards = (cards: cardProps[]) => {
-    return cards.sort((a, b) => {
-      console.log("Comparing cards:", a.code, " | ", b.code);
+    return [...cards].sort((a, b) => {
       if (a.cardOrder < b.cardOrder) return -1;
       if (a.cardOrder > b.cardOrder) return 1;
       return 0;
     });
   };
-
-  useEffect(() => {
-    const sortedCards = sortCards(cardsInHand);
-    setCardsInHand(sortedCards);
-  }, [cardsInHand]);
 
   const areHandsEqual = (hand1: cardProps[], hand2: cardProps[]) => {
     if (hand1.length !== hand2.length) return false;
@@ -1778,22 +1970,6 @@ const MatchPage: React.FC = () => {
   }, [hasConfirmedSkipPassing]);
 
   const hand0Ref = useRef<HTMLDivElement>(null);
-  const [handWidth, setHandWidth] = useState(500);
-
-  useEffect(() => {
-    function updateHandWidth() {
-      if (hand0Ref.current) {
-        setHandWidth(hand0Ref.current.offsetWidth);
-      }
-    }
-    updateHandWidth(); // Set initially
-
-    window.addEventListener("resize", updateHandWidth);
-    return () => window.removeEventListener("resize", updateHandWidth);
-  }, [cardsInHand.length]);
-
-
-
 
   useEffect(() => {
     function updateSize() {
@@ -1826,6 +2002,50 @@ const MatchPage: React.FC = () => {
   }, [cardsInHand.length]);
 
 
+  const calculateCardPosition = (
+    index: number,
+    totalCards: number,
+    handWidth: number,
+    handHeight: number,
+    handPosition: { x: number; y: number },
+    rotation: number,
+    handIndex: number // Add handIndex to determine the hand's behavior
+  ) => {
+    const MAX_SPACING = CARD_WIDTH * 1.05; // Maximum spacing between cards
+    const spacing = totalCards > 1
+      ? Math.min((handWidth - CARD_WIDTH) / (totalCards - 1), MAX_SPACING)
+      : 0;
+
+    let left = handPosition.x;
+    let top = handPosition.y;
+
+    // Adjust spacing based on hand index and rotation
+    if (handIndex === 0 || handIndex === 2) {
+      // Horizontal spacing for hands 0 and 2
+      if (handIndex === 0) {
+        // Hand 0: Left to right
+        left += index * spacing;
+      } else if (handIndex === 2) {
+        // Hand 2: Right to left
+        left -= index * spacing;
+      }
+    } else if (handIndex === 1 || handIndex === 3) {
+      // Vertical spacing for hands 1 and 3
+      if (handIndex === 1) {
+        // Hand 1: Top to bottom
+        top += index * spacing;
+      } else if (handIndex === 3) {
+        // Hand 3: Bottom to top
+        top -= index * spacing;
+      }
+    }
+
+    return {
+      left,
+      top,
+      transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+    };
+  };
 
 
   return (
@@ -1973,49 +2193,56 @@ const MatchPage: React.FC = () => {
           className="hand-0"
           ref={hand0Ref} // adjust height as needed
         >
-          {cardsInHand.map((card, index) => {
-            const cardRef = cardRefs.current[index];
-            const numCards = cardsInHand.length;
-            const MAX_SPACING = CARD_WIDTH * 1.05; // px, adjust as you like
-            const spacing = numCards > 1
-              ? Math.min((handWidth - CARD_WIDTH) / (numCards - 1), MAX_SPACING)
-              : 0;
-            const left = index * spacing;
 
-            return (
-              <div
-                key={card.code}
-                ref={cardRef}
-                style={{
-                  position: "absolute",
-                  left: `${left}px`,
-                  top: 0,
-                  width: `${CARD_WIDTH}px`,
-                  height:`${CARD_HEIGHT}px`,
-                  transform: `translateY(${((gameboardSize.height * 0.2) - CARD_HEIGHT )/ 2}px)`,
-                  zIndex: index,
-                }}
-              >
-                <Card
-                  code={card.code}
-                  suit={card.suit}
-                  value={card.value}
-                  cardOrder={card.cardOrder}
-                  image={card.image}
-                  backimage={cardback}
-                  flipped
-                  onClick={currentGamePhase === "PASSING" && hasPassedCards
-                    ? () => {}
-                    : () => handlePlayCard(card, cardRef)}
-                  isSelected={cardsToPass.some((c) => c.code === card.code)}
-                  isPlayable={playableCards.includes(card.code)}
-                  isPassable={currentGamePhase === "PASSING"}
-                  isDisabled={currentGamePhase === "PASSING" && hasPassedCards}
-                />
-              </div>
-            );
-          })}
         </div>
+
+        {cardsInHand.map((card, index) => {
+          const cardRef = cardRefs.current[index];
+          const position = calculateCardPosition(
+            index,
+            cardsInHand.length,
+            gameboardSize.width * 0.5, // Example hand width
+            gameboardSize.height * 0.2, // Example hand height
+            { x: gameboardSize.width * 0.3, y: gameboardSize.height * 0.85 }, // Hand position
+            0, // No rotation for the player's hand
+            0 // Hand index 0
+          );
+
+          return (
+            <div
+              key={card.code}
+              ref={cardRef}
+              style={{
+                position: "absolute",
+                left: `${position.left}px`,
+                top: `${position.top}px`,
+                width: `${CARD_WIDTH}px`,
+                height: `${CARD_HEIGHT}px`,
+                transform: position.transform,
+                zIndex: 50+index,
+              }}
+            >
+              <Card
+                code={card.code}
+                suit={card.suit}
+                value={card.value}
+                cardOrder={card.cardOrder}
+                image={card.image}
+                backimage={cardback}
+                flipped
+                onClick={currentGamePhase === "PASSING" && hasPassedCards
+                  ? () => {}
+                  : () => handlePlayCard(card, cardRef)}
+                isSelected={cardsToPass.some((c) => c.code === card.code)}
+                isPlayable={playableCards.includes(card.code)}
+                isPassable={currentGamePhase === "PASSING"}
+                isDisabled={currentGamePhase === "PASSING" && hasPassedCards}
+                isDummy={card.isDummy} // Pass the isDummy prop
+              />
+            </div>
+          );
+        })}
+
 
         <div className="hand-1"
           style={{
@@ -2028,41 +2255,46 @@ const MatchPage: React.FC = () => {
             display: "block",
           }}
         >
-          {opponent1Cards.map((card, index) => {
-            const numCards = opponent1Cards.length;
-            const MAX_SPACING = CARD_WIDTH * 1.05;
-            const spacing = numCards > 1
-              ? Math.min((handWidth - CARD_WIDTH) / (numCards - 1), MAX_SPACING)
-              : 0;
-            const left = index * spacing;
-
-            return (
-              <div
-                key={index}
-                style={{
-                  position: "absolute",
-                  left: `${left}px`,
-                  top: 0,
-                  width: `${CARD_WIDTH}px`,
-                  height: `${CARD_HEIGHT}px`,
-                  transform: `translateY(${((gameboardSize.height * 0.2) - CARD_HEIGHT )/ 2}px)`,
-                  zIndex: index,
-                }}
-              >
-                <Card
-                  code={card.code}
-                  suit={card.suit}
-                  value={card.value}
-                  cardOrder={card.cardOrder}
-                  image={card.image}
-                  backimage={cardback}
-                  flipped={false}
-                  onClick={card.onClick}
-                />
-              </div>
-            );
-          })}
         </div>
+
+        {opponent1Cards.map((card, index) => {
+          const position = calculateCardPosition(
+            index,
+            opponent1Cards.length,
+            gameboardSize.width * 0.5, // Example hand width
+            gameboardSize.height * 0.2, // Example hand height
+            { x: gameboardSize.width * 0.15, y: gameboardSize.height * 0.3 }, // Hand position
+            90, // Rotation for opponent 3 (right hand)
+            1 // Hand index 3
+          );
+
+          return (
+            <div
+              key={index}
+              style={{
+                position: "absolute",
+                left: `${position.left}px`,
+                top: `${position.top}px`,
+                width: `${CARD_WIDTH}px`,
+                height: `${CARD_HEIGHT}px`,
+                transform: position.transform,
+                zIndex: 50 + index,
+              }}
+            >
+              <Card
+                code={card.code}
+                suit={card.suit}
+                value={card.value}
+                cardOrder={card.cardOrder}
+                image={card.image}
+                backimage={cardback}
+                flipped={false}
+                onClick={card.onClick}
+                isDummy={card.isDummy}
+              />
+            </div>
+          );
+        })}
 
         <div className="hand-2"
           style={{
@@ -2075,41 +2307,46 @@ const MatchPage: React.FC = () => {
             display: "block",
           }}
         >
-          {opponent2Cards.map((card, index) => {
-            const numCards = opponent2Cards.length;
-            const MAX_SPACING = CARD_WIDTH * 1.05;
-            const spacing = numCards > 1
-              ? Math.min((handWidth - CARD_WIDTH) / (numCards - 1), MAX_SPACING)
-              : 0;
-            const left = index * spacing;
-
-            return (
-              <div
-                key={index}
-                style={{
-                  position: "absolute",
-                  left: `${left}px`,
-                  top: 0,
-                  width: `${CARD_WIDTH}px`,
-                  height: `${CARD_HEIGHT}px`,
-                  transform: `translateY(${((gameboardSize.height * 0.2) - CARD_HEIGHT )/ 2}px)`,
-                  zIndex: index,
-                }}
-              >
-                <Card
-                  code={card.code}
-                  suit={card.suit}
-                  value={card.value}
-                  cardOrder={card.cardOrder}
-                  image={card.image}
-                  backimage={cardback}
-                  flipped={false}
-                  onClick={card.onClick}
-                />
-              </div>
-            );
-          })}
         </div>
+
+        {opponent2Cards.map((card, index) => {
+          const position = calculateCardPosition(
+            index,
+            opponent2Cards.length,
+            gameboardSize.width * 0.5, // Example hand width
+            gameboardSize.height * 0.2, // Example hand height
+            { x: gameboardSize.width * 0.7, y: gameboardSize.height * 0.15 }, // Hand position
+            180, // Rotation for opponent 2 (top hand)
+            2 // Hand index 2
+          );
+
+          return (
+            <div
+              key={index}
+              style={{
+                position: "absolute",
+                left: `${position.left}px`,
+                top: `${position.top}px`,
+                width: `${CARD_WIDTH}px`,
+                height: `${CARD_HEIGHT}px`,
+                transform: position.transform,
+                zIndex: 50 + index,
+              }}
+            >
+              <Card
+                code={card.code}
+                suit={card.suit}
+                value={card.value}
+                cardOrder={card.cardOrder}
+                image={card.image}
+                backimage={cardback}
+                flipped={false}
+                onClick={card.onClick}
+                isDummy={card.isDummy}
+              />
+            </div>
+          );
+        })}
 
         <div className="hand-3"
           style={{
@@ -2122,41 +2359,46 @@ const MatchPage: React.FC = () => {
             display: "block",
           }}
         >
-          {opponent3Cards.map((card, index) => {
-            const numCards = opponent3Cards.length;
-            const MAX_SPACING = CARD_WIDTH * 1.05;
-            const spacing = numCards > 1
-              ? Math.min((handWidth - CARD_WIDTH) / (numCards - 1), MAX_SPACING)
-              : 0;
-            const left = index * spacing;
-
-            return (
-              <div
-                key={index}
-                style={{
-                  position: "absolute",
-                  left: `${left}px`,
-                  top: 0,
-                  width: `${CARD_WIDTH}px`,
-                  height: `${CARD_HEIGHT}px`,
-                  transform: `translateY(${((gameboardSize.height * 0.2) - CARD_HEIGHT )/ 2}px)`,
-                  zIndex: index,
-                }}
-              >
-                <Card
-                  code={card.code}
-                  suit={card.suit}
-                  value={card.value}
-                  cardOrder={card.cardOrder}
-                  image={card.image}
-                  backimage={cardback}
-                  flipped={false}
-                  onClick={card.onClick}
-                />
-              </div>
-            );
-          })}
         </div>
+
+        {opponent3Cards.map((card, index) => {
+          const position = calculateCardPosition(
+            index,
+            opponent3Cards.length,
+            gameboardSize.width * 0.5, // Example hand width
+            gameboardSize.height * 0.2, // Example hand height
+            { x: gameboardSize.width * 0.85, y: gameboardSize.height * 0.7 }, // Hand position
+            270, // Rotation for opponent 3 (right hand)
+            3 // Hand index 3
+          );
+
+          return (
+            <div
+              key={index}
+              style={{
+                position: "absolute",
+                left: `${position.left}px`,
+                top: `${position.top}px`,
+                width: `${CARD_WIDTH}px`,
+                height: `${CARD_HEIGHT}px`,
+                transform: position.transform,
+                zIndex: 50 + index,
+              }}
+            >
+              <Card
+                code={card.code}
+                suit={card.suit}
+                value={card.value}
+                cardOrder={card.cardOrder}
+                image={card.image}
+                backimage={cardback}
+                flipped={false}
+                onClick={card.onClick}
+                isDummy={card.isDummy}
+              />
+            </div>
+          );
+        })}
 
         <div className="pile">
           {[trickSlot0, trickSlot1, trickSlot2, trickSlot3].map(
