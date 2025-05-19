@@ -1841,34 +1841,6 @@ const MatchPage: React.FC = () => {
         ))}
       </div>
 
-      {(myTurn && timer !== null && timer !== Infinity &&
-          (currentGamePhase === "FIRSTTRICK" ||
-            currentGamePhase === "NORMALTRICK" ||
-            currentGamePhase === "FINALTRICK") ||
-        (currentGamePhase === "PASSING" && timer !== null &&
-          timer !== Infinity)) &&
-        (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between", // Space out the elements
-              alignItems: "center", // Align the items vertically centered
-              position: "absolute",
-              top: "3%",
-              left: "50%",
-              transform: "translateX(-50%)",
-              backgroundColor: "white",
-              color: "black",
-              padding: "8px 15px",
-              borderRadius: "10px",
-              zIndex: 1000,
-              width: "auto", // Ensure the width adjusts based on content
-            }}
-          >
-            Time Remaining: {timer}s
-          </div>
-        )}
-
       {(
         (["FIRSTTRICK", "NORMALTRICK", "FINALTRICK"].includes(
           currentGamePhase,
@@ -1899,12 +1871,13 @@ const MatchPage: React.FC = () => {
           }}
         >
           {["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase)
-            ? (trickWinner
-              ? `${trickWinner} won the trick!`
-              : "Trick complete!")
-            : (currentPlayer
-              ? `It's ${currentPlayer}'s turn`
-              : "Waiting for player...")}
+        ? (trickWinner
+            ? `${trickWinner} won the trick!`
+            : "Trick complete!")
+        : (currentPlayer
+            ? `It's ${currentPlayer}'s turn${myTurn ? ` | Time Remaining: ${timer}s` : ""}`
+            : "Waiting for player...")}
+
         </div>
       )}
 
