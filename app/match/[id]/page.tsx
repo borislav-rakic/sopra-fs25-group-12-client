@@ -80,6 +80,7 @@ const MatchPage: React.FC = () => {
   const [cardsToPass, setCardsToPass] = useState<cardProps[]>([]);
   const [myTurn, setMyTurn] = useState(false);
   const [playableCards, setPlayableCards] = useState<Array<string | null>>([]);
+  const playableCardsRef = useRef(playableCards);
   const [pollingPausedUntil, setPollingPausedUntil] = useState<number | null>(
     null,
   );
@@ -1885,6 +1886,8 @@ const animatePassingCards = (
   }, [myTurn, currentGamePhase]);
 
   const playRandomCard = async () => {
+    console.log("playRandomCard called");
+    console.log("playableCards:", playableCardsRef.current);
     if (playRandomCardCalled.current) {
       console.log("playRandomCard already called. Skipping...");
       return;
@@ -1892,14 +1895,20 @@ const animatePassingCards = (
 
     playRandomCardCalled.current = true; // Mark as called
 
-    if (playableCards.length === 0) {
+    if (playableCardsRef.current.length === 0) {
       console.log("No playable cards available.");
       return;
     }
 
+    lastPlayedCardRect.current = null;
+
     await apiService.post(`/matches/${matchId}/play/any`, {});
     console.log("Random card played.");
   };
+
+  useEffect(() => {
+    playableCardsRef.current = playableCards;
+  }, [playableCards]);
 
   const passRandomCards = async () => {
     if (passRandomCardsCalled.current) {
@@ -2061,18 +2070,24 @@ const animatePassingCards = (
         ))}
       </div>
 
-      {(
-        (["FIRSTTRICK", "NORMALTRICK", "FINALTRICK"].includes(
-          currentGamePhase,
-        )) ||
-        (["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase))
-      ) && (
-        <div
-          style={{
-            position: "absolute",
-            top: "7%",
-            left: "50%",
-            transform: "translateX(-50%)",
+{(
+  (
+    (
+    (currentGamePhase === "PASSING" && timer !== Infinity && timer !== null) ||
+    // Show during trick phases only if timer is not Infinity/null (and it's your turn)
+    (["FIRSTTRICK", "NORMALTRICK", "FINALTRICK"].includes(currentGamePhase)) ||
+    // Always show for PROCESSINGTRICK/TRICKJUSTCOMPLETED
+    (["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase))
+    ) &&
+    currentGamePhase !== "RESULT" 
+  )
+) && (
+  <div
+    style={{
+      position: "absolute",
+      top: "7%",
+      left: "50%",
+      transform: "translateX(-50%)",
             backgroundColor:
               ["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase)
                 ? "darkgreen"
@@ -2081,25 +2096,26 @@ const animatePassingCards = (
               ["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase)
                 ? "white"
                 : "white",
-            padding: "8px 18px",
-            borderRadius: "10px",
-            border: "2px solid white",
-            zIndex: 1000,
-            fontSize: "1.15rem",
-            textAlign: "center",
-            minWidth: "200px",
-          }}
-        >
-          {["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase)
+      padding: "8px 18px",
+      borderRadius: "10px",
+      border: "2px solid white",
+      zIndex: 1000,
+      fontSize: "1.15rem",
+      textAlign: "center",
+      minWidth: "200px",
+    }}
+  >
+    {currentGamePhase === "PASSING"
+      ? `Passing phase | Time Remaining: ${timer}s`
+      : ["PROCESSINGTRICK", "TRICKJUSTCOMPLETED"].includes(trickPhase)
         ? (trickWinner
             ? `${trickWinner} won the trick!`
             : "Trick complete!")
         : (currentPlayer
-            ? `It's ${currentPlayer}'s turn${myTurn ? ` | Time Remaining: ${timer}s` : ""}`
+            ? `It's ${currentPlayer}'s turn${myTurn && typeof timer === "number" && isFinite(timer) ? ` | Time Remaining: ${timer}s` : myTurn ? " | Time Remaining: 0s" : ""}`
             : "Waiting for player...")}
-
-        </div>
-      )}
+  </div>
+)}
 
       <div className="menu-dropdown">
         <Dropdown
