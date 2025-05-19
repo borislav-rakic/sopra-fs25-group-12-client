@@ -105,6 +105,17 @@ const MatchPage: React.FC = () => {
   const [previousGamePhase, setPreviousGamePhase] = useState<string>("");
   const passingCardsforAnimation = useRef<string[]>(["", "", ""]);
   const passId = useRef<number>(0);
+  const [pendingPassingAnimation, setPendingPassingAnimation] = useState<{
+    passing: string[];
+    receiving: string[];
+    passingToId: number;
+  } | null>(null);
+  const [pendingPassingRemoveDone, setPendingPassingRemoveDone] = useState<null | {
+    response: any,
+    receivedCards: string[],
+    passingCards: string[],
+    passToId: number,
+  }>(null);
 
   const CLEANUP_ANIMATION_DURATION = 1000;
   const cleanupNow = useRef<boolean>(false);
@@ -662,17 +673,19 @@ const MatchPage: React.FC = () => {
           cardsInHand,
         );
 
-        console.log("passing cards", passingCardsforAnimation.current);
-        console.log("received cards", receivedCards);
-        console.log("current player hand", cardsInHand);
-        console.log("passing to player in slot", response.passingToPlayerSlot);
-
-        console.log("invoking animatePassingCards");
-        animatePassingCards(
-          passingCardsforAnimation.current,
-          receivedCards,
-          passId.current,
+        setCardsInHand((prev) =>
+          prev.filter((card) =>
+            !passingCardsforAnimation.current.includes(card.code)
+          )
         );
+
+        setPendingPassingRemoveDone({
+          response,
+          receivedCards,
+          passingCards: passingCardsforAnimation.current,
+          passToId: passId.current,
+        });
+
         passNow.current = false;
         return;
       }
@@ -974,10 +987,6 @@ const MatchPage: React.FC = () => {
         anim.div.style.transform =
           `translate(-50%, -50%) scale(${curScale}) rotate(${curRot}deg)`;
 
-        if (idx === 10) {
-          console.log("Card scale", curScale);
-        }
-
         if (progress >= 1) {
           anim.finished = true;
         } else {
@@ -1011,7 +1020,7 @@ const MatchPage: React.FC = () => {
     if (!gameboard) return;
 
     const PASS_SCALE = 1.2;
-    const PASS_DURATION = 700;
+    const PASS_DURATION = PASSING_ANIMATION_DURATION - 800;
     const PASS_STAGGER = 60;
 
     // Hand positions and rotations: 0 = you, 1 = left, 2 = top, 3 = right
@@ -1075,7 +1084,36 @@ const MatchPage: React.FC = () => {
       const to = handCenters[toIdx];
 
       for (let i = 0; i < 3; i++) {
-        const dest = getStaggeredDest(toIdx, i);
+        let dest = getStaggeredDest(toIdx, i);
+        let animatedZIndex = 2001; // Default zIndex for non-player targets
+
+        if (toIdx === 0) {
+          const code = receivingCards[i];
+          console.log("generating card for animation to player hand:", code);
+          // Find the dummy card's index in cardsInHand
+          const dummyIndex = cardsInHand.findIndex(
+            c => c.code === code && c.isDummy
+          );
+          console.log("dummyIndex", dummyIndex);
+          if (dummyIndex !== -1 && cardRefs.current[dummyIndex]?.current) {
+            const rect = cardRefs.current[dummyIndex].current!.getBoundingClientRect();
+            const gameboardRect = gameboard.getBoundingClientRect();
+            dest = {
+              x: rect.left - gameboardRect.left + rect.width / 2,
+              y: rect.top - gameboardRect.top + rect.height / 2,
+            };
+            // --- Set zIndex for the animated card ---
+            animatedZIndex = 50 + dummyIndex;
+          } else {
+            animatedZIndex = 2001; // fallback if not found
+          }
+        } else {
+          animatedZIndex = 2001; // default for non-player targets
+        }
+
+        
+
+
         const cardDiv = document.createElement("div");
         cardDiv.className = "passing-card";
         cardDiv.style.position = "absolute";
@@ -1085,7 +1123,7 @@ const MatchPage: React.FC = () => {
         cardDiv.style.height = `${CARD_HEIGHT}px`;
         cardDiv.style.transform =
           `translate(-50%, -50%) scale(${PASS_SCALE}) rotate(${from.rotation}deg)`;
-        cardDiv.style.zIndex = "2001";
+        cardDiv.style.zIndex = animatedZIndex.toString();
 
         // Show real card image only for your outgoing and incoming cards
         if (fromIdx === 0) {
@@ -1164,13 +1202,29 @@ const MatchPage: React.FC = () => {
         }
       });
 
-      if (!allFinished) {
-        requestAnimationFrame(animateAll);
-      } else {
-        setTimeout(() => {
-          animatingCards.forEach((anim) => anim.div.remove());
-        }, 500);
-      }
+    if (!allFinished) {
+      requestAnimationFrame(animateAll);
+    } else {
+      // 1. Show the new cards immediately
+      setCardsInHand((prev) => {
+        return prev.map((card) => {
+          if (card.isDummy) {
+            const real = (pollingResponse?.playerCards ?? []).find(
+              (pc) => pc.card.code === card.code
+            );
+            if (real) {
+              return generateCard(real.card.code, real.card.cardOrder);
+            }
+          }
+          return card;
+        });
+      });
+
+      // 2. Remove the animated cards after a short delay (e.g., 200ms)
+      setTimeout(() => {
+        animatingCards.forEach((anim) => anim.div.remove());
+      }, 200);
+    }
     }
     requestAnimationFrame(animateAll);
   };
@@ -1184,6 +1238,90 @@ const MatchPage: React.FC = () => {
       .filter((cardObj) => !currentCodes.has(cardObj.card.code))
       .map((cardObj) => cardObj.card.code);
   }
+
+  const createDummyCard = (code: string, cardOrder: number): cardProps => ({
+    code: code,
+    suit: "",
+    value: BigInt(0),
+    cardOrder,
+    image: `https://deckofcardsapi.com/static/img/${code}.png`, 
+    backimage: cardback,
+    flipped: false,
+    onClick: () => {},
+    zIndex: 1,
+    isDummy: true, // Custom property to identify dummy cards
+  });
+
+  useEffect(() => {
+    const animation = pendingPassingAnimation;
+    if (
+      animation &&
+      animation.receiving.every(code =>
+        cardsInHand.find(c => c.code === code && c.isDummy)
+      )
+    ) {
+      let tries = 0;
+      function tryAnimate() {
+        if (!animation) return;
+        const allRefsReady = animation.receiving.every(code => {
+          const idx = cardsInHand.findIndex(c => c.code === code && c.isDummy);
+          return idx !== -1 && cardRefs.current[idx]?.current;
+        });
+        if (allRefsReady) {
+          animatePassingCards(
+            animation.passing,
+            animation.receiving,
+            animation.passingToId
+          );
+          setPendingPassingAnimation(null);
+        } else if (tries < 20) {
+          tries++;
+          setTimeout(tryAnimate, 50);
+        } else {
+          console.warn("Animation refs not ready after 1 second, skipping animation.");
+          setPendingPassingAnimation(null);
+        }
+      }
+      tryAnimate();
+    }
+  }, [pendingPassingAnimation, cardsInHand]);
+
+  useEffect(() => {
+    console.log("pendingPassingRemoveDone", pendingPassingRemoveDone);
+    if (
+      pendingPassingRemoveDone &&
+      // Make sure the cards to be removed are actually gone
+      passingCardsforAnimation.current.every(
+        code => !cardsInHand.some(card => card.code === code)
+      )
+    ) {
+      console.log("now executing inside of pendingPassingRemoveDone");
+      // Now add dummy cards and trigger the animation as before
+      const { response, receivedCards, passingCards, passToId } = pendingPassingRemoveDone;
+
+      const receivedCardOrders = receivedCards.map(code => {
+        const found = (response.playerCards ?? []).find((pc: PlayerCard) => pc.card.code === code);
+        return found ? found.card.cardOrder : 0;
+      });
+
+      const dummyCards = receivedCards.map((code, i) =>
+        createDummyCard(code, receivedCardOrders[i])
+      );
+
+      console.log("dummyCards", dummyCards);
+
+      const newHandWithDummies = sortCards([...cardsInHand, ...dummyCards]);
+      setCardsInHand(newHandWithDummies);
+
+      setPendingPassingAnimation({
+        passing: passingCards,
+        receiving: receivedCards,
+        passingToId: passToId,
+      });
+
+      setPendingPassingRemoveDone(null);
+    }
+  }, [pendingPassingRemoveDone, cardsInHand]);
 
   const animateTrickCleanup = (previousTrick: TrickDTO, winner: number) => {
     const gameboard = document.querySelector(".gameboard") as HTMLElement;
@@ -1576,18 +1714,12 @@ const MatchPage: React.FC = () => {
   };
 
   const sortCards = (cards: cardProps[]) => {
-    return cards.sort((a, b) => {
-      console.log("Comparing cards:", a.code, " | ", b.code);
+    return [...cards].sort((a, b) => {
       if (a.cardOrder < b.cardOrder) return -1;
       if (a.cardOrder > b.cardOrder) return 1;
       return 0;
     });
   };
-
-  useEffect(() => {
-    const sortedCards = sortCards(cardsInHand);
-    setCardsInHand(sortedCards);
-  }, [cardsInHand]);
 
   const areHandsEqual = (hand1: cardProps[], hand2: cardProps[]) => {
     if (hand1.length !== hand2.length) return false;
@@ -2000,49 +2132,53 @@ const MatchPage: React.FC = () => {
           className="hand-0"
           ref={hand0Ref} // adjust height as needed
         >
-          {cardsInHand.map((card, index) => {
-            const cardRef = cardRefs.current[index];
-            const numCards = cardsInHand.length;
-            const MAX_SPACING = CARD_WIDTH * 1.05; // px, adjust as you like
-            const spacing = numCards > 1
-              ? Math.min((handWidth - CARD_WIDTH) / (numCards - 1), MAX_SPACING)
-              : 0;
-            const left = index * spacing;
 
-            return (
-              <div
-                key={card.code}
-                ref={cardRef}
-                style={{
-                  position: "absolute",
-                  left: `${left}px`,
-                  top: 0,
-                  width: `${CARD_WIDTH}px`,
-                  height:`${CARD_HEIGHT}px`,
-                  transform: `translateY(${((gameboardSize.height * 0.2) - CARD_HEIGHT )/ 2}px)`,
-                  zIndex: index,
-                }}
-              >
-                <Card
-                  code={card.code}
-                  suit={card.suit}
-                  value={card.value}
-                  cardOrder={card.cardOrder}
-                  image={card.image}
-                  backimage={cardback}
-                  flipped
-                  onClick={currentGamePhase === "PASSING" && hasPassedCards
-                    ? () => {}
-                    : () => handlePlayCard(card, cardRef)}
-                  isSelected={cardsToPass.some((c) => c.code === card.code)}
-                  isPlayable={playableCards.includes(card.code)}
-                  isPassable={currentGamePhase === "PASSING"}
-                  isDisabled={currentGamePhase === "PASSING" && hasPassedCards}
-                />
-              </div>
-            );
-          })}
         </div>
+
+        {cardsInHand.map((card, index) => {
+          const cardRef = cardRefs.current[index];
+          const numCards = cardsInHand.length;
+          const MAX_SPACING = CARD_WIDTH * 1.05; // px, adjust as you like
+          const spacing = numCards > 1
+            ? Math.min((handWidth - CARD_WIDTH) / (numCards - 1), MAX_SPACING)
+            : 0;
+          const left = index * spacing;
+
+          return (
+            <div
+              key={card.code}
+              ref={cardRef}
+              style={{
+                position: "absolute",
+                left: `calc(25% + ${left}px)`,
+                top: `calc(75%)`,
+                width: `${CARD_WIDTH}px`,
+                height:`${CARD_HEIGHT}px`,
+                transform: `translateY(${((gameboardSize.height * 0.2) - CARD_HEIGHT )/ 2}px)`,
+                zIndex: 50+index,
+              }}
+            >
+              <Card
+                code={card.code}
+                suit={card.suit}
+                value={card.value}
+                cardOrder={card.cardOrder}
+                image={card.image}
+                backimage={cardback}
+                flipped
+                onClick={currentGamePhase === "PASSING" && hasPassedCards
+                  ? () => {}
+                  : () => handlePlayCard(card, cardRef)}
+                isSelected={cardsToPass.some((c) => c.code === card.code)}
+                isPlayable={playableCards.includes(card.code)}
+                isPassable={currentGamePhase === "PASSING"}
+                isDisabled={currentGamePhase === "PASSING" && hasPassedCards}
+                isDummy={card.isDummy} // Pass the isDummy prop
+              />
+            </div>
+          );
+        })}
+
 
         <div className="hand-1"
           style={{
