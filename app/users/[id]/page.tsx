@@ -22,6 +22,18 @@ type UserPublicProfile = {
   avatar: number;
   birthday: string;
   rating: number;
+  scoreTotal: number;
+  gamesPlayed: number;
+  matchesPlayed: number;
+  avgGameRanking: number;
+  avgMatchRanking: number;
+  moonShots: number;
+  perfectGames: number;
+  perfectMatches: number;
+  currentGameStreak: number;
+  longestGameStreak: number;
+  currentMatchStreak: number;
+  longestMatchStreak: number;
 };
 
 const UserProfileView: React.FC = () => {
@@ -233,7 +245,64 @@ const UserProfileView: React.FC = () => {
       <h2 style={{ color: "white" }}>{user.username}</h2>
       <p>Status: {user.status}</p>
       <p>Birthday: {formattedBirthday || "Unknown"}</p>
-      <p>Rating: {user.rating != null ? user.rating : "Unknown"}</p>
+
+      <table className="user-stats-table" style={{ margin: "2rem auto", background: "#f8f8f8", color: "black", borderRadius: 8, minWidth: 320 }}>
+        <tbody>
+          <tr>
+            <th colSpan={2} style={{ textAlign: "center", fontSize: "1.5rem", background: "#d0ffd0" }}>
+              Stats
+            </th>
+          </tr>
+          <tr>
+            <th>Total Score</th>
+            <td>{user.scoreTotal}</td>
+          </tr>
+          <tr>
+            <th>Games Played</th>
+            <td>{user.gamesPlayed}</td>
+          </tr>
+          <tr>
+            <th>Matches Played</th>
+            <td>{user.matchesPlayed}</td>
+          </tr>
+          <tr>
+            <th>Avg. Game Ranking</th>
+            <td>{user.avgGameRanking?.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <th>Avg. Match Ranking</th>
+            <td>{user.avgMatchRanking?.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <th>Moon Shots</th>
+            <td>{user.moonShots}</td>
+          </tr>
+          <tr>
+            <th>Perfect Games</th>
+            <td>{user.perfectGames}</td>
+          </tr>
+          <tr>
+            <th>Perfect Matches</th>
+            <td>{user.perfectMatches}</td>
+          </tr>
+          <tr>
+            <th>Current Game Streak</th>
+            <td>{user.currentGameStreak}</td>
+          </tr>
+          <tr>
+            <th>Longest Game Streak</th>
+            <td>{user.longestGameStreak}</td>
+          </tr>
+          <tr>
+            <th>Current Match Streak</th>
+            <td>{user.currentMatchStreak}</td>
+          </tr>
+          <tr>
+            <th>Longest Match Streak</th>
+            <td>{user.longestMatchStreak}</td>
+          </tr>
+        </tbody>
+      </table>
 
       <div className="friend-action-block" style={{ marginTop: "1.5rem" }}>
         {renderFriendActions()}

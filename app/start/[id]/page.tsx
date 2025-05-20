@@ -69,6 +69,7 @@ const StartPage: React.FC = () => {
     { userId: string; status: string }[]
   >([]);
   const [isActionLoading, setIsActionLoading] = useState(false);
+  const [isStartable, setIsStartable] = useState(false);
 
   interface JoinRequest {
     userId: string;
@@ -126,6 +127,12 @@ const StartPage: React.FC = () => {
         const updatedInviteStatus = [...inviteStatus];
         const updatedPendingInvites = [...pendingInvites];
         const updatedDifficulties = [...selectedDifficulties];
+
+        if(!match.slotAvailable){
+          setIsStartable(true);
+        } else {
+          setIsStartable(false);
+        }
 
         for (let i = 0; i < TOTAL_SLOTS; i++) {
           updatedSelectedPlayers[i] = "";
@@ -461,9 +468,16 @@ const StartPage: React.FC = () => {
         alignItems: "center",
       }}
     >
-      <p style={{ fontWeight: "bold", fontSize: "16px", color: "black" }}>
-        {hostUsername}
-      </p>
+      <div className="lobby-playername-wrapper">
+        <p
+          className="lobby-playername"
+          style={{
+            "--name-length": hostUsername ? hostUsername.length : 20,
+          } as React.CSSProperties}
+        >
+          {hostUsername}
+        </p>
+      </div>
     </Card>
   );
 
@@ -527,6 +541,7 @@ const StartPage: React.FC = () => {
           type: "success",
           content: `AI player removed from slot ${index}`,
         });
+        setIsStartable(false);
       } catch {
         message.open({
           type: "error",
@@ -701,11 +716,10 @@ const StartPage: React.FC = () => {
                 }}
               >
                 <p
+                  className="lobby-playername"
                   style={{
-                    fontWeight: "bold",
-                    fontSize: "16px",
-                    color: "black",
-                  }}
+                    "--name-length": player ? player.length : 20,
+                  } as React.CSSProperties}
                 >
                   {player}
                 </p>
@@ -988,9 +1002,9 @@ const StartPage: React.FC = () => {
               </Button>
               <Button
                 block
-                className={styles.whiteButton}
+                className={`${styles.whiteButton} ${!isStartable ? styles.disabledButton : ""}`}
                 onClick={handleStart}
-                disabled={isActionLoading}
+                disabled={isActionLoading || !isStartable}
                 loading={isActionLoading}
               >
                 Start

@@ -496,8 +496,8 @@ const MatchPage: React.FC = () => {
         previousWinner.current = (response.previousTrickDTO?.winningPosition ?? -1);
       }
 
-      if (response.passingToPlayerSlot !== null) {
-        passId.current = response.passingToPlayerSlot;
+      if (response.passingToPlayerSlot !== null && response.playerSlot !== null) {
+        passId.current = (4 + response.passingToPlayerSlot - response.playerSlot) % 4;
       }
 
       if (currentGamePhase === "NORMALTRICK") {
@@ -505,9 +505,10 @@ const MatchPage: React.FC = () => {
       }
 
       console.log("passId", passId.current);
-
-      if (response.currentPlayerSlot !== null) {
-        setCurrentPlayer(players[response.currentPlayerSlot] ?? "");
+      
+      
+      if (response.currentPlayerSlot !== null && response.playerSlot !== null) {
+        setCurrentPlayer(players[(4 + response.currentPlayerSlot - response.playerSlot) % 4] ?? "");
       }
 
       if (
@@ -2169,30 +2170,34 @@ const animatePassingCards = (
 
       <div className="score-table">
         <table>
+            <colgroup>
+              <col style={{ width: "70%" }} />
+              <col style={{ width: "30%" }} />
+            </colgroup>
           <thead>
             <tr>
               <th>Player</th>
               <th>Score</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>{players[0] ? players[0] : ""}</td>
-              <td>{players[0] ? matchScore[0] : ""}</td>
-            </tr>
-            <tr>
-              <td>{players[1] ? players[1] : ""}</td>
-              <td>{players[1] ? matchScore[1] : ""}</td>
-            </tr>
-            <tr>
-              <td>{players[2] ? players[2] : ""}</td>
-              <td>{players[2] ? matchScore[2] : ""}</td>
-            </tr>
-            <tr>
-              <td>{players[3] ? players[3] : ""}</td>
-              <td>{players[3] ? matchScore[3] : ""}</td>
-            </tr>
-          </tbody>
+            <tbody>
+              <tr>
+                <td className="score-playername">{players[0] ? players[0] : ""}</td>
+                <td>{players[0] ? matchScore[0] : ""}</td>
+              </tr>
+              <tr>
+                <td className="score-playername">{players[1] ? players[1] : ""}</td>
+                <td>{players[1] ? matchScore[1] : ""}</td>
+              </tr>
+              <tr>
+                <td className="score-playername">{players[2] ? players[2] : ""}</td>
+                <td>{players[2] ? matchScore[2] : ""}</td>
+              </tr>
+              <tr>
+                <td className="score-playername">{players[3] ? players[3] : ""}</td>
+                <td>{players[3] ? matchScore[3] : ""}</td>
+              </tr>
+            </tbody>
         </table>
       </div>
 
@@ -2476,7 +2481,7 @@ const animatePassingCards = (
               height={72}
             />
           </div>
-          <div className="game-playername">
+          <div className="game-playername" style={{ "--name-length": `${getDisplayName(players[0]).length}` } as React.CSSProperties}>
             {getDisplayName(players[0])}
           </div>
         </div>
@@ -2493,7 +2498,7 @@ const animatePassingCards = (
               height={72}
             />
           </div>
-          <div className="game-playername">
+          <div className="game-playername" style={{ "--name-length": `${getDisplayName(players[1]).length}` } as React.CSSProperties}>
             {getDisplayName(players[1])}
           </div>
         </div>
@@ -2510,7 +2515,7 @@ const animatePassingCards = (
               height={72}
             />
           </div>
-          <div className="game-playername">
+          <div className="game-playername" style={{ "--name-length": `${getDisplayName(players[2]).length}` } as React.CSSProperties}>
             {getDisplayName(players[2])}
           </div>
         </div>
@@ -2527,7 +2532,7 @@ const animatePassingCards = (
               height={72}
             />
           </div>
-          <div className="game-playername">
+          <div className="game-playername" style={{ "--name-length": `${getDisplayName(players[3]).length}` } as React.CSSProperties}>
             {getDisplayName(players[3])}
           </div>
         </div>
@@ -2551,7 +2556,7 @@ const animatePassingCards = (
             }}
           >
             <p style={{ fontSize: "1.2rem", margin: 0 }}>
-              Select 3 cards to pass to your opponent
+              Select 3 cards to pass to {players[passId.current]}.
             </p>
           </div>
         )}

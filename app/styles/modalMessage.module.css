@@ -79,3 +79,31 @@
 .modalMessageMatchFinished td:first-child {
   text-align: left; /* Align player names to the left */
 }
+
+.modalMessageNewsFlash {
+  margin-top: 15px;
+  background-color: #f0f8f0; /* Light green background */
+  border-left: 4px solid darkgreen;
+  border-radius: 6px;
+  padding: 10px 16px;
+  max-width: 500px;
+  color: black;
+  font-style: italic;
+}
+
+.modalMessageNewsFlashItem {
+  margin-bottom: 8px;
+  color: black;
+  font-style: italic;
+}
+
+.personalSummary {
+  margin-top: 15px;
+  background-color: #f0f8f0; /* Light green background */
+  border-left: 4px solid darkgreen;
+  border-radius: 6px;
+  padding: 10px 16px;
+  max-width: 500px;
+  color: black;
+  font-style: italic;
+}

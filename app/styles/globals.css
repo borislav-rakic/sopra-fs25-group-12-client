@@ -93,6 +93,14 @@ a {
   font-weight: 500;
 }
 
+.disabledButton {
+  background-color: #ccc !important;
+  color: #888 !important;
+  border: 1px solid #aaa !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
 .greyButton {
   background-color: grey !important;
   color: black;
@@ -231,12 +239,17 @@ a {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   padding: 10px;
   z-index: 1000;
+  width: 300px; /* or 400px, or whatever you want */
+  min-width: 200px; /* optional, for responsiveness */
+  max-width: 400px;  /* optional, for responsiveness */
+  overflow-x: auto;
   /* Ensure it's on top */
 }
 
 /* Table styling */
 .score-table table {
-  width: 200px;
+  table-layout: fixed;
+  width: 100%;
   /* Set the table width */
   border-collapse: collapse;
   /* Removes space between table cells */
@@ -268,6 +281,19 @@ a {
 .score-table tr:hover {
   background-color: #f1f1f1;
   /* Light gray background on row hover */
+}
+
+.score-playername {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.score-table th:first-child,
+.score-table td.score-playername {
+  width: 80%; /* or whatever fits your layout */
 }
 
 .gameboard {
@@ -650,7 +676,7 @@ a {
   z-index: 10;
   min-width: 10%;
   max-width: 90%;
-  height: 20%;
+  height: 40%;
   top: 45%;
   left: 5%;
   font-weight: bold;
@@ -658,7 +684,9 @@ a {
   padding-left: 5px;
   padding-right: 5px;
   padding-top: 3px;
-  font-size: 1vw;
+  font-size: clamp( 0.1rem, 
+                    calc((var(--gameboard-width, 500px) * 0.02) * (10 / var(--name-length))), 
+                    calc(var(--gameboard-width, 500px) * 0.02));
   border-radius: 5%;
   overflow: hidden;
   /* Prevent text overflow */
@@ -837,4 +865,32 @@ a {
   font-family: var(--font-luckiest-guy);
   /* Ensures long messages wrap */
   pointer-events: none;
+}
+
+.lobby-playername-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lobby-playername {
+  font-size: clamp(
+    0.6rem,
+    calc((20 / var(--name-length, 16)) * 1rem),
+    1rem
+  );
+  min-width: 0;
+  max-width: 180px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  font-weight: bold;
+  color: black;
+  padding: 3px 5px 0 5px;
+  border-radius: 5%;
 }
