@@ -2057,6 +2057,37 @@ const animatePassingCards = (
     };
   };
 
+  useEffect(() => {
+    // All possible card codes (2-10, J, Q, K, A for each suit)
+    const suits = ["H", "S", "D", "C"];
+    const ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "0", "J", "Q", "K", "A"];
+    const cardUrls: string[] = [];
+
+    for (const suit of suits) {
+      for (const rank of ranks) {
+        cardUrls.push(`https://deckofcardsapi.com/static/img/${rank}${suit}.png`);
+      }
+    }
+
+    // Preload each image
+    cardUrls.forEach((url) => {
+      const img = new window.Image();
+      img.src = url;
+    });
+
+    // Optionally preload cardback(s) as well
+    const cardbacks = [
+      "/card_back/c101.png", "/card_back/c102.png", "/card_back/c103.png",
+      "/card_back/c104.png", "/card_back/c105.png", "/card_back/c106.png",
+      "/card_back/b101.png", "/card_back/b102.png", "/card_back/b103.png",
+      "/card_back/b104.png", "/card_back/b105.png", "/card_back/b106.png"
+    ];
+    cardbacks.forEach((url) => {
+      const img = new window.Image();
+      img.src = url;
+    });
+  }, []);
+
 
   return (
     <div className={`${styles.page} matchPage`}>
