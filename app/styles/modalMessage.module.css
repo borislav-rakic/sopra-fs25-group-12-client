@@ -9,7 +9,7 @@
 .modalMessageGameResult table {
   width: fit-content;
   border-collapse: collapse;
-  border: 2px solid darkgreen; /* Dark green border */
+  border: 2px solid white; /* Dark green border */
   border-radius: 8px;
   overflow: hidden;
   background-color: white; /* White background for the table */

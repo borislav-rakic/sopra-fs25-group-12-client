@@ -545,7 +545,7 @@ const MatchPage: React.FC = () => {
       const slot = response.playerSlot ?? 0;
 
       if (response.resultHtml) {
-        setHtmlContent(response.resultHtml);
+        setHtmlContent(response.resultHtml.replace(/classname=/g, 'class='));
       }
 
       if (response.gamePhase !== "PASSING") {
@@ -2812,12 +2812,13 @@ const animatePassingCards = (
             border: "2px solid white",
             borderRadius: "10px",
             textAlign: "center",
-            width: "fit-content", // Automatically adjust width based on content
-            maxWidth: "90%", // Optional: Limit the maximum width for responsiveness
-            height: "auto", // Automatically adjust height based on content
-            maxHeight: "80%", // Optional: Limit the maximum height for responsiveness
-            overflowY: "auto", // Add scrolling if content overflows vertically
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)", // Add a shadow for better visibility
+            width: "100%",
+            maxWidth: "700px",
+            minWidth: "320px",
+            height: "auto",
+            maxHeight: "80%",
+            overflowY: "auto",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
           }}
         >
           <div>

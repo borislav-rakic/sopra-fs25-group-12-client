@@ -894,3 +894,91 @@ a {
   padding: 3px 5px 0 5px;
   border-radius: 5%;
 }
+
+/* Modal Message Container */
+.modalMessage,
+.modalMessageMatchFinished,
+.modalMessageMatchResult,
+.modalMessageGameResult {
+  font-family: Arial, sans-serif;
+  background-color: white;
+  border-radius: 8px;
+  color: black;
+  padding: 0 0 24px 0;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Table Styling (shared for all result tables) */
+.modalMessage table,
+.modalMessageMatchFinished table,
+.modalMessageMatchResult table,
+.modalMessageGameResult table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid white;
+  border-radius: 8px;
+  background-color: white;
+  margin-top: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.modalMessage th,
+.modalMessageMatchFinished th,
+.modalMessageMatchResult th,
+.modalMessageGameResult th {
+  background-color: darkgreen;
+  color: white;
+  padding: 10px 15px;
+  text-align: center;
+}
+
+.modalMessage td,
+.modalMessageMatchFinished td,
+.modalMessageMatchResult td,
+.modalMessageGameResult td {
+  border-top: 1px solid #cfcfcf;
+  padding: 8px 12px;
+  text-align: center;
+  color: black;
+}
+
+.modalMessage td:first-child,
+.modalMessageMatchFinished td:first-child,
+.modalMessageMatchResult td:first-child,
+.modalMessageGameResult td:first-child {
+  text-align: left;
+}
+
+/* News Flash and Personal Summary */
+.modalMessageNewsFlash,
+.personalSummary {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 18px;
+  background-color: #f0f8f0;
+  border-radius: 6px;
+  padding: 14px 20px;
+  color: black;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+.modalMessageNewsFlashItem {
+  margin-bottom: 8px;
+  color: black;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+/* Optional: Center modal action buttons */
+.modalMessage button,
+.modalMessageMatchFinished button,
+.modalMessageMatchResult button,
+.modalMessageGameResult button {
+  margin: 24px auto 0 auto;
+  display: block;
+}
