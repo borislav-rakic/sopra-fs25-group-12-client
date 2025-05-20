@@ -177,10 +177,12 @@ could add_
 Here are the top 2–3 features that new developers who want to contribute to the
 project could add:
 
-- Add some background music 🎵
+- Add some optional background music and sound effects for actions like shuffling cards, playing a card, breaking hearts, playing the Queen of Spades etc. 🎵
 - Add chat feature for users to interact during a match 💬
 
 ## Authors & Acknowledgment
+
+SoPra25 Team 12 consists of:
 
 - **Stevania Eilyn Frutiger** -
   [stevaniaeilyn](https://github.com/stevaniaeilyn)
@@ -188,7 +190,14 @@ project could add:
 - **Borislav Rakic** - [borislav-rakic](https://github.com/borislav-rakic)
 - **Dieter Andreas Studer** - [diderot5038](https://github.com/diderot5038)
 
+We would like to extend our sincere gratitude to the external resources that helped bring this project to life. Our special thanks go to:
+
+- Deck of Cards API – This API provided an efficient and creative way to draw cards and utilize their [unique card designs](https://www.deckofcardsapi.com), enhancing the visual appeal and functionality of our application.
+- IconPacks – We are grateful for the [free card back design](https://www.iconpacks.net/free-icon/red-playing-card-back-25479.html) available on IconPacks, which added an engaging visual element to the game interface.
+- Sketch App Sources – Our avatar designs are derived from the creative resources offered on [Sketch App Sources](https://www.sketchappsources.com/free-source/4830-avatar-characters-sketch-freebie-resource.html). We also wish to acknowledge the original author of the avatar artworks, [Laura Reen](http://laurareen.com/), a visual artist from Prague, Czech Republic.
+
+Their contributions have been instrumental in shaping a visually appealing and interactive experience, and we are deeply appreciative of their generosity in providing these free resources.
+
 ## License
 
-_Say how your project is licensed
-[(see License guide3)](https://choosealicense.com/)_
+This project is provided under the [MIT License](LICENSE).
