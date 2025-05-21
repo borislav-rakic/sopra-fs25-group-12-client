@@ -34,7 +34,7 @@ type UserPublicProfile = {
   longestGameStreak: number;
   currentMatchStreak: number;
   longestMatchStreak: number;
-  isMe: boolean;
+  me: boolean;
 };
 
 const UserProfileView: React.FC = () => {
@@ -141,7 +141,7 @@ const UserProfileView: React.FC = () => {
   };
 
   const renderFriendActions = () => {
-    if (!friendStatus || !user|| user.isMe) return null;
+    if (!friendStatus || !user|| user.me) return null;
     const { status, initiatedByCurrentUser } = friendStatus;
 
     switch (status) {
