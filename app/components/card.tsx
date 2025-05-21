@@ -50,18 +50,18 @@ const Card: React.FC<cardProps> = (
 
   return (
     <div
-        className={`${styles.cardContainer} ${flipped ? styles.scalable : ""} 
+      className={`${styles.cardContainer} ${flipped ? styles.scalable : ""} 
           ${isSelected ? styles.selected : ""}
           ${isPlayable ? styles.playableCard : ""}
           ${isPassable ? styles.passableCard : ""}
           ${isDisabled ? styles.disabledCard : ""}
           ${isDummy ? styles.dummyCard : ""}`}
-        onClick={handleCardClick}
-        style={{
-          zIndex,
-          ...(isDummy ? { opacity: 0, pointerEvents: "none" } : {}),
-        }}
-      >
+      onClick={handleCardClick}
+      style={{
+        zIndex,
+        ...(isDummy ? { opacity: 0, pointerEvents: "none" } : {}),
+      }}
+    >
       {flipped
         ? (
           <div className={styles.imageWrapper}>

@@ -74,7 +74,7 @@ const UserProfileView: React.FC = () => {
     };
 
     fetchData();
-  }, [api, id]);
+  }, [api, id, router]);
 
   const refreshFriendStatus = async () => {
     try {
@@ -247,10 +247,26 @@ const UserProfileView: React.FC = () => {
       <p>Status: {user.status}</p>
       <p>Birthday: {formattedBirthday || "Unknown"}</p>
 
-      <table className="user-stats-table" style={{ margin: "2rem auto", background: "#f8f8f8", color: "black", borderRadius: 8, minWidth: 320 }}>
+      <table
+        className="user-stats-table"
+        style={{
+          margin: "2rem auto",
+          background: "#f8f8f8",
+          color: "black",
+          borderRadius: 8,
+          minWidth: 320,
+        }}
+      >
         <tbody>
           <tr>
-            <th colSpan={2} style={{ textAlign: "center", fontSize: "1.5rem", background: "#d0ffd0" }}>
+            <th
+              colSpan={2}
+              style={{
+                textAlign: "center",
+                fontSize: "1.5rem",
+                background: "#d0ffd0",
+              }}
+            >
               Stats
             </th>
           </tr>

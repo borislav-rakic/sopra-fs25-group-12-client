@@ -5,36 +5,12 @@ import Image from "next/image";
 import { Button } from "antd";
 // import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
 import styles from "@/styles/page.module.css";
-import { useEffect } from "react";
 import { useApi } from "@/hooks/useApi";
 import { User /* UserAuthDTO */ } from "./types/user";
 
 export default function Home() {
   const router = useRouter();
   const apiService = useApi();
-
-  const handleResetStorage = () => {
-    localStorage.clear();
-    sessionStorage.clear();
-    console.log("Storage cleared.");
-    router.push("/"); // Optional: refresh or redirect after clearing
-  };
-
-  useEffect(() => {
-    const resetAndPopulate = async () => {
-      // Always clear tokens
-      localStorage.removeItem("token");
-
-      // Always call /populate
-      try {
-        await apiService.post<void>("/leaderboard/populate", null);
-      } catch (err) {
-        console.error("Failed to populate leaderboard:", err);
-      }
-    };
-
-    resetAndPopulate();
-  }, [apiService]);
 
   const handleGuestLogin = async () => {
     try {
@@ -109,24 +85,6 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <div
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          backgroundColor: "#1d4b2b", // matches deep green
-          color: "#1b5928", // soft mint green
-          border: "none",
-          padding: "12px 20px",
-          borderRadius: "8px",
-          cursor: "pointer",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
-          zIndex: 9999,
-        }}
-        onClick={handleResetStorage}
-      >
-        r
-      </div>
     </div>
   );
 }
