@@ -100,6 +100,7 @@ const StartPage: React.FC = () => {
         const result = await apiService.get<User[]>(
           `/matches/${gameId}/eligibleusers`,
         );
+        console.log("Eligible users:", result);
         setUsers(result);
         setFilteredUsers(result);
         usersRef.current = result;
@@ -149,13 +150,6 @@ const StartPage: React.FC = () => {
           match.player3Id,
           match.player4Id,
         ];
-
-        if (usersRef.current.length === 0) {
-          console.warn(
-            "User list not loaded yet. Skipping player name assignment.",
-          );
-          return;
-        }
 
         for (let i = 0; i < playerIdsArray.length; i++) {
           const pid = playerIdsArray[i];
