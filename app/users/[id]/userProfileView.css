@@ -52,13 +52,13 @@ p {
   max-width: 400px;
   background: #f8f8f8;
   border: 2px solid black; /* White border around the table */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 .user-stats-table th,
 .user-stats-table td {
   padding: 8px 14px;
   border-bottom: 1px solid black; /* Black horizontal lines */
-  border-right: 1px solid black;  /* Vertical lines */
+  border-right: 1px solid black; /* Vertical lines */
   text-align: left;
 }
 .user-stats-table th {

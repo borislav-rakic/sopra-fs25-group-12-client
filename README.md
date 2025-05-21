@@ -98,10 +98,11 @@ Make sure you have the following installed:
 
 ### Clone The Repository
 
-```shell 
+```shell
 git clone https://github.com/borislav-rakic/sopra-fs25-group-12-client
 ```
-```shell 
+
+```shell
 cd sopra-fs25-student-client
 ```
 
@@ -110,6 +111,7 @@ cd sopra-fs25-student-client
 ```shell
 source setup.sh
 ```
+
 ### External Dependencies
 
 **Backend Repository:**
@@ -120,7 +122,8 @@ source setup.sh
 ```shell
 npm start
 ```
-or 
+
+or
 
 ```shell
 npm run dev
@@ -168,13 +171,14 @@ npm run build
 
 <img width="1280" alt="Screenshot 2025-05-21 at 10 29 09" src="https://github.com/user-attachments/assets/904fbd45-9a44-47b9-aad0-ac83884e3734" />
 
-
 ## Roadmap
 
 Here are the top 2–3 features that new developers who want to contribute to the
 project could add:
 
-- Add some optional background music and sound effects for actions like shuffling cards, playing a card, breaking hearts, playing the Queen of Spades etc. 🎵
+- Add some optional background music and sound effects for actions like
+  shuffling cards, playing a card, breaking hearts, playing the Queen of Spades
+  etc. 🎵
 - Add chat feature for users to interact during a match 💬
 
 ## Authors & Acknowledgment
@@ -187,13 +191,26 @@ SoPra25 Team 12 consists of:
 - **Borislav Rakic** - [borislav-rakic](https://github.com/borislav-rakic)
 - **Dieter Andreas Studer** - [diderot5038](https://github.com/diderot5038)
 
-We would like to extend our sincere gratitude to the external resources that helped bring this project to life. Our special thanks go to:
+We would like to extend our sincere gratitude to the external resources that
+helped bring this project to life. Our special thanks go to:
 
-- Deck of Cards API – This API provided an efficient and creative way to draw cards and utilize their [unique card designs](https://www.deckofcardsapi.com), enhancing the visual appeal and functionality of our application.
-- IconPacks – We are grateful for the [free card back design](https://www.iconpacks.net/free-icon/red-playing-card-back-25479.html) available on IconPacks, which added an engaging visual element to the game interface.
-- Sketch App Sources – Our avatar designs are derived from the creative resources offered on [Sketch App Sources](https://www.sketchappsources.com/free-source/4830-avatar-characters-sketch-freebie-resource.html). We also wish to acknowledge the original author of the avatar artworks, [Laura Reen](http://laurareen.com/), a visual artist from Prague, Czech Republic.
+- Deck of Cards API – This API provided an efficient and creative way to draw
+  cards and utilize their [unique card designs](https://www.deckofcardsapi.com),
+  enhancing the visual appeal and functionality of our application.
+- IconPacks – We are grateful for the
+  [free card back design](https://www.iconpacks.net/free-icon/red-playing-card-back-25479.html)
+  available on IconPacks, which added an engaging visual element to the game
+  interface.
+- Sketch App Sources – Our avatar designs are derived from the creative
+  resources offered on
+  [Sketch App Sources](https://www.sketchappsources.com/free-source/4830-avatar-characters-sketch-freebie-resource.html).
+  We also wish to acknowledge the original author of the avatar artworks,
+  [Laura Reen](http://laurareen.com/), a visual artist from Prague, Czech
+  Republic.
 
-Their contributions have been instrumental in shaping a visually appealing and interactive experience, and we are deeply appreciative of their generosity in providing these free resources.
+Their contributions have been instrumental in shaping a visually appealing and
+interactive experience, and we are deeply appreciative of their generosity in
+providing these free resources.
 
 ## License
 

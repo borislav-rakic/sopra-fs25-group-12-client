@@ -113,7 +113,7 @@ const LeaderboardPage: React.FC = () => {
     };
 
     fetchLeaderboard();
-  }, [page, apiService, pageSize, searchValue, selectedFilter]);
+  }, [page, apiService, pageSize, searchValue, selectedFilter, router]);
 
   const filteredData = data.filter((user) =>
     user.username.toLowerCase().includes(searchValue.toLowerCase())

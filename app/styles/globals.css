@@ -241,7 +241,7 @@ a {
   z-index: 1000;
   width: 300px; /* or 400px, or whatever you want */
   min-width: 200px; /* optional, for responsiveness */
-  max-width: 400px;  /* optional, for responsiveness */
+  max-width: 400px; /* optional, for responsiveness */
   overflow-x: auto;
   /* Ensure it's on top */
 }
@@ -684,9 +684,11 @@ a {
   padding-left: 5px;
   padding-right: 5px;
   padding-top: 3px;
-  font-size: clamp( 0.1rem, 
-                    calc((var(--gameboard-width, 500px) * 0.02) * (10 / var(--name-length))), 
-                    calc(var(--gameboard-width, 500px) * 0.02));
+  font-size: clamp(
+    0.1rem,
+    calc(var(--gameboard-width, 500px) * 0.02 * (10 / var(--name-length))),
+    calc(var(--gameboard-width, 500px) * 0.02)
+  );
   border-radius: 5%;
   overflow: hidden;
   /* Prevent text overflow */
@@ -879,7 +881,7 @@ a {
 .lobby-playername {
   font-size: clamp(
     0.6rem,
-    calc((20 / var(--name-length, 16)) * 1rem),
+    calc(20 / var(--name-length, 16) * 1rem),
     1rem
   );
   min-width: 0;

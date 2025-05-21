@@ -128,7 +128,7 @@ const StartPage: React.FC = () => {
         const updatedPendingInvites = [...pendingInvites];
         const updatedDifficulties = [...selectedDifficulties];
 
-        if(!match.slotAvailable){
+        if (!match.slotAvailable) {
           setIsStartable(true);
         } else {
           setIsStartable(false);
@@ -1002,7 +1002,9 @@ const StartPage: React.FC = () => {
               </Button>
               <Button
                 block
-                className={`${styles.whiteButton} ${!isStartable ? styles.disabledButton : ""}`}
+                className={`${styles.whiteButton} ${
+                  !isStartable ? styles.disabledButton : ""
+                }`}
                 onClick={handleStart}
                 disabled={isActionLoading || !isStartable}
                 loading={isActionLoading}

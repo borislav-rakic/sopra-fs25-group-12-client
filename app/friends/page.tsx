@@ -55,7 +55,7 @@ const FriendsPage: React.FC = () => {
     };
 
     fetchFriends();
-  }, [apiService]);
+  }, [apiService, router]);
 
   const renderFriendSection = (
     title: string,
