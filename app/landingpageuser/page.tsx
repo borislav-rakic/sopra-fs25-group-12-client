@@ -176,6 +176,11 @@ const LandingPageUser: React.FC = () => {
                       onClick: () => router.push("/friends"),
                     },
                     {
+                      key: "my-stats",
+                      label: "My Stats",
+                      onClick: () => router.push(`/users/${user.id}`), // <-- Go to user's own profile
+                    },
+                    {
                       key: "profile",
                       label: "Profile",
                       onClick: () => router.push("/profile"),

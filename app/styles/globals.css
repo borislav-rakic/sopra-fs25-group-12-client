@@ -749,6 +749,8 @@ a {
   border-radius: 6px;
   display: inline-flex;
   gap: 4px;
+  display: flex !important;
+  justify-content: center !important;
 }
 
 /* Pagination buttons */

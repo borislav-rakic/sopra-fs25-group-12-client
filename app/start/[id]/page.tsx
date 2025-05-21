@@ -20,6 +20,8 @@ import { Match } from "@/types/match";
 import { User } from "@/types/user";
 import "@/styles/globals.css";
 import { handleApiError } from "@/utils/errorHandlers";
+import { ReloadOutlined } from "@ant-design/icons";
+import { join } from "path";
 
 const StartPage: React.FC = () => {
   const params = useParams();
@@ -66,7 +68,7 @@ const StartPage: React.FC = () => {
   const [hostUsername, setHostUsername] = useState<string>("");
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
   const [joinRequests, setJoinRequests] = useState<
-    { userId: string; status: string }[]
+    { userId: string; status: string; username: string }[]
   >([]);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [isStartable, setIsStartable] = useState(false);
@@ -256,17 +258,35 @@ const StartPage: React.FC = () => {
     const fetchJoinRequests = async () => {
       try {
         const joinRequestsObject: JoinRequest[] = await apiService.get(
-          `/matches/${gameId}/joinRequests`,
+          `/matches/${gameId}/joinRequests`
         );
 
-        const filteredRequests = joinRequestsObject
-          .filter((request) => request.status === "pending")
-          .map((request) => ({
-            userId: request.userId,
-            status: request.status,
-          }));
+        // Only keep pending requests
+        const pendingRequests = joinRequestsObject.filter(
+          (request) => request.status === "pending"
+        );
 
-        setJoinRequests(filteredRequests);
+        // Fetch usernames for each pending request
+        const requestsWithUsernames = await Promise.all(
+          pendingRequests.map(async (request) => {
+            try {
+              const user = await apiService.get<User>(`/users/${request.userId}`);
+              return {
+                userId: request.userId,
+                status: request.status,
+                username: user.username,
+              };
+            } catch {
+              return {
+                userId: request.userId,
+                status: request.status,
+                username: "Unknown",
+              };
+            }
+          })
+        );
+
+        setJoinRequests(requestsWithUsernames);
       } catch {
         message.open({
           type: "error",
@@ -611,7 +631,24 @@ const StartPage: React.FC = () => {
         key: "username",
       },
       {
-        title: "",
+        title: (
+          <Button
+            type="text"
+            icon={<ReloadOutlined />}
+            size="small"
+            onClick={async (e) => {
+              e.stopPropagation();
+              try {
+                const result = await apiService.get<User[]>(`/matches/${gameId}/eligibleusers`);
+                setUsers(result);
+                setFilteredUsers(result);
+                message.open({ type: "success", content: "User list refreshed." });
+              } catch {
+                message.open({ type: "error", content: "Could not refresh users." });
+              }
+            }}
+          />
+        ),
         key: "action",
         render: (record: User) => (
           <Button
@@ -878,25 +915,25 @@ const StartPage: React.FC = () => {
       return null;
     }
 
-    return joinRequests.map((request) => (
-      <Modal
-        key={request.userId}
-        title={`Join Request`}
-        open
-        onOk={() => handleAcceptJoin(Number(request.userId), Number(gameId))}
-        onCancel={() =>
-          handleDeclineJoin(Number(request.userId), Number(gameId))}
-        okText="Accept"
-        cancelText="Decline"
-        closable={false}
-        maskClosable={false}
-      >
-        <p style={{ color: "black" }}>
-          {`User with ID ${request.userId} has requested to join your game.`}
-        </p>
-      </Modal>
+  return joinRequests.map((request) => (
+    <Modal
+      key={request.userId}
+      title={`Join Request`}
+      open
+      onOk={() => handleAcceptJoin(Number(request.userId), Number(gameId))}
+      onCancel={() =>
+        handleDeclineJoin(Number(request.userId), Number(gameId))}
+      okText="Accept"
+      cancelText="Decline"
+      closable={false}
+      maskClosable={false}
+    >
+      <p style={{ color: "black" }}>
+        {`User "${request.username}" has requested to join your game.`}
+      </p>
+    </Modal>
     ));
-  };
+  }
 
   return (
     <div className="contentContainer" style={{ textAlign: "center" }}>
