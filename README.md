@@ -4,16 +4,12 @@ This project is a web app implementation of the classic card game Hearts.
 
 ## Introduction
 
-_the project’s goal and motivation_
-
 We are designing an online version of the card game “Hearts”, in which players
 can meet online for a match or complete their group with virtual players. Our
 aim is to provide players with detailed statistics of previous wins/losses so
 they can track their progress and compare their skills with other players.
 
 ## Technologies
-
-_Technologies used (short)_
 
 ### Frontend
 
@@ -43,10 +39,6 @@ _Technologies used (short)_
 - [JUnit](https://junit.org/) – Testing framework for Java
 
 ## High-Level Components
-
-_Identify your project’s 3-5 main components. What is their role? How are they
-correlated? Reference the main class, file, or function in the README text with
-a link._
 
 ### 1. **MatchPage Component**
 
@@ -93,11 +85,6 @@ a link._
 
 ## Launch & Deployment
 
-_Write down the steps a new developer joining your team would have to take to
-get started with your application. What commands are required to build and run
-your project locally? How can they run the tests? Do you have external
-dependencies or a database that needs to be running? How can they do releases?_
-
 ### Prerequisites
 
 Make sure you have the following installed:
@@ -107,41 +94,51 @@ Make sure you have the following installed:
 - [Java 17](https://adoptium.net/en-GB/temurin/releases/)
 - [Maven](https://maven.apache.org/)
 
-### Running the Application Locally
+## Running the Application Locally
 
 ### Clone The Repository
 
-`git clone https://github.com/borislav-rakic/sopra-fs25-group-12-client`
+```shell 
+git clone https://github.com/borislav-rakic/sopra-fs25-group-12-client
+```
+```shell 
+cd sopra-fs25-student-client
+```
 
-### Navigate to the cloned directory in the terminal
-
-`cd sopra-fs25-student-client`
-
-### Inside the repository folder (with `ls` you can list files) there is a bash script _setup.sh_ that will install everything you need, according to the system you are using. Run the following command and follow the instructions
+### Setup Script
 
 ```shell
 source setup.sh
 ```
+### External Dependencies
+
+**Backend Repository:**
+[sopra-fs25-group-12-server](https://github.com/borislav-rakic/sopra-fs25-group-12-server)
 
 ### Start Development Server
 
-`npm start` or `npm run dev`
+```shell
+npm start
+```
+or 
+
+```shell
+npm run dev
+```
 
 ### Running Tests
 
-`npm test`
-
-### External Dependencies
+```shell
+npm test
+```
 
 ### Releases
 
-`npm run build`
+```shell
+npm run build
+```
 
 ## Illustrations
-
-_In your client repository, briefly describe and illustrate the main user
-flow(s) of your interface. How does it work (without going into too much
-detail)? Feel free to include a few screenshots of your application._
 
 ### 1. Login / Registration / Play as Guest
 
@@ -169,10 +166,10 @@ detail)? Feel free to include a few screenshots of your application._
 
 ### 7. Add your friends
 
-## Roadmap
+<img width="1280" alt="Screenshot 2025-05-21 at 10 29 09" src="https://github.com/user-attachments/assets/904fbd45-9a44-47b9-aad0-ac83884e3734" />
 
-_The top 2-3 features that new developers who want to contribute to your project
-could add_
+
+## Roadmap
 
 Here are the top 2–3 features that new developers who want to contribute to the
 project could add:
