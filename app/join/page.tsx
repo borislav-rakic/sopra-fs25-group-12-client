@@ -9,6 +9,8 @@ import { User } from "@/types/user";
 import { JoinRequest } from "@/types/joinRequest";
 import { useApi } from "@/hooks/useApi";
 import type { TableProps } from "antd";
+import { ReloadOutlined } from "@ant-design/icons";
+
 
 const { useModal } = Modal;
 
@@ -157,11 +159,38 @@ const JoinPage: React.FC = () => {
       pollingInterval.current = setInterval(() => {
         checkJoinRequestStatus(matchId, parsedUserId);
       }, 3000);
-    } catch {
+    } catch (error: any) {
       modalInstance.destroy();
+      // Check for 404 error
+      if (
+        (typeof error === "object" && error !== null && "status" in error && error.status === 404) ||
+        (error?.response?.status === 404)
+      ) {
+        message.open({
+          type: "error",
+          content: "This match was cancelled or already started.",
+        });
+      } else {
+        message.open({
+          type: "error",
+          content: "Could not send join request.",
+        });
+      }
+    }
+  };
+
+  const fetchMatches = async () => {
+    try {
+      const fetchedMatches = await apiService.get<Match[]>("/matches");
+      const availableMatches = fetchedMatches.filter((match) =>
+        match.slotAvailable
+      );
+      setMatches(availableMatches);
+      setFilteredMatches(availableMatches);
+    } catch {
       message.open({
         type: "error",
-        content: "Could not send join request.",
+        content: "Could not fetch matches.",
       });
     }
   };
@@ -171,7 +200,15 @@ const JoinPage: React.FC = () => {
     { title: "Host", dataIndex: "hostUsername", key: "hostUsername" },
     { title: "Length", dataIndex: "matchGoal", key: "matchGoal" },
     {
-      title: "",
+      title: (
+        <Button
+          icon={<ReloadOutlined />}
+          type="text"
+          onClick={fetchMatches}
+          style={{ padding: 0 }}
+          aria-label="Refresh matches"
+        />
+      ),
       key: "action",
       render: (_, record) => (
         <Button
