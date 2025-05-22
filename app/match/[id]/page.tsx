@@ -362,6 +362,7 @@ const MatchPage: React.FC = () => {
           // Create the animated card
           const animatedCardDiv = document.createElement("div");
           animatedCardDiv.id = tempCardId;
+          animatedCardDiv.className = "trick-card";
           animatedCardDiv.style.position = "absolute";
           animatedCardDiv.style.left = `${startX}px`;
           animatedCardDiv.style.top = `${startY}px`;
@@ -2174,6 +2175,23 @@ const MatchPage: React.FC = () => {
       const img = new window.Image();
       img.src = url;
     });
+  }, []);
+
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        console.log("Page is visible again");
+        // Remove all animated card divs
+        document.querySelectorAll(".dealing-card, .passing-card, .cleanup-card, .trick-card")
+          .forEach((el) => el.remove());
+        // Resume polling immediately
+        setPollingPausedUntil(null);
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   return (
