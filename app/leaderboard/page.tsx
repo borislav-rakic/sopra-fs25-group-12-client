@@ -44,7 +44,7 @@ const LeaderboardPage: React.FC = () => {
 
   const [data, setData] = useState<LeaderboardRow[]>([]);
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(5);
+  const [pageSize] = useState(12);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -55,14 +55,17 @@ const LeaderboardPage: React.FC = () => {
       title: "Rank",
       dataIndex: "rank",
       key: "rank",
+      width: 60, // smaller
+      align: "center" as const,
     },
     {
       title: "Username",
       dataIndex: "username",
       key: "username",
+      width: 300, // bigger
       render: (_: unknown, record: LeaderboardRow) => (
-        <Link href={`/users/${record.key}`} style={{ color: "#1890ff" }}>
-          {record.username}
+        <Link href={`/users/${record.key}`}>
+          <span className="leaderboard-username">{record.username}</span>
         </Link>
       ),
     },
@@ -71,6 +74,8 @@ const LeaderboardPage: React.FC = () => {
         selectedFilter,
       dataIndex: "score_total",
       key: "score_total",
+      width: 100, // smaller
+      align: "center" as const,
       render: (value: number) => formatStatValue(value),
     },
   ];
@@ -168,6 +173,7 @@ const LeaderboardPage: React.FC = () => {
             }}
             bordered
             loading={loading}
+            style={{ width: 500, minWidth: 400, maxWidth: 600 }} 
           />
           {/* Below-table buttons */}
           <div

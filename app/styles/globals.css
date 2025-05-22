@@ -986,3 +986,12 @@ a {
   margin: 24px auto 0 auto;
   display: block;
 }
+
+.leaderboard-username {
+  display: inline-block;
+  max-width: 300px; /* slightly less than column width */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
