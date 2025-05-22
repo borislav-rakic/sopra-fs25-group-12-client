@@ -72,7 +72,7 @@ const StartPage: React.FC = () => {
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [isStartable, setIsStartable] = useState(false);
   const [fetchErrorCount, setFetchErrorCount] = useState(0);
-  const [lastFetchError, setLastFetchError] = useState<any>(null);
+  const [lastFetchError, setLastFetchError] = useState<unknown>(null);
 
   interface JoinRequest {
     userId: string;
