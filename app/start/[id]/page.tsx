@@ -71,6 +71,8 @@ const StartPage: React.FC = () => {
   >([]);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [isStartable, setIsStartable] = useState(false);
+  const [fetchErrorCount, setFetchErrorCount] = useState(0);
+  const [lastFetchError, setLastFetchError] = useState<any>(null);
 
   interface JoinRequest {
     userId: string;
@@ -189,50 +191,10 @@ const StartPage: React.FC = () => {
         if (match.started) {
           router.push(`/match/${gameId}`);
         }
-      } catch (error) {
-        console.log("Error caught:", error); // Inspect the error structure
-
-        // Check if the error has a `response` property (e.g., Axios errors)
-        if (
-          typeof error === "object" && error !== null && "status" in error &&
-          error.status === 403
-        ) {
-          message.open({
-            type: "error",
-            content: "You are not authorized to view this match.",
-          });
-          router.push("/landingpageuser");
-        } else if (
-          typeof error === "object" && error !== null && "status" in error &&
-          error.status === 409
-        ) {
-          message.open({
-            type: "error",
-            content: "You are not authorized to view this match.",
-          });
-          router.push("/landingpageuser");
-        } else if (
-          typeof error === "object" && error !== null && "status" in error &&
-          error.status === 404
-        ) {
-          message.open({
-            type: "error",
-            content:
-              "This no longer exists. It was cancelled by the host or never existed.",
-          });
-          router.push("/landingpageuser");
-        } else if (error instanceof Error) {
-          // Handle standard Error objects
-          handleApiError(error, "Failed to fetch match data.");
-        } else {
-          // Fallback for unexpected error structures
-          console.error("Unexpected error structure:", error);
-          message.open({
-            type: "error",
-            content: "An unexpected error occurred. Please try again.",
-          });
+        } catch (error) {
+          setFetchErrorCount((c) => c + 1);
+          setLastFetchError(error);
         }
-      }
     };
 
     const loadCurrentUser = async () => {
@@ -302,6 +264,74 @@ const StartPage: React.FC = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiService, gameId, router]);
+
+  useEffect(() => {
+    if (fetchErrorCount > 0 && fetchErrorCount < 3) {
+      // Retry after a short delay
+      const timeout = setTimeout(() => {
+        // Only retry loadMatch, not the others
+        apiService.get<Match>(`/matches/${gameId}`)
+          .then(() => {
+            setFetchErrorCount(0);
+            setLastFetchError(null);
+          })
+          .catch((error) => {
+            setFetchErrorCount((c) => c + 1);
+            setLastFetchError(error);
+          });
+      }, 300);
+      return () => clearTimeout(timeout);
+    }
+    if (fetchErrorCount >= 3 && lastFetchError) {
+      const error = lastFetchError;
+      if (
+        typeof error === "object" && error !== null && "status" in error &&
+        error.status === 401
+      ) {
+        message.open({
+          type: "error",
+          content: "Your session has expired or is invalid. Please log in again.",
+        });
+        router.push("/");
+      } else if (
+        typeof error === "object" && error !== null && "status" in error &&
+        error.status === 403
+      ) {
+        message.open({
+          type: "error",
+          content: "You are not authorized to view this match.",
+        });
+        router.push("/landingpageuser");
+      } else if (
+        typeof error === "object" && error !== null && "status" in error &&
+        error.status === 409
+      ) {
+        message.open({
+          type: "error",
+          content: "You are not authorized to view this match.",
+        });
+        router.push("/landingpageuser");
+      } else if (
+        typeof error === "object" && error !== null && "status" in error &&
+        error.status === 404
+      ) {
+        message.open({
+          type: "error",
+          content:
+            "This no longer exists. It was cancelled by the host or never existed.",
+        });
+        router.push("/landingpageuser");
+      } else if (error instanceof Error) {
+        handleApiError(error, "Failed to fetch match data.");
+      } else {
+        console.error("Unexpected error structure:", error);
+        message.open({
+          type: "error",
+          content: "An unexpected error occurred. Please try again.",
+        });
+      }
+    }
+  }, [fetchErrorCount, lastFetchError, apiService, gameId, router]);
 
   const isHost = currentUsername === hostUsername;
 

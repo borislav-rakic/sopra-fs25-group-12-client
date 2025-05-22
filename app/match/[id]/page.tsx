@@ -812,6 +812,23 @@ const MatchPage: React.FC = () => {
       const error = lastFetchError;
       if (
         typeof error === "object" && error !== null && "status" in error &&
+        error.status === 401
+      ) {
+        message.open({
+          type: "error",
+          content: "Your session has expired or is invalid. Please log in again.",
+        });
+        router.push("/");
+      } else if (
+        typeof error === "object" && error !== null && "status" in error &&
+        error.status === 400) {
+        message.open({
+          type: "error",
+          content: "Your session has expired or is invalid. Please log in again.",
+        });      
+        router.push("/");    
+      } else if (
+        typeof error === "object" && error !== null && "status" in error &&
         error.status === 403
       ) {
         message.open({
