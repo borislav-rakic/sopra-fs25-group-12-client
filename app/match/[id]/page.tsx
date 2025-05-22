@@ -227,7 +227,9 @@ const MatchPage: React.FC = () => {
     }
   };
 
-  const isFastForwardAvailable = currentGamePhase === "NORMALTRICK";
+  // only allow fast forward in development during a normal trick.
+  const isFastForwardAvailable = process.env.NODE_ENV === "development" &&
+    currentGamePhase === "NORMALTRICK";
 
   const generateEnemyCard = useCallback((): cardProps => ({
     code: "XX",
