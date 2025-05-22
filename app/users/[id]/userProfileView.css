@@ -98,3 +98,14 @@ p {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
+
+.username-header {
+  max-width: 90vw;
+  margin: 0 auto;
+  font-size: clamp(0.5rem, 1.5rem * (20/var(--name-length)), 1.5rem); /* Shrinks if needed */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  text-align: center;
+}

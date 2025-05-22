@@ -243,7 +243,7 @@ const UserProfileView: React.FC = () => {
         height={80}
         className="user-avatar"
       />
-      <h2 style={{ color: "white" }}>{user.username}</h2>
+      <h2 className="username-header" style={{ color: "white", "--name-length":user.username.length } as React.CSSProperties}>{user.username}</h2>
       <p>Status: {user.status}</p>
       <p>Birthday: {formattedBirthday || "Unknown"}</p>
 

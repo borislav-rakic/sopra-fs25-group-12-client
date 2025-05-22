@@ -73,6 +73,7 @@ const StartPage: React.FC = () => {
   const [isStartable, setIsStartable] = useState(false);
   const [fetchErrorCount, setFetchErrorCount] = useState(0);
   const [lastFetchError, setLastFetchError] = useState<unknown>(null);
+  const isHost = currentUsername === hostUsername;
 
   interface JoinRequest {
     userId: string;
@@ -253,11 +254,15 @@ const StartPage: React.FC = () => {
     loadUsers();
     loadCurrentUser();
     loadMatch();
-    fetchJoinRequests();
+    if(isHost) {
+      fetchJoinRequests();
+    }
 
     const interval = setInterval(() => {
       loadMatch();
-      fetchJoinRequests();
+      if (isHost) {
+        fetchJoinRequests();
+      }
     }, 2000);
 
     return () => clearInterval(interval);
@@ -333,7 +338,7 @@ const StartPage: React.FC = () => {
     }
   }, [fetchErrorCount, lastFetchError, apiService, gameId, router]);
 
-  const isHost = currentUsername === hostUsername;
+  
 
   const handleSearch = (index: number, value: string) => {
     const updatedSearch = [...searchValues];
