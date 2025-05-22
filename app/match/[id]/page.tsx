@@ -744,7 +744,30 @@ const MatchPage: React.FC = () => {
         }
       }
 
-      if (response.playableCards) {
+      let trickChanged = false;
+      if (response.currentTrickDTO) {
+        // Build an array of 4 codes, filling with "" if missing
+        const trickCodes = response.currentTrickDTO
+          ? [0, 1, 2, 3].map(
+              i => response.currentTrickDTO!.cards.find(c => c.position === i)?.code ?? ""
+            )
+          : ["", "", "", ""];
+        const slotCodes = [
+          trickSlot0[0]?.code ?? "",
+          trickSlot1[0]?.code ?? "",
+          trickSlot2[0]?.code ?? "",
+          trickSlot3[0]?.code ?? "",
+        ];
+        // If any slot doesn't match the trick, a new card was played
+        for (let i = 0; i < 4; i++) {
+          if (trickCodes[i] !== slotCodes[i]) {
+            trickChanged = true;
+            break;
+          }
+        }
+      }
+
+      if (response.playableCards && !trickChanged) {
         const playableCardCodes = response.playableCards.map((item) =>
           item.card.code
         );
@@ -1988,6 +2011,9 @@ const MatchPage: React.FC = () => {
     lastPlayedCardRect.current = null;
 
     await apiService.post(`/matches/${matchId}/play/any`, {});
+    console.log("setting myTurn to false");
+    setMyTurn(false); // Lock the UI
+    setPlayableCards([]); // Clear playable cards
     console.log("Random card played.");
   };
 
