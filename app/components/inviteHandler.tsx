@@ -116,9 +116,9 @@ export const InviteHandler: React.FC = () => {
     >
       {invite
         ? (
-          <p>
-            <strong>{invite.fromUsername}</strong> invited you to join game{" "}
-            <strong>{invite.matchId}</strong>.
+          <p  style={{color:"black"}}>
+            <strong style={{color:"black"}}>{invite.fromUsername}</strong> invited you to join game{" "}
+            <strong style={{color:"black"}}>{invite.matchId}</strong>.
           </p>
         )
         : <p>No invite available.</p>}

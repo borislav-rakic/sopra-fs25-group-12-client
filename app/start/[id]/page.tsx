@@ -268,7 +268,9 @@ const StartPage: React.FC = () => {
     return () => clearInterval(interval);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiService, gameId, router]);
+  }, [apiService, gameId, router, isHost]);
+
+  
 
   useEffect(() => {
     if (fetchErrorCount > 0 && fetchErrorCount < 3) {
