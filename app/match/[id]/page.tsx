@@ -2018,6 +2018,7 @@ const MatchPage: React.FC = () => {
         return;
       }
 
+      passingCardsforAnimation.current = randomCardsToPass.map((card) => card.code);
       setHasPassedCards(true);
       setCardsToPass(randomCardsToPass); // Update the state with the passed cards
       console.log("Random cards passed successfully.");
