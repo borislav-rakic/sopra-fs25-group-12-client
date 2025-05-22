@@ -21,7 +21,6 @@ import { User } from "@/types/user";
 import "@/styles/globals.css";
 import { handleApiError } from "@/utils/errorHandlers";
 import { ReloadOutlined } from "@ant-design/icons";
-import { join } from "path";
 
 const StartPage: React.FC = () => {
   const params = useParams();

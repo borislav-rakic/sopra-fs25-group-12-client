@@ -159,21 +159,24 @@ const JoinPage: React.FC = () => {
       pollingInterval.current = setInterval(() => {
         checkJoinRequestStatus(matchId, parsedUserId);
       }, 3000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       modalInstance.destroy();
-      // Check for 404 error
+
       if (
-        (typeof error === "object" && error !== null && "status" in error && error.status === 404) ||
-        (error?.response?.status === 404)
+        typeof error === 'object' &&
+        error !== null &&
+        'response' in error &&
+        typeof (error as { response?: { status?: number } }).response?.status === 'number' &&
+        (error as { response?: { status?: number } }).response?.status === 404
       ) {
         message.open({
-          type: "error",
-          content: "This match was cancelled or already started.",
+          type: 'error',
+          content: 'This match was cancelled or already started.',
         });
       } else {
         message.open({
-          type: "error",
-          content: "Could not send join request.",
+          type: 'error',
+          content: 'Could not send join request.',
         });
       }
     }
