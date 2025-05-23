@@ -200,7 +200,11 @@ const JoinPage: React.FC = () => {
 
   const columns: TableProps<Match>["columns"] = [
     { title: "MatchID", dataIndex: "matchId", key: "matchId" },
-    { title: "Host", dataIndex: "hostUsername", key: "hostUsername" },
+    { title: "Host", dataIndex: "hostUsername", key: "hostUsername", width:280, 
+          render: (text: string) => (
+      <span className="host-username">{text}</span>
+    ),
+    },
     { title: "Length", dataIndex: "matchGoal", key: "matchGoal" },
     {
       title: (
@@ -225,7 +229,7 @@ const JoinPage: React.FC = () => {
   ];
 
   return (
-    <div className="contentContainer">
+    <div className="contentContainer" style={{maxWidth: "700px"}}>
       {contextHolder}
       <Form layout="vertical" size="large">
         <Form.Item label="Enter Match ID:">
@@ -241,10 +245,12 @@ const JoinPage: React.FC = () => {
           columns={columns}
           rowKey={(record) => record.matchId?.toString() ?? ""}
           pagination={{
-            pageSize: 5,
+            pageSize: 10,
             showSizeChanger: false,
           }}
           bordered
+          style={{ width: 600 }}
+
         />
 
         <Form.Item style={{ marginTop: "1.5rem" }}>
