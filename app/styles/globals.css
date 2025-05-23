@@ -935,6 +935,19 @@ a {
   table-layout: fixed !important;
 }
 
+[class*="modalMessageGameResult"] table {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+[class*="modalMessage"] th:not(:first-child) {
+  max-width: 145px;
+  width: 145px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .modalMessage th,
 .modalMessageMatchFinished th,
 .modalMessageMatchResult th,
@@ -999,4 +1012,22 @@ a {
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: middle;
+}
+
+.host-username {
+  display: inline-block;
+  max-width: 260px; /* slightly less than column width */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.pass-username {
+  display: inline-block;
+  max-width: 350px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
 }

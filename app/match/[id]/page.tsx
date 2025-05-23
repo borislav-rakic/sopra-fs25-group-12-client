@@ -2772,9 +2772,9 @@ const MatchPage: React.FC = () => {
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)", // Add a shadow for better visibility
             }}
           >
-            <p style={{ fontSize: "1.2rem", margin: 0 }}>
-              Select 3 cards to pass to {players[passId.current]}.
-            </p>
+          <p style={{ fontSize: "1.2rem", margin: 0 }}>
+            Select 3 cards to pass to <span className="pass-username">{players[passId.current]}</span>
+          </p>
           </div>
         )}
 
