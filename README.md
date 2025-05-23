@@ -103,7 +103,7 @@ git clone https://github.com/borislav-rakic/sopra-fs25-group-12-client
 ```
 
 ```shell
-cd sopra-fs25-student-client
+cd sopra-fs25-group-12-client
 ```
 
 ### Setup Script
