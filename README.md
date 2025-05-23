@@ -215,6 +215,10 @@ A brief summary of the total points and rounds played so far, as well as informa
 A total summary of the game, as well as how many points you earned for the global leaderboard.
 <img width="1280" alt="Match End" src="public/ReadmeImages/Match End.png" />
 
+### 19. Leaderboard 
+Shows the stats of all users ranked on a leaderboard
+<img width="1280" alt="Leaderboard" src="public/ReadmeImages/Leaderboard.png" />
+
 ## Roadmap
 
 Here are the top 2–3 features that new developers who want to contribute to the
