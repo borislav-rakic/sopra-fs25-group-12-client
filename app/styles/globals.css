@@ -930,6 +930,11 @@ a {
   overflow: hidden;
 }
 
+[class*="modalMessageMatchFinished"] table {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
 .modalMessage th,
 .modalMessageMatchFinished th,
 .modalMessageMatchResult th,
