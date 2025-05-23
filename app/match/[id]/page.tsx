@@ -2853,7 +2853,7 @@ const MatchPage: React.FC = () => {
             }}
           >
             <p style={{ fontSize: "1.2rem", marginBottom: "20px" }}>
-              Skipping phase is skipped every 4th round.
+              Passing phase is skipped every 4th round.
             </p>
             <button
               type="button"
